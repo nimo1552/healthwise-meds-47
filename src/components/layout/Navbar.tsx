@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ShoppingCart, User, Menu, X } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, X, Store } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -57,6 +57,9 @@ const Navbar = () => {
           <Link to="/prescription" className="font-medium hover:text-nimocare-600 transition-colors">
             Upload Prescription
           </Link>
+          <Link to="/seller" className="font-medium hover:text-nimocare-600 transition-colors">
+            Seller Portal
+          </Link>
           <Link to="/contact" className="font-medium hover:text-nimocare-600 transition-colors">
             Contact
           </Link>
@@ -91,6 +94,14 @@ const Navbar = () => {
             aria-label="Account"
           >
             <User className="w-5 h-5" />
+          </Link>
+          
+          <Link 
+            to="/seller"
+            className="flex items-center space-x-1 p-2 rounded-full hover:bg-nimocare-50 transition-colors"
+            aria-label="Seller Portal"
+          >
+            <Store className="w-5 h-5" />
           </Link>
         </div>
         
@@ -178,6 +189,13 @@ const Navbar = () => {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Upload Prescription
+            </Link>
+            <Link 
+              to="/seller" 
+              className="text-2xl font-medium hover:text-nimocare-600 transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Seller Portal
             </Link>
             <Link 
               to="/contact" 
