@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { 
@@ -9,10 +9,11 @@ import {
   Loader2, 
   Mail, 
   Lock,
-  ArrowRight,
   Check
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
+import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -21,6 +22,8 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const navigate = useNavigate();
+  const { toast } = useToast();
   
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -54,12 +57,45 @@ const Login = () => {
     
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // For demo purposes - in a real app, replace with actual auth API
+      if (email === "demo@nimocare.com" && password === "password123") {
+        // Successful login
+        toast({
+          title: "Login Successful",
+          description: "Welcome back to Nimocare!",
+        });
+        
+        // Save login state to localStorage
+        if (rememberMe) {
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('userEmail', email);
+        } else {
+          sessionStorage.setItem('isLoggedIn', 'true');
+          sessionStorage.setItem('userEmail', email);
+        }
+        
+        // Redirect to homepage after login
+        setTimeout(() => {
+          navigate('/');
+        }, 1000);
+      } else {
+        // Failed login
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: "Invalid email or password. Please try again.",
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Login Error",
+        description: "Something went wrong. Please try again later.",
+      });
+    } finally {
       setIsLoading(false);
-      console.log('Login successful');
-      // In a real app, you would handle authentication and redirect
-    }, 1500);
+    }
   };
   
   return (
@@ -88,16 +124,14 @@ const Login = () => {
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <Mail className="h-5 w-5 text-gray-400" />
                       </div>
-                      <input
+                      <Input
                         id="email"
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className={cn(
-                          "block w-full pl-10 pr-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors",
-                          errors.email
-                            ? "border-red-300 text-red-900 focus:border-red-500 focus:ring-red-100"
-                            : "border-gray-300 focus:border-nimocare-400 focus:ring-nimocare-100"
+                          "pl-10",
+                          errors.email && "border-red-300 focus:border-red-500 focus:ring-red-100"
                         )}
                         placeholder="your@email.com"
                       />
@@ -121,16 +155,14 @@ const Login = () => {
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <Lock className="h-5 w-5 text-gray-400" />
                       </div>
-                      <input
+                      <Input
                         id="password"
                         type={showPassword ? "text" : "password"}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className={cn(
-                          "block w-full pl-10 pr-10 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors",
-                          errors.password
-                            ? "border-red-300 text-red-900 focus:border-red-500 focus:ring-red-100"
-                            : "border-gray-300 focus:border-nimocare-400 focus:ring-nimocare-100"
+                          "pl-10",
+                          errors.password && "border-red-300 focus:border-red-500 focus:ring-red-100"
                         )}
                         placeholder="••••••••"
                       />
