@@ -25,7 +25,7 @@ const Logo = ({ size = 'md', showText = true, className }: LogoProps) => {
   return (
     <div className={cn("relative flex items-center", className)}>
       <img 
-        src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3" 
+        src="https://images.unsplash.com/photo-1587854692152-cbe660dbde88?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3" 
         alt="Nimocare Logo" 
         className={cn("object-contain mr-2", sizes[size])}
       />
