@@ -161,7 +161,7 @@ const HeroSection = () => {
                 transition={{ type: "spring", stiffness: 300 }}
               >
                 <img 
-                  src="https://images.unsplash.com/photo-1579154392429-17e5e3d6e631?q=80&w=800&auto=format&fit=crop" 
+                  src="https://images.unsplash.com/photo-1471864190281-a93a3070b6de?q=80&w=800&auto=format&fit=crop" 
                   alt="Pharmacy hero image" 
                   className="w-full h-auto rounded-2xl shadow-medium"
                 />
@@ -198,7 +198,7 @@ const HeroSection = () => {
                     </svg>
                   ))}
                 </div>
-                <p className="text-xs mt-1 font-medium">Trusted by 10,000+ customers</p>
+                <p className="text-xs mt-1 font-medium">Trusted by 50,000+ customers</p>
               </motion.div>
             </div>
           </motion.div>

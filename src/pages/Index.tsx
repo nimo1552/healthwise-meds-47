@@ -162,7 +162,7 @@ const Index = () => {
                 <div className="absolute -bottom-8 -left-8 bg-white p-6 rounded-xl shadow-medium border border-gray-100 max-w-[260px] animate-float">
                   <div className="grid grid-cols-2 gap-4">
                     {[
-                      { value: "10k+", label: "Customers" },
+                      { value: "50k+", label: "Customers" },
                       { value: "99%", label: "Satisfaction" },
                       { value: "24h", label: "Delivery" },
                       { value: "100%", label: "Authentic" }
