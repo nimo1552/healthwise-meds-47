@@ -1,9 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, ShoppingCart, User, Menu, X, Store } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import Logo from '@/components/ui/Logo';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -40,10 +40,7 @@ const Navbar = () => {
           className="relative flex items-center"
           onClick={() => setIsMobileMenuOpen(false)}
         >
-          <span className="text-2xl font-display font-bold text-nimocare-600">
-            Nimocare
-          </span>
-          <span className="absolute -top-1 -right-3 text-xs bg-nimocare-100 text-nimocare-600 px-1 rounded">Rx</span>
+          <Logo size="md" />
         </Link>
 
         {/* Desktop Navigation */}
@@ -168,6 +165,9 @@ const Navbar = () => {
         )}
       >
         <div className="container-custom py-8">
+          <div className="flex justify-center mb-8">
+            <Logo size="lg" />
+          </div>
           <nav className="flex flex-col space-y-6">
             <Link 
               to="/" 
