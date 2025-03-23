@@ -13,6 +13,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import Seller from "./pages/Seller";
+import OrderTracking from "./pages/OrderTracking";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/seller" element={<Seller />} />
+          <Route path="/order-tracking" element={<OrderTracking />} />
           {/* Category routes */}
           <Route path="/categories/prescription" element={<Products />} />
           <Route path="/categories/otc" element={<Products />} />

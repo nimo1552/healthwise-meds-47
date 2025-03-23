@@ -4,8 +4,10 @@ import Footer from '@/components/layout/Footer';
 import HeroSection from '@/components/ui/HeroSection';
 import FeaturedProducts from '@/components/ui/FeaturedProducts';
 import CategorySection from '@/components/ui/CategorySection';
-import { ArrowRight, Upload, TruckIcon, ShieldCheckIcon, ThumbsUpIcon, BadgeCheckIcon } from 'lucide-react';
+import { ArrowRight, Upload, TruckIcon, ShieldCheckIcon, ThumbsUpIcon, BadgeCheckIcon, Mail, Star, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 const Index = () => {
   return (
@@ -80,12 +82,22 @@ const Index = () => {
               ))}
             </div>
             
-            <div className="text-center mt-12">
+            <div className="text-center mt-12 space-y-4">
               <Link 
                 to="/prescription" 
                 className="btn-primary inline-flex items-center"
               >
                 <span>Upload Your Prescription</span>
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Link>
+              
+              <p className="text-gray-600">or</p>
+              
+              <Link 
+                to="/order-tracking" 
+                className="btn-outline inline-flex items-center"
+              >
+                <span>Track Your Order</span>
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
             </div>
@@ -179,6 +191,154 @@ const Index = () => {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials Section */}
+        <section className="section-padding bg-white">
+          <div className="container-custom">
+            <div className="text-center max-w-2xl mx-auto mb-16">
+              <span className="inline-block bg-nimocare-100 text-nimocare-600 px-3 py-1 rounded-full text-sm font-medium mb-3">
+                Customer Reviews
+              </span>
+              <h2 className="header-2 text-gray-900 mb-4">What Our Customers Say</h2>
+              <p className="subtitle-1 mx-auto">
+                Don't just take our word for it. See what our satisfied customers have to say about their experience with NimoCare.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  name: "Sarah Johnson",
+                  avatar: "https://randomuser.me/api/portraits/women/32.jpg",
+                  rating: 5,
+                  comment: "I've been ordering my medications from NimoCare for over a year now. The service is reliable, and their prices are the best I've found.",
+                  date: "May 10, 2023"
+                },
+                {
+                  name: "Michael Chen",
+                  avatar: "https://randomuser.me/api/portraits/men/54.jpg",
+                  rating: 5,
+                  comment: "As someone with chronic medication needs, I appreciate the ease of refilling prescriptions. Their delivery is always on time, and the customer service is excellent.",
+                  date: "April 28, 2023"
+                },
+                {
+                  name: "Emily Williams",
+                  avatar: "https://randomuser.me/api/portraits/women/67.jpg",
+                  rating: 4,
+                  comment: "The prescription verification process is straightforward and secure. I feel confident knowing my medications are authentic and properly handled.",
+                  date: "May 3, 2023"
+                }
+              ].map((testimonial, index) => (
+                <div key={index} className="bg-white p-6 rounded-xl border border-gray-100 shadow-soft">
+                  <div className="flex items-center mb-4">
+                    <img src={testimonial.avatar} alt={testimonial.name} className="w-12 h-12 rounded-full mr-4" />
+                    <div>
+                      <h3 className="font-medium text-gray-900">{testimonial.name}</h3>
+                      <div className="flex mt-1">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star key={i} className={`w-4 h-4 ${i < testimonial.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 mb-3">{testimonial.comment}</p>
+                  <p className="text-sm text-gray-500">{testimonial.date}</p>
+                </div>
+              ))}
+            </div>
+            
+            <div className="text-center mt-10">
+              <Link to="/testimonials" className="btn-text inline-flex items-center">
+                <span>View All Reviews</span>
+                <ArrowRight className="w-4 h-4 ml-1" />
+              </Link>
+            </div>
+          </div>
+        </section>
+        
+        {/* Newsletter Section */}
+        <section className="py-16 bg-nimocare-50">
+          <div className="container-custom">
+            <div className="max-w-3xl mx-auto text-center">
+              <Mail className="w-12 h-12 text-nimocare-600 mx-auto mb-4" />
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Subscribe to Our Newsletter</h2>
+              <p className="text-gray-600 mb-8">
+                Stay updated with our latest products, health tips, and exclusive offers.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+                <Input 
+                  type="email" 
+                  placeholder="Enter your email address" 
+                  className="flex-grow"
+                />
+                <Button className="bg-nimocare-600 hover:bg-nimocare-700">
+                  Subscribe
+                </Button>
+              </div>
+              
+              <p className="text-sm text-gray-500 mt-4">
+                By subscribing, you agree to receive marketing emails from NimoCare.
+                You can unsubscribe at any time.
+              </p>
+            </div>
+          </div>
+        </section>
+        
+        {/* FAQ Section */}
+        <section className="section-padding bg-white">
+          <div className="container-custom">
+            <div className="text-center max-w-2xl mx-auto mb-16">
+              <span className="inline-block bg-nimocare-100 text-nimocare-600 px-3 py-1 rounded-full text-sm font-medium mb-3">
+                FAQ
+              </span>
+              <h2 className="header-2 text-gray-900 mb-4">Frequently Asked Questions</h2>
+              <p className="subtitle-1 mx-auto">
+                Find answers to common questions about our services, ordering process, and more.
+              </p>
+            </div>
+            
+            <div className="max-w-3xl mx-auto space-y-6">
+              {[
+                {
+                  question: "How do I order prescription medications?",
+                  answer: "To order prescription medications, upload a valid prescription through our secure platform. Our licensed pharmacists will verify your prescription and process your order."
+                },
+                {
+                  question: "How long does delivery take?",
+                  answer: "Standard delivery typically takes 1-3 business days. For urgent medications, we offer expedited shipping options that can deliver within 24 hours in eligible areas."
+                },
+                {
+                  question: "Are all your medications authentic?",
+                  answer: "Yes, we only source medications directly from authorized manufacturers and distributors. We have a strict verification process to ensure all products are authentic and of the highest quality."
+                },
+                {
+                  question: "How do I track my order?",
+                  answer: "You can track your order by using the order tracking feature on our website. Simply enter your order number to get real-time updates on your delivery status."
+                },
+                {
+                  question: "What if I need to return a product?",
+                  answer: "For unopened products, we offer a 30-day return policy. Please note that prescription medications cannot be returned once they have been dispensed due to safety regulations."
+                }
+              ].map((faq, index) => (
+                <div key={index} className="bg-gray-50 rounded-xl p-6">
+                  <h3 className="text-lg font-medium text-gray-900 mb-3 flex items-start">
+                    <MessageSquare className="w-5 h-5 text-nimocare-600 mr-2 mt-1 flex-shrink-0" />
+                    {faq.question}
+                  </h3>
+                  <p className="text-gray-600 ml-7">{faq.answer}</p>
+                </div>
+              ))}
+            </div>
+            
+            <div className="text-center mt-10">
+              <Link to="/faq" className="btn-text inline-flex items-center">
+                <span>View All FAQs</span>
+                <ArrowRight className="w-4 h-4 ml-1" />
+              </Link>
             </div>
           </div>
         </section>
