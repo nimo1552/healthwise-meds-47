@@ -1,6 +1,7 @@
 
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 // Sample category data
 const categories = [
@@ -56,58 +57,91 @@ const categories = [
 
 const CategorySection = () => {
   return (
-    <section className="section-padding">
+    <section className="section-padding bg-gradient-to-b from-white to-gray-50">
       <div className="container-custom">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="inline-block bg-nimocare-100 text-nimocare-600 px-3 py-1 rounded-full text-sm font-medium mb-3">
+        <motion.div 
+          className="text-center max-w-2xl mx-auto mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.5 }}
+        >
+          <motion.span 
+            className="inline-block bg-nimocare-100 text-nimocare-600 px-3 py-1 rounded-full text-sm font-medium mb-3"
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
             Categories
-          </span>
-          <h2 className="header-2 text-gray-900 mb-4">Browse By Categories</h2>
-          <p className="subtitle-1 mx-auto">
+          </motion.span>
+          <motion.h2 
+            className="header-2 text-gray-900 mb-4"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+          >
+            Browse By Categories
+          </motion.h2>
+          <motion.p 
+            className="subtitle-1 mx-auto"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+          >
             Explore our wide range of health products organized in easy-to-navigate categories for your convenience.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((category) => (
-            <Link 
+          {categories.map((category, index) => (
+            <motion.div
               key={category.id}
-              to={category.link}
-              className={cn(
-                "group p-6 rounded-xl transition-all duration-300 border border-transparent hover:border-gray-200",
-                "hover:shadow-medium hover:-translate-y-1 flex flex-col h-full",
-                category.backgroundColor
-              )}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ delay: 0.1 * index }}
             >
-              <div className="flex items-start mb-4">
-                <span className="text-4xl mr-4 group-hover:scale-110 transition-transform duration-300">
-                  {category.icon}
-                </span>
-                <div>
-                  <h3 className="text-xl font-medium text-gray-900 mb-1">
-                    {category.name}
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    {category.description}
-                  </p>
+              <Link 
+                to={category.link}
+                className={cn(
+                  "group p-6 rounded-xl transition-all duration-300 border border-transparent hover:border-gray-200",
+                  "hover:shadow-medium hover:-translate-y-2 flex flex-col h-full",
+                  category.backgroundColor
+                )}
+              >
+                <div className="flex items-start mb-4">
+                  <span className="text-4xl mr-4 group-hover:scale-110 transition-transform duration-300">
+                    {category.icon}
+                  </span>
+                  <div>
+                    <h3 className="text-xl font-medium text-gray-900 mb-1">
+                      {category.name}
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      {category.description}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="mt-auto pt-4">
-                <span className="text-nimocare-600 text-sm font-medium flex items-center group-hover:translate-x-1 transition-transform duration-300">
-                  Browse Products
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    className="h-4 w-4 ml-1" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </span>
-              </div>
-            </Link>
+                
+                <div className="mt-auto pt-4">
+                  <span className="text-nimocare-600 text-sm font-medium flex items-center group-hover:translate-x-2 transition-transform duration-300">
+                    Browse Products
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      className="h-4 w-4 ml-1" 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </span>
+                </div>
+              </Link>
+            </motion.div>
           ))}
         </div>
       </div>
