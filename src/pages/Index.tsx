@@ -4,10 +4,12 @@ import Footer from '@/components/layout/Footer';
 import HeroSection from '@/components/ui/HeroSection';
 import FeaturedProducts from '@/components/ui/FeaturedProducts';
 import CategorySection from '@/components/ui/CategorySection';
+import Newsletter from '@/components/ui/Newsletter';
+import ContactForm from '@/components/ui/ContactForm';
 import { ArrowRight, Upload, TruckIcon, ShieldCheckIcon, ThumbsUpIcon, BadgeCheckIcon, Mail, Star, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { motion } from 'framer-motion';
 
 const Index = () => {
   return (
@@ -58,15 +60,19 @@ const Index = () => {
                   icon: <TruckIcon className="w-6 h-6" />
                 }
               ].map((item, index) => (
-                <div 
-                  key={index} 
-                  className="flex flex-col p-6 rounded-xl border border-gray-100 bg-white shadow-soft transition-all duration-300 hover:shadow-medium hover:-translate-y-1"
+                <motion.div 
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.2 }}
+                  className="flex flex-col p-6 rounded-xl border border-gray-100 bg-white shadow-soft transition-all duration-300 hover:shadow-medium hover:-translate-y-1 glass-card"
                 >
                   <div className="flex items-center mb-4">
                     <span className="text-4xl font-bold text-nimocare-100 mr-4 font-display">
                       {item.step}
                     </span>
-                    <div className="w-12 h-12 rounded-full bg-nimocare-100 flex items-center justify-center text-nimocare-600">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-nimocare-100 to-nimocare-200 flex items-center justify-center text-nimocare-600">
                       {item.icon}
                     </div>
                   </div>
@@ -78,14 +84,14 @@ const Index = () => {
                   <p className="text-gray-600 mb-4">
                     {item.description}
                   </p>
-                </div>
+                </motion.div>
               ))}
             </div>
             
             <div className="text-center mt-12 space-y-4">
               <Link 
                 to="/prescription" 
-                className="btn-primary inline-flex items-center"
+                className="btn-primary inline-flex items-center neo-button"
               >
                 <span>Upload Your Prescription</span>
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -108,7 +114,12 @@ const Index = () => {
         <section className="section-padding bg-gradient-to-br from-nimocare-50/50 via-white to-nimocare-50/50">
           <div className="container-custom">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <div>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
                 <span className="inline-block bg-nimocare-100 text-nimocare-600 px-3 py-1 rounded-full text-sm font-medium mb-3">
                   Why Choose Us
                 </span>
@@ -134,8 +145,15 @@ const Index = () => {
                       description: "We use sustainable materials for packaging to reduce environmental impact."
                     }
                   ].map((feature, index) => (
-                    <div key={index} className="flex">
-                      <div className="mr-4 mt-1 w-12 h-12 rounded-full bg-nimocare-100 flex items-center justify-center text-nimocare-600 flex-shrink-0">
+                    <motion.div 
+                      key={index} 
+                      className="flex"
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: index * 0.2 }}
+                    >
+                      <div className="mr-4 mt-1 w-12 h-12 rounded-full bg-gradient-to-br from-nimocare-100 to-nimocare-200 flex items-center justify-center text-nimocare-600 flex-shrink-0">
                         {feature.icon}
                       </div>
                       <div>
@@ -146,7 +164,7 @@ const Index = () => {
                           {feature.description}
                         </p>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
                 
@@ -159,9 +177,15 @@ const Index = () => {
                     <ArrowRight className="w-4 h-4 ml-1" />
                   </Link>
                 </div>
-              </div>
+              </motion.div>
               
-              <div className="relative">
+              <motion.div 
+                className="relative"
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
                 <div className="relative z-10">
                   <img 
                     src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=800&auto=format&fit=crop" 
@@ -171,7 +195,15 @@ const Index = () => {
                 </div>
                 
                 {/* Statistics card */}
-                <div className="absolute -bottom-8 -left-8 bg-white p-6 rounded-xl shadow-medium border border-gray-100 max-w-[260px] animate-float">
+                <motion.div 
+                  className="absolute -bottom-8 -left-8 bg-white p-6 rounded-xl shadow-medium border border-gray-100 max-w-[260px] backdrop-blur-card"
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ 
+                    repeat: Infinity, 
+                    duration: 5,
+                    ease: "easeInOut" 
+                  }}
+                >
                   <div className="grid grid-cols-2 gap-4">
                     {[
                       { value: "50k+", label: "Customers" },
@@ -180,7 +212,7 @@ const Index = () => {
                       { value: "100%", label: "Authentic" }
                     ].map((stat, index) => (
                       <div key={index} className="text-center">
-                        <p className="text-2xl font-bold text-nimocare-600 font-display">
+                        <p className="text-2xl font-bold text-gradient-premium font-display">
                           {stat.value}
                         </p>
                         <p className="text-xs text-gray-600 mt-1">
@@ -189,14 +221,14 @@ const Index = () => {
                       </div>
                     ))}
                   </div>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             </div>
           </div>
         </section>
 
         {/* Testimonials Section */}
-        <section className="section-padding bg-white">
+        <section className="section-padding bg-white relative overflow-hidden">
           <div className="container-custom">
             <div className="text-center max-w-2xl mx-auto mb-16">
               <span className="inline-block bg-nimocare-100 text-nimocare-600 px-3 py-1 rounded-full text-sm font-medium mb-3">
@@ -232,7 +264,14 @@ const Index = () => {
                   date: "May 3, 2023"
                 }
               ].map((testimonial, index) => (
-                <div key={index} className="bg-white p-6 rounded-xl border border-gray-100 shadow-soft">
+                <motion.div 
+                  key={index} 
+                  className="bg-white p-6 rounded-xl border border-gray-100 shadow-soft card-3d-effect"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.2 }}
+                >
                   <div className="flex items-center mb-4">
                     <img src={testimonial.avatar} alt={testimonial.name} className="w-12 h-12 rounded-full mr-4" />
                     <div>
@@ -246,7 +285,7 @@ const Index = () => {
                   </div>
                   <p className="text-gray-600 mb-3">{testimonial.comment}</p>
                   <p className="text-sm text-gray-500">{testimonial.date}</p>
-                </div>
+                </motion.div>
               ))}
             </div>
             
@@ -260,33 +299,10 @@ const Index = () => {
         </section>
         
         {/* Newsletter Section */}
-        <section className="py-16 bg-nimocare-50">
-          <div className="container-custom">
-            <div className="max-w-3xl mx-auto text-center">
-              <Mail className="w-12 h-12 text-nimocare-600 mx-auto mb-4" />
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Subscribe to Our Newsletter</h2>
-              <p className="text-gray-600 mb-8">
-                Stay updated with our latest products, health tips, and exclusive offers.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-                <Input 
-                  type="email" 
-                  placeholder="Enter your email address" 
-                  className="flex-grow"
-                />
-                <Button className="bg-nimocare-600 hover:bg-nimocare-700">
-                  Subscribe
-                </Button>
-              </div>
-              
-              <p className="text-sm text-gray-500 mt-4">
-                By subscribing, you agree to receive marketing emails from NimoCare.
-                You can unsubscribe at any time.
-              </p>
-            </div>
-          </div>
-        </section>
+        <Newsletter />
+        
+        {/* Contact Form Section */}
+        <ContactForm />
         
         {/* FAQ Section */}
         <section className="section-padding bg-white">
@@ -324,13 +340,20 @@ const Index = () => {
                   answer: "For unopened products, we offer a 30-day return policy. Please note that prescription medications cannot be returned once they have been dispensed due to safety regulations."
                 }
               ].map((faq, index) => (
-                <div key={index} className="bg-gray-50 rounded-xl p-6">
+                <motion.div 
+                  key={index} 
+                  className="bg-gray-50 rounded-xl p-6 hover-scale-subtle futuristic-border"
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                >
                   <h3 className="text-lg font-medium text-gray-900 mb-3 flex items-start">
                     <MessageSquare className="w-5 h-5 text-nimocare-600 mr-2 mt-1 flex-shrink-0" />
                     {faq.question}
                   </h3>
                   <p className="text-gray-600 ml-7">{faq.answer}</p>
-                </div>
+                </motion.div>
               ))}
             </div>
             
@@ -344,9 +367,21 @@ const Index = () => {
         </section>
         
         {/* CTA Section */}
-        <section className="py-16 md:py-24 bg-nimocare-600 text-white">
-          <div className="container-custom">
-            <div className="text-center max-w-3xl mx-auto">
+        <section className="py-16 md:py-24 bg-gradient-to-r from-nimocare-600 to-nimocare-700 text-white relative overflow-hidden">
+          {/* Abstract shapes */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
+            <div className="absolute -top-24 -right-24 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 -left-24 w-72 h-72 bg-white rounded-full blur-3xl"></div>
+          </div>
+          
+          <div className="container-custom relative z-10">
+            <motion.div 
+              className="text-center max-w-3xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
               <h2 className="text-3xl md:text-4xl font-bold font-display mb-6">
                 Ready to experience healthcare delivered with care?
               </h2>
@@ -356,18 +391,18 @@ const Index = () => {
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Link 
                   to="/register" 
-                  className="bg-white text-nimocare-600 hover:bg-nimocare-50 px-8 py-3 rounded-lg font-medium transition-colors"
+                  className="bg-white text-nimocare-600 hover:bg-nimocare-50 px-8 py-3 rounded-lg font-medium transition-all duration-300 hover:shadow-lg pill-button"
                 >
                   Create an Account
                 </Link>
                 <Link 
                   to="/products" 
-                  className="bg-nimocare-700 hover:bg-nimocare-800 text-white px-8 py-3 rounded-lg font-medium transition-colors"
+                  className="bg-nimocare-700 hover:bg-nimocare-800 text-white border border-nimocare-500 px-8 py-3 rounded-lg font-medium transition-all duration-300 hover:shadow-lg pill-button"
                 >
                   Browse Products
                 </Link>
               </div>
-            </div>
+            </motion.div>
           </div>
         </section>
       </main>

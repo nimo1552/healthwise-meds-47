@@ -16,6 +16,7 @@ import Seller from "./pages/Seller";
 import OrderTracking from "./pages/OrderTracking";
 import Wishlist from "./pages/Wishlist";
 import CustomerDashboard from "./pages/CustomerDashboard";
+import LiveChat from "./components/ui/LiveChat";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <LiveChat />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
