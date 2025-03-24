@@ -17,6 +17,7 @@ import OrderTracking from "./pages/OrderTracking";
 import Wishlist from "./pages/Wishlist";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import LiveChat from "./components/ui/LiveChat";
+import CategoryPage from "./pages/CategoryPage";
 
 const queryClient = new QueryClient();
 
@@ -38,13 +39,10 @@ const App = () => (
           <Route path="/order-tracking" element={<OrderTracking />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/account" element={<CustomerDashboard />} />
-          {/* Category routes */}
-          <Route path="/categories/prescription" element={<Products />} />
-          <Route path="/categories/otc" element={<Products />} />
-          <Route path="/categories/vitamins" element={<Products />} />
-          <Route path="/categories/personal-care" element={<Products />} />
-          <Route path="/categories/devices" element={<Products />} />
-          <Route path="/categories/baby-mother" element={<Products />} />
+          
+          {/* Category routes - now use the CategoryPage component */}
+          <Route path="/categories/:categoryId" element={<CategoryPage />} />
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

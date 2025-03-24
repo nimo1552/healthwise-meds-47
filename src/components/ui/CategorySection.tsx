@@ -104,16 +104,13 @@ const CategorySection = () => {
               viewport={{ once: true, margin: "-50px" }}
               transition={{ delay: 0.1 * index }}
             >
-              <div // Changed from Link to div as a temporary fix for the router issue
+              <Link
+                to={category.link}
                 className={cn(
                   "group p-6 rounded-xl transition-all duration-300 border border-transparent hover:border-gray-200",
-                  "hover:shadow-medium hover:-translate-y-2 flex flex-col h-full cursor-pointer",
+                  "hover:shadow-medium hover:-translate-y-2 flex flex-col h-full",
                   category.backgroundColor
                 )}
-                onClick={() => {
-                  // Just log for now instead of navigation
-                  console.log(`Navigating to ${category.link}`);
-                }}
               >
                 <div className="flex items-start mb-4">
                   <span className="text-4xl mr-4 group-hover:scale-110 transition-transform duration-300">
@@ -143,7 +140,7 @@ const CategorySection = () => {
                     </svg>
                   </span>
                 </div>
-              </div>
+              </Link>
             </motion.div>
           ))}
         </div>
