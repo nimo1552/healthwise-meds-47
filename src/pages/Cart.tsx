@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { 
@@ -9,11 +9,11 @@ import {
   Minus, 
   X, 
   ArrowRight, 
-  AlertCircle, 
   ShieldCheck,
   RefreshCw
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from '@/hooks/use-toast';
 
 // Sample cart data
 const initialCartItems = [
@@ -33,11 +33,12 @@ const initialCartItems = [
     price: 19.99,
     quantity: 1,
     stock: 20,
-    isPrescriptionRequired: true
+    isPrescriptionRequired: false
   }
 ];
 
 const Cart = () => {
+  const navigate = useNavigate();
   const [cartItems, setCartItems] = useState(initialCartItems);
   const [couponCode, setCouponCode] = useState("");
   const [couponApplied, setCouponApplied] = useState(false);
@@ -72,9 +73,19 @@ const Cart = () => {
     if (couponCode.toLowerCase() === "welcome10") {
       setCouponApplied(true);
       setCouponDiscount(subtotal * 0.1); // 10% discount
+      toast({
+        title: "Coupon Applied",
+        description: "10% discount has been applied to your order.",
+        variant: "default"
+      });
     } else {
       setCouponApplied(false);
       setCouponDiscount(0);
+      toast({
+        title: "Invalid Coupon",
+        description: "The coupon code you entered is not valid.",
+        variant: "destructive"
+      });
     }
   };
   
@@ -83,12 +94,19 @@ const Cart = () => {
     // Simulate processing delay
     setTimeout(() => {
       setIsProcessing(false);
-      // In a real app, redirect to checkout page or process payment
-      console.log("Proceeding to checkout with total:", total);
+      // Navigate to order confirmation page with order details
+      navigate("/order-confirmation", { 
+        state: { 
+          orderItems: cartItems,
+          orderTotal: total,
+          orderDiscount: discount,
+          orderShipping: shipping,
+          orderTax: tax,
+          orderSubtotal: subtotal
+        } 
+      });
     }, 1500);
   };
-  
-  const prescriptionRequired = cartItems.some(item => item.isPrescriptionRequired);
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -146,13 +164,6 @@ const Cart = () => {
                                 <p className="text-sm text-gray-600 mb-2">
                                   ${item.price.toFixed(2)} each
                                 </p>
-                                
-                                {item.isPrescriptionRequired && (
-                                  <div className="flex items-center text-xs text-amber-600 mb-3">
-                                    <AlertCircle className="w-3 h-3 mr-1" />
-                                    <span>Prescription required</span>
-                                  </div>
-                                )}
                               </div>
                               
                               <button 
@@ -220,26 +231,6 @@ const Cart = () => {
                       </Link>
                     </div>
                   </div>
-                  
-                  {/* Prescription warning */}
-                  {prescriptionRequired && (
-                    <div className="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-6 flex">
-                      <AlertCircle className="w-5 h-5 text-amber-500 mt-0.5 mr-3 flex-shrink-0" />
-                      <div>
-                        <p className="text-amber-800 font-medium mb-1">Prescription Required</p>
-                        <p className="text-amber-700 text-sm mb-3">
-                          One or more items in your cart require a valid prescription. Please upload your prescription before checkout.
-                        </p>
-                        <Link 
-                          to="/prescription" 
-                          className="bg-white text-amber-700 border border-amber-300 px-4 py-2 rounded-md text-sm font-medium hover:bg-amber-50 transition-colors inline-flex items-center"
-                        >
-                          Upload Prescription
-                          <ArrowRight className="w-4 h-4 ml-2" />
-                        </Link>
-                      </div>
-                    </div>
-                  )}
                 </div>
                 
                 {/* Order Summary */}
@@ -323,10 +314,10 @@ const Cart = () => {
                       {/* Checkout button */}
                       <button 
                         onClick={handleCheckout}
-                        disabled={isProcessing || prescriptionRequired}
+                        disabled={isProcessing || cartItems.length === 0}
                         className={cn(
                           "w-full py-3 rounded-md font-medium text-white flex items-center justify-center",
-                          (isProcessing || prescriptionRequired)
+                          (isProcessing || cartItems.length === 0)
                             ? "bg-gray-400 cursor-not-allowed"
                             : "bg-nimocare-600 hover:bg-nimocare-700 transition-colors"
                         )}
@@ -336,21 +327,13 @@ const Cart = () => {
                             <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
                             Processing...
                           </>
-                        ) : prescriptionRequired ? (
-                          "Upload Prescription to Checkout"
                         ) : (
                           <>
-                            Proceed to Checkout
+                            Confirm Order
                             <ArrowRight className="w-5 h-5 ml-2" />
                           </>
                         )}
                       </button>
-                      
-                      {prescriptionRequired && (
-                        <p className="text-xs text-amber-600 mt-2 text-center">
-                          You need to upload a valid prescription before checkout.
-                        </p>
-                      )}
                       
                       {/* Security badges */}
                       <div className="mt-6">

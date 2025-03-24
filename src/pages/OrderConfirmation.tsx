@@ -11,23 +11,26 @@ import {
   CreditCard,
   ArrowRight,
   Printer,
-  FileText
+  FileText,
+  ShoppingBag
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+
+interface OrderItem {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+}
 
 interface OrderDetails {
   orderId: string;
   date: string;
   total: number;
   paymentMethod: string;
-  items: {
-    id: string;
-    name: string;
-    price: number;
-    quantity: number;
-    image: string;
-  }[];
+  items: OrderItem[];
   shippingAddress: {
     name: string;
     street: string;
@@ -37,6 +40,10 @@ interface OrderDetails {
     country: string;
   };
   estimatedDelivery: string;
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  discount: number;
 }
 
 const OrderConfirmation = () => {
@@ -44,52 +51,98 @@ const OrderConfirmation = () => {
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
   
   useEffect(() => {
-    // In a real app, you would get this data from an API
-    // For now, we'll simulate order details with mock data
-    const mockOrderDetails: OrderDetails = {
-      orderId: "ORD-" + Math.floor(100000 + Math.random() * 900000),
-      date: new Date().toLocaleDateString(),
-      total: 124.95,
-      paymentMethod: "Credit Card (ending in 4242)",
-      items: [
-        {
-          id: "prod-1",
-          name: "Acetaminophen 500mg",
-          price: 12.99,
-          quantity: 2,
-          image: "/placeholder.svg"
-        },
-        {
-          id: "prod-2",
-          name: "Digital Thermometer",
-          price: 24.99,
-          quantity: 1,
-          image: "/placeholder.svg"
-        },
-        {
-          id: "prod-3",
-          name: "First Aid Kit",
-          price: 34.99,
-          quantity: 1,
-          image: "/placeholder.svg"
-        }
-      ],
-      shippingAddress: {
-        name: "Jane Doe",
-        street: "123 Main St",
-        city: "Anytown",
-        state: "California",
-        zipCode: "12345",
-        country: "United States"
-      },
-      estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString()
-    };
+    // Generate a random order ID
+    const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
     
-    // Simulating API call delay
-    setTimeout(() => {
-      setOrderDetails(mockOrderDetails);
-    }, 500);
-  }, [location]);
+    // Get current date and estimated delivery date (3 days from now)
+    const currentDate = new Date();
+    const deliveryDate = new Date(currentDate);
+    deliveryDate.setDate(deliveryDate.getDate() + 3);
+    
+    // If we have order details from the cart page, use them
+    if (location.state && location.state.orderItems) {
+      const { 
+        orderItems, 
+        orderTotal, 
+        orderSubtotal, 
+        orderShipping, 
+        orderTax, 
+        orderDiscount = 0 
+      } = location.state;
+      
+      const newOrderDetails: OrderDetails = {
+        orderId,
+        date: currentDate.toLocaleDateString(),
+        total: orderTotal,
+        subtotal: orderSubtotal,
+        shipping: orderShipping,
+        tax: orderTax,
+        discount: orderDiscount,
+        paymentMethod: "Credit Card (ending in 4242)",
+        items: orderItems,
+        shippingAddress: {
+          name: "Jane Doe",
+          street: "123 Main St",
+          city: "Anytown",
+          state: "California",
+          zipCode: "12345",
+          country: "United States"
+        },
+        estimatedDelivery: deliveryDate.toLocaleDateString()
+      };
+      
+      setOrderDetails(newOrderDetails);
+    } else {
+      // Create mock order details if not provided from cart
+      const mockOrderDetails: OrderDetails = {
+        orderId,
+        date: currentDate.toLocaleDateString(),
+        total: 124.95,
+        subtotal: 112.95,
+        shipping: 0,
+        tax: 12.00,
+        discount: 0,
+        paymentMethod: "Credit Card (ending in 4242)",
+        items: [
+          {
+            id: 1,
+            name: "Acetaminophen 500mg",
+            price: 12.99,
+            quantity: 2,
+            image: "/placeholder.svg"
+          },
+          {
+            id: 2,
+            name: "Digital Thermometer",
+            price: 24.99,
+            quantity: 1,
+            image: "/placeholder.svg"
+          },
+          {
+            id: 3,
+            name: "First Aid Kit",
+            price: 34.99,
+            quantity: 1,
+            image: "/placeholder.svg"
+          }
+        ],
+        shippingAddress: {
+          name: "Jane Doe",
+          street: "123 Main St",
+          city: "Anytown",
+          state: "California",
+          zipCode: "12345",
+          country: "United States"
+        },
+        estimatedDelivery: deliveryDate.toLocaleDateString()
+      };
+      
+      // Simulating API call delay
+      setTimeout(() => {
+        setOrderDetails(mockOrderDetails);
+      }, 500);
+    }
+  }, [location.state]);
   
   if (!orderDetails) {
     return (
@@ -118,9 +171,9 @@ const OrderConfirmation = () => {
             <div className="w-16 h-16 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Order Confirmed!</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Thank You for Your Order!</h1>
             <p className="text-gray-600 max-w-lg mx-auto">
-              Thank you for your order. We've received your purchase and will process it right away.
+              Your order has been confirmed and will be processed right away. You will receive an email confirmation shortly.
             </p>
           </div>
           
@@ -207,16 +260,24 @@ const OrderConfirmation = () => {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="font-medium">${orderDetails.total.toFixed(2)}</span>
+                  <span className="font-medium">${orderDetails.subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Shipping</span>
-                  <span className="font-medium">$0.00</span>
+                  <span className="font-medium">
+                    {orderDetails.shipping === 0 ? "Free" : `$${orderDetails.shipping.toFixed(2)}`}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Tax</span>
-                  <span className="font-medium">$0.00</span>
+                  <span className="font-medium">${orderDetails.tax.toFixed(2)}</span>
                 </div>
+                {orderDetails.discount > 0 && (
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span>Discount</span>
+                    <span>-${orderDetails.discount.toFixed(2)}</span>
+                  </div>
+                )}
                 <Separator className="my-2" />
                 <div className="flex justify-between">
                   <span className="font-medium text-gray-900">Total</span>
@@ -255,7 +316,7 @@ const OrderConfirmation = () => {
             <Button asChild className="flex-1 bg-nimocare-600 hover:bg-nimocare-700">
               <Link to="/products">
                 Continue Shopping
-                <ArrowRight className="w-4 h-4 ml-2" />
+                <ShoppingBag className="w-4 h-4 ml-2" />
               </Link>
             </Button>
           </div>
