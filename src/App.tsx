@@ -18,6 +18,7 @@ import Wishlist from "./pages/Wishlist";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import LiveChat from "./components/ui/LiveChat";
 import CategoryPage from "./pages/CategoryPage";
+import OrderConfirmation from "./pages/OrderConfirmation";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
           <Route path="/order-tracking" element={<OrderTracking />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/account" element={<CustomerDashboard />} />
+          <Route path="/order-confirmation" element={<OrderConfirmation />} />
           
           {/* Category routes - now use the CategoryPage component */}
           <Route path="/categories/:categoryId" element={<CategoryPage />} />
