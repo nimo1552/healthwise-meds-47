@@ -14,6 +14,8 @@ import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import Seller from "./pages/Seller";
 import OrderTracking from "./pages/OrderTracking";
+import Wishlist from "./pages/Wishlist";
+import CustomerDashboard from "./pages/CustomerDashboard";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +35,8 @@ const App = () => (
           <Route path="/register" element={<Register />} />
           <Route path="/seller" element={<Seller />} />
           <Route path="/order-tracking" element={<OrderTracking />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/account" element={<CustomerDashboard />} />
           {/* Category routes */}
           <Route path="/categories/prescription" element={<Products />} />
           <Route path="/categories/otc" element={<Products />} />

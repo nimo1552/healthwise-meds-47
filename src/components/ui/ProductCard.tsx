@@ -1,8 +1,9 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, ShoppingCart, AlertCircle } from 'lucide-react';
+import { Heart, ShoppingCart, AlertCircle, Star, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface ProductCardProps {
   id: number;
@@ -36,13 +37,20 @@ const ProductCard = ({
     e.preventDefault();
     e.stopPropagation();
     // Add to cart logic here
-    console.log(`Added ${name} to cart`);
+    toast.success(`Added ${name} to cart`);
   };
 
   const handleToggleFavorite = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsFavorite(!isFavorite);
+    toast.success(isFavorite ? `Removed ${name} from wishlist` : `Added ${name} to wishlist`);
+  };
+
+  const handleQuickView = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toast.info(`Quick view for ${name}`);
   };
 
   // Generate star rating display
@@ -53,9 +61,7 @@ const ProductCard = ({
 
     for (let i = 0; i < fullStars; i++) {
       stars.push(
-        <svg key={`full-${i}`} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.462a1 1 0 00.95-.69l1.07-3.292z" />
-        </svg>
+        <Star key={`full-${i}`} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
       );
     }
 
@@ -77,9 +83,7 @@ const ProductCard = ({
     const emptyStars = 5 - Math.ceil(rating);
     for (let i = 0; i < emptyStars; i++) {
       stars.push(
-        <svg key={`empty-${i}`} className="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.462a1 1 0 00.95-.69l1.07-3.292z" />
-        </svg>
+        <Star key={`empty-${i}`} className="w-4 h-4 text-gray-300" />
       );
     }
 
@@ -122,19 +126,34 @@ const ProductCard = ({
           </div>
         )}
         
-        {/* Favorite button */}
-        <button
-          onClick={handleToggleFavorite}
-          className={cn(
-            "absolute bottom-3 right-3 p-2 rounded-full transition-colors",
-            isFavorite 
-              ? "bg-red-50 text-red-500" 
-              : "bg-white/80 backdrop-blur-xs text-gray-600 hover:text-gray-900"
-          )}
-          aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-        >
-          <Heart className={cn("w-5 h-5", isFavorite ? "fill-red-500" : "")} />
-        </button>
+        {/* Quick actions */}
+        <div className={cn(
+          "absolute bottom-3 right-3 flex flex-col gap-2 transition-opacity duration-300",
+          isHovered ? "opacity-100" : "opacity-0"
+        )}>
+          {/* Favorite button */}
+          <button
+            onClick={handleToggleFavorite}
+            className={cn(
+              "p-2 rounded-full transition-colors",
+              isFavorite 
+                ? "bg-red-50 text-red-500" 
+                : "bg-white/80 backdrop-blur-xs text-gray-600 hover:text-gray-900"
+            )}
+            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+          >
+            <Heart className={cn("w-5 h-5", isFavorite ? "fill-red-500" : "")} />
+          </button>
+          
+          {/* Quick view button */}
+          <button
+            onClick={handleQuickView}
+            className="p-2 rounded-full bg-white/80 backdrop-blur-xs text-gray-600 hover:text-gray-900 transition-colors"
+            aria-label="Quick view"
+          >
+            <Eye className="w-5 h-5" />
+          </button>
+        </div>
         
         {/* Discount badge */}
         {discount && (
