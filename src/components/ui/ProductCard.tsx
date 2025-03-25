@@ -1,6 +1,5 @@
-
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Heart, ShoppingCart, AlertCircle, Star, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -32,28 +31,81 @@ const ProductCard = ({
 }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    try {
+      const favorites = localStorage.getItem('favorites') 
+        ? JSON.parse(localStorage.getItem('favorites') || '[]') 
+        : [];
+      
+      setIsFavorite(favorites.some((favId: number) => favId === id));
+    } catch (error) {
+      console.error('Error checking favorites:', error);
+    }
+  }, [id]);
+
+  const addToRecentlyViewed = () => {
+    try {
+      if (typeof window === 'undefined') return;
+      
+      const product = { id, name, image, price, oldPrice, discount, rating, isPrescriptionRequired, description, isBestseller };
+      const recentlyViewed = localStorage.getItem('recentlyViewedProducts') 
+        ? JSON.parse(localStorage.getItem('recentlyViewedProducts') || '[]') 
+        : [];
+      
+      const filteredProducts = recentlyViewed.filter((p: any) => p.id !== id);
+      const updatedProducts = [product, ...filteredProducts].slice(0, 10);
+      
+      localStorage.setItem('recentlyViewedProducts', JSON.stringify(updatedProducts));
+    } catch (error) {
+      console.error('Error adding to recently viewed:', error);
+    }
+  };
+
+  const handleProductClick = (e: React.MouseEvent) => {
+    if (e.defaultPrevented) return;
+    addToRecentlyViewed();
+  };
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // Add to cart logic here
     toast.success(`Added ${name} to cart`);
   };
 
   const handleToggleFavorite = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsFavorite(!isFavorite);
-    toast.success(isFavorite ? `Removed ${name} from wishlist` : `Added ${name} to wishlist`);
+    
+    try {
+      const favorites = localStorage.getItem('favorites') 
+        ? JSON.parse(localStorage.getItem('favorites') || '[]') 
+        : [];
+      
+      let updatedFavorites;
+      if (isFavorite) {
+        updatedFavorites = favorites.filter((favId: number) => favId !== id);
+      } else {
+        updatedFavorites = [...favorites, id];
+      }
+      
+      localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+      setIsFavorite(!isFavorite);
+      
+      toast.success(isFavorite ? `Removed ${name} from wishlist` : `Added ${name} to wishlist`);
+    } catch (error) {
+      console.error('Error updating favorites:', error);
+    }
   };
 
   const handleQuickView = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    toast.info(`Quick view for ${name}`);
+    addToRecentlyViewed();
+    navigate(`/product/${id}?quickView=true`);
   };
 
-  // Generate star rating display
   const renderStars = () => {
     const stars = [];
     const fullStars = Math.floor(rating);
@@ -79,7 +131,6 @@ const ProductCard = ({
       );
     }
 
-    // Add empty stars
     const emptyStars = 5 - Math.ceil(rating);
     for (let i = 0; i < emptyStars; i++) {
       stars.push(
@@ -99,8 +150,8 @@ const ProductCard = ({
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={handleProductClick}
     >
-      {/* Image container */}
       <div className="relative aspect-square overflow-hidden bg-gray-100">
         <img 
           src={image} 
@@ -111,7 +162,6 @@ const ProductCard = ({
           )} 
         />
         
-        {/* Prescription badge */}
         {isPrescriptionRequired && (
           <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-xs px-2 py-1 rounded-md text-xs font-medium flex items-center space-x-1 border border-gray-200">
             <AlertCircle className="w-3 h-3 text-nimocare-600" />
@@ -119,19 +169,16 @@ const ProductCard = ({
           </div>
         )}
         
-        {/* Bestseller badge */}
         {isBestseller && (
           <div className="absolute top-3 right-3 bg-nimocare-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
             Bestseller
           </div>
         )}
         
-        {/* Quick actions */}
         <div className={cn(
           "absolute bottom-3 right-3 flex flex-col gap-2 transition-opacity duration-300",
           isHovered ? "opacity-100" : "opacity-0"
         )}>
-          {/* Favorite button */}
           <button
             onClick={handleToggleFavorite}
             className={cn(
@@ -145,7 +192,6 @@ const ProductCard = ({
             <Heart className={cn("w-5 h-5", isFavorite ? "fill-red-500" : "")} />
           </button>
           
-          {/* Quick view button */}
           <button
             onClick={handleQuickView}
             className="p-2 rounded-full bg-white/80 backdrop-blur-xs text-gray-600 hover:text-gray-900 transition-colors"
@@ -155,7 +201,6 @@ const ProductCard = ({
           </button>
         </div>
         
-        {/* Discount badge */}
         {discount && (
           <div className="absolute bottom-3 left-3 bg-nimocare-600 text-white px-2 py-1 rounded-md text-xs font-semibold">
             {discount}% OFF
@@ -163,7 +208,6 @@ const ProductCard = ({
         )}
       </div>
       
-      {/* Content */}
       <div className="p-4 flex flex-col flex-1">
         <h3 className="font-medium text-gray-900 mb-1 line-clamp-1">{name}</h3>
         

@@ -1,7 +1,9 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import ProductCard from '@/components/ui/ProductCard';
+import RecentlyViewedProducts from '@/components/products/RecentlyViewedProducts';
 import { Search, Filter, ChevronDown, X } from 'lucide-react';
 
 // Sample product data
@@ -184,6 +186,9 @@ const Products = () => {
             </p>
           </div>
         </section>
+        
+        {/* Recently Viewed Products */}
+        <RecentlyViewedProducts />
         
         {/* Filters and Search */}
         <section className="py-8 border-b border-gray-200">

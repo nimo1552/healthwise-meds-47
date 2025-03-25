@@ -20,6 +20,7 @@ import LiveChat from "./components/ui/LiveChat";
 import CategoryPage from "./pages/CategoryPage";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import ScrollToTop from "./components/layout/ScrollToTop";
+import BackToTop from "./components/ui/BackToTop";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
         <LiveChat />
+        <BackToTop />
       </TooltipProvider>
     </BrowserRouter>
   </QueryClientProvider>

@@ -1,9 +1,33 @@
 
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
+import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin, X } from 'lucide-react';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const [showCookieConsent, setShowCookieConsent] = useState(false);
+  
+  useEffect(() => {
+    // Check if user has already accepted cookies
+    const hasAcceptedCookies = localStorage.getItem('cookieConsent') === 'accepted';
+    if (!hasAcceptedCookies) {
+      // Show banner after a short delay
+      const timer = setTimeout(() => {
+        setShowCookieConsent(true);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+  
+  const acceptCookies = () => {
+    localStorage.setItem('cookieConsent', 'accepted');
+    setShowCookieConsent(false);
+  };
+  
+  const declineCookies = () => {
+    localStorage.setItem('cookieConsent', 'declined');
+    setShowCookieConsent(false);
+  };
   
   return (
     <footer className="bg-white border-t border-gray-100">
@@ -150,6 +174,41 @@ const Footer = () => {
           </div>
         </div>
       </div>
+      
+      {/* Cookie Consent Banner */}
+      {showCookieConsent && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200 p-4 z-50 animate-fade-in">
+          <div className="container-custom flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex-1">
+              <h4 className="font-semibold text-gray-900 mb-1">We use cookies</h4>
+              <p className="text-sm text-gray-600">
+                We use cookies to enhance your browsing experience, serve personalized ads or content, and analyze our traffic. By clicking "Accept All", you consent to our use of cookies.
+              </p>
+            </div>
+            <div className="flex gap-3 mt-3 md:mt-0">
+              <button 
+                onClick={declineCookies}
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Decline
+              </button>
+              <button 
+                onClick={acceptCookies}
+                className="px-4 py-2 bg-nimocare-600 text-white rounded-md text-sm font-medium hover:bg-nimocare-700 transition-colors"
+              >
+                Accept All
+              </button>
+              <button 
+                onClick={() => setShowCookieConsent(false)}
+                className="p-2 text-gray-500 hover:text-gray-700 md:hidden"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </footer>
   );
 };
