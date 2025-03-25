@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
@@ -12,10 +11,13 @@ import {
   ArrowRight,
   Printer,
   FileText,
-  ShoppingBag
+  ShoppingBag,
+  Mail
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { sendOrderConfirmationEmail } from '@/utils/emailService';
+import { useToast } from '@/hooks/use-toast';
 
 interface OrderItem {
   id: number;
@@ -48,18 +50,18 @@ interface OrderDetails {
 
 const OrderConfirmation = () => {
   const location = useLocation();
+  const { toast } = useToast();
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
+  const [emailSent, setEmailSent] = useState(false);
+  const [customerEmail, setCustomerEmail] = useState('jane.doe@example.com');
   
   useEffect(() => {
-    // Generate a random order ID
     const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
     
-    // Get current date and estimated delivery date (3 days from now)
     const currentDate = new Date();
     const deliveryDate = new Date(currentDate);
     deliveryDate.setDate(deliveryDate.getDate() + 3);
     
-    // If we have order details from the cart page, use them
     if (location.state && location.state.orderItems) {
       const { 
         orderItems, 
@@ -93,7 +95,6 @@ const OrderConfirmation = () => {
       
       setOrderDetails(newOrderDetails);
     } else {
-      // Create mock order details if not provided from cart
       const mockOrderDetails: OrderDetails = {
         orderId,
         date: currentDate.toLocaleDateString(),
@@ -137,12 +138,46 @@ const OrderConfirmation = () => {
         estimatedDelivery: deliveryDate.toLocaleDateString()
       };
       
-      // Simulating API call delay
       setTimeout(() => {
         setOrderDetails(mockOrderDetails);
       }, 500);
     }
   }, [location.state]);
+  
+  useEffect(() => {
+    if (orderDetails && !emailSent) {
+      sendOrderConfirmationEmail(customerEmail, {
+        orderId: orderDetails.orderId,
+        date: orderDetails.date,
+        total: orderDetails.total,
+        items: orderDetails.items,
+        estimatedDelivery: orderDetails.estimatedDelivery
+      }).then(() => {
+        setEmailSent(true);
+        toast({
+          title: "Order Confirmation Sent",
+          description: `A confirmation email has been sent to ${customerEmail}`,
+        });
+      });
+    }
+  }, [orderDetails, emailSent, customerEmail, toast]);
+  
+  const handleResendEmail = () => {
+    if (!orderDetails) return;
+    
+    sendOrderConfirmationEmail(customerEmail, {
+      orderId: orderDetails.orderId,
+      date: orderDetails.date,
+      total: orderDetails.total,
+      items: orderDetails.items,
+      estimatedDelivery: orderDetails.estimatedDelivery
+    }).then(() => {
+      toast({
+        title: "Email Resent",
+        description: `The confirmation email has been resent to ${customerEmail}`,
+      });
+    });
+  };
   
   if (!orderDetails) {
     return (
@@ -166,18 +201,16 @@ const OrderConfirmation = () => {
       
       <main className="flex-grow pt-20 pb-16">
         <div className="container-custom max-w-4xl">
-          {/* Success Banner */}
           <div className="bg-gradient-to-r from-green-50 to-teal-50 border border-green-100 rounded-xl p-6 mb-8 text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Thank You for Your Order!</h1>
             <p className="text-gray-600 max-w-lg mx-auto">
-              Your order has been confirmed and will be processed right away. You will receive an email confirmation shortly.
+              Your order has been confirmed and will be processed right away. A confirmation email has been sent to {customerEmail}.
             </p>
           </div>
           
-          {/* Order Details */}
           <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden mb-8">
             <div className="p-6 border-b border-gray-100">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -187,19 +220,22 @@ const OrderConfirmation = () => {
                 </div>
                 
                 <div className="mt-4 md:mt-0 flex gap-3">
+                  <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={handleResendEmail}>
+                    <Mail className="w-4 h-4" />
+                    Resend Email
+                  </Button>
                   <Button variant="outline" size="sm" className="flex items-center gap-2">
                     <Printer className="w-4 h-4" />
                     Print
                   </Button>
                   <Button variant="outline" size="sm" className="flex items-center gap-2">
                     <FileText className="w-4 h-4" />
-                    Email Receipt
+                    Download Receipt
                   </Button>
                 </div>
               </div>
             </div>
             
-            {/* Order Summary */}
             <div className="p-6 bg-gray-50 border-b border-gray-100">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
@@ -228,7 +264,6 @@ const OrderConfirmation = () => {
               </div>
             </div>
             
-            {/* Order Items */}
             <div className="p-6 border-b border-gray-100">
               <h3 className="font-medium text-gray-900 mb-4">Order Items</h3>
               
@@ -256,7 +291,6 @@ const OrderConfirmation = () => {
               
               <Separator className="my-6" />
               
-              {/* Order Totals */}
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Subtotal</span>
@@ -286,7 +320,6 @@ const OrderConfirmation = () => {
               </div>
             </div>
             
-            {/* Shipping Address */}
             <div className="p-6">
               <h3 className="font-medium text-gray-900 mb-4">Shipping Address</h3>
               
@@ -304,7 +337,6 @@ const OrderConfirmation = () => {
             </div>
           </div>
           
-          {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild variant="outline" className="flex-1">
               <Link to="/order-tracking">
