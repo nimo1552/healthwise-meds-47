@@ -24,16 +24,16 @@ const Footer = () => {
             </div>
             
             <div className="flex space-x-4">
-              <a href="https://facebook.com" target="_blank" rel="noreferrer" className="p-2 rounded-full bg-gray-100 hover:bg-nimocare-100 transition-colors">
+              <a href="https://facebook.com/nimocare" target="_blank" rel="noreferrer" className="p-2 rounded-full bg-gray-100 hover:bg-nimocare-100 transition-colors">
                 <Facebook className="w-5 h-5 text-nimocare-600" />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noreferrer" className="p-2 rounded-full bg-gray-100 hover:bg-nimocare-100 transition-colors">
+              <a href="https://twitter.com/nimocare" target="_blank" rel="noreferrer" className="p-2 rounded-full bg-gray-100 hover:bg-nimocare-100 transition-colors">
                 <Twitter className="w-5 h-5 text-nimocare-600" />
               </a>
-              <a href="https://instagram.com" target="_blank" rel="noreferrer" className="p-2 rounded-full bg-gray-100 hover:bg-nimocare-100 transition-colors">
+              <a href="https://instagram.com/nimocare" target="_blank" rel="noreferrer" className="p-2 rounded-full bg-gray-100 hover:bg-nimocare-100 transition-colors">
                 <Instagram className="w-5 h-5 text-nimocare-600" />
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="p-2 rounded-full bg-gray-100 hover:bg-nimocare-100 transition-colors">
+              <a href="https://linkedin.com/company/nimocare" target="_blank" rel="noreferrer" className="p-2 rounded-full bg-gray-100 hover:bg-nimocare-100 transition-colors">
                 <Linkedin className="w-5 h-5 text-nimocare-600" />
               </a>
             </div>
