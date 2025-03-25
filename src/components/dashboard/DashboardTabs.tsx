@@ -8,7 +8,7 @@ import UserAccountSettings from '@/components/account/UserAccountSettings';
 import AddressManagement from '@/components/addresses/AddressManagement';
 import LoyaltyProgram from '@/components/loyalty/LoyaltyProgram';
 import PharmacyLocator from '@/components/pharmacy/PharmacyLocator';
-import { User, FileText, MapPin, Settings, Award, Map, Clock } from 'lucide-react';
+import { Clock, FileText, MapPin, Settings, Award, Map } from 'lucide-react';
 
 const DashboardTabs = () => {
   const [activeTab, setActiveTab] = useState('orders');
