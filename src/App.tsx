@@ -19,6 +19,7 @@ import CustomerDashboard from "./pages/CustomerDashboard";
 import LiveChat from "./components/ui/LiveChat";
 import CategoryPage from "./pages/CategoryPage";
 import OrderConfirmation from "./pages/OrderConfirmation";
+import ScrollToTop from "./components/layout/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/products" element={<Products />} />
