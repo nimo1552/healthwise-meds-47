@@ -17,12 +17,16 @@ import {
   CheckCircle2, 
   ShieldCheck, 
   ArrowRight, 
-  Loader2 
+  Loader2,
+  Bitcoin,
+  Paypal
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-const paymentSchema = z.object({
+// Credit Card schema
+const creditCardSchema = z.object({
   cardNumber: z.string()
     .min(16, { message: "Card number must be at least 16 digits" })
     .max(19, { message: "Card number cannot exceed 19 digits" })
@@ -35,11 +39,31 @@ const paymentSchema = z.object({
     .regex(/^[0-9]+$/, { message: "CVV can only contain numbers" }),
 });
 
+// UPI schema
+const upiSchema = z.object({
+  upiId: z.string()
+    .min(5, { message: "UPI ID is required" })
+    .regex(/^[a-zA-Z0-9.\-_]{3,}@[a-zA-Z]{3,}$/, { message: "Please enter a valid UPI ID (e.g., name@upi)" }),
+});
+
+// PayPal schema
+const paypalSchema = z.object({
+  email: z.string()
+    .email({ message: "Please enter a valid email address" }),
+});
+
+// Crypto schema
+const cryptoSchema = z.object({
+  walletAddress: z.string()
+    .min(10, { message: "Wallet address is required" }),
+});
+
 const Payment = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [activePaymentMethod, setActivePaymentMethod] = useState("card");
   
   // Get order details from location state or use default values
   const orderDetails = location.state?.orderDetails || {
@@ -70,13 +94,38 @@ const Payment = () => {
     ]
   };
   
-  const form = useForm<z.infer<typeof paymentSchema>>({
-    resolver: zodResolver(paymentSchema),
+  // Credit Card form
+  const cardForm = useForm<z.infer<typeof creditCardSchema>>({
+    resolver: zodResolver(creditCardSchema),
     defaultValues: {
       cardNumber: "",
       cardholderName: "",
       expiryDate: "",
       cvv: "",
+    },
+  });
+  
+  // UPI form
+  const upiForm = useForm<z.infer<typeof upiSchema>>({
+    resolver: zodResolver(upiSchema),
+    defaultValues: {
+      upiId: "",
+    },
+  });
+  
+  // PayPal form
+  const paypalForm = useForm<z.infer<typeof paypalSchema>>({
+    resolver: zodResolver(paypalSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
+  
+  // Crypto form
+  const cryptoForm = useForm<z.infer<typeof cryptoSchema>>({
+    resolver: zodResolver(cryptoSchema),
+    defaultValues: {
+      walletAddress: "",
     },
   });
   
@@ -90,7 +139,7 @@ const Payment = () => {
   
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCardNumber(e.target.value);
-    form.setValue("cardNumber", formatted);
+    cardForm.setValue("cardNumber", formatted);
   };
   
   const handleExpiryDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,20 +150,37 @@ const Payment = () => {
       value = value.substring(0, 2) + "/" + value.substring(2, 4);
     }
     
-    form.setValue("expiryDate", value);
+    cardForm.setValue("expiryDate", value);
   };
   
-  const onSubmit = (data: z.infer<typeof paymentSchema>) => {
+  const handlePaymentSubmit = (data: any) => {
     setIsProcessing(true);
+    
+    // Log payment data based on method
+    console.log(`Payment data (${activePaymentMethod}):`, data);
     
     // Simulate payment processing
     setTimeout(() => {
       setIsProcessing(false);
       setShowSuccessDialog(true);
       
-      // Log payment data (would be sent to payment processor in a real app)
-      console.log("Payment data:", data);
+      // Show success toast based on payment method
+      toast({
+        title: "Payment Successful",
+        description: `Your payment using ${getPaymentMethodName(activePaymentMethod)} was successful`,
+        variant: "default",
+      });
     }, 2000);
+  };
+  
+  const getPaymentMethodName = (method: string) => {
+    switch (method) {
+      case "card": return "Credit Card";
+      case "upi": return "UPI";
+      case "paypal": return "PayPal";
+      case "crypto": return "Cryptocurrency";
+      default: return "Payment Method";
+    }
   };
   
   const handleCompleteOrder = () => {
@@ -129,6 +195,7 @@ const Payment = () => {
         orderShipping: orderDetails.shipping,
         orderTax: orderDetails.tax,
         orderDiscount: orderDetails.discount,
+        paymentMethod: getPaymentMethodName(activePaymentMethod)
       } 
     });
   };
@@ -142,134 +209,346 @@ const Payment = () => {
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Payment Details</h1>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Payment Form */}
+            {/* Payment Methods */}
             <div className="lg:col-span-2">
               <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                <div className="p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                    <CreditCard className="inline-block mr-2 h-5 w-5 text-nimocare-600" />
-                    Card Information
-                  </h2>
+                <Tabs defaultValue="card" value={activePaymentMethod} onValueChange={setActivePaymentMethod}>
+                  <div className="p-6 border-b border-gray-100">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                      Select Payment Method
+                    </h2>
+                    
+                    <TabsList className="grid grid-cols-4 gap-2">
+                      <TabsTrigger value="card" className="flex items-center gap-2">
+                        <CreditCard className="h-4 w-4" />
+                        <span className="hidden sm:inline">Card</span>
+                      </TabsTrigger>
+                      <TabsTrigger value="upi" className="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                          <path d="m22 2-7 20-4-9-9-4Z"></path>
+                          <path d="M22 2 11 13"></path>
+                        </svg>
+                        <span className="hidden sm:inline">UPI</span>
+                      </TabsTrigger>
+                      <TabsTrigger value="paypal" className="flex items-center gap-2">
+                        <Paypal className="h-4 w-4" />
+                        <span className="hidden sm:inline">PayPal</span>
+                      </TabsTrigger>
+                      <TabsTrigger value="crypto" className="flex items-center gap-2">
+                        <Bitcoin className="h-4 w-4" />
+                        <span className="hidden sm:inline">Crypto</span>
+                      </TabsTrigger>
+                    </TabsList>
+                  </div>
                   
-                  <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                      <FormField
-                        control={form.control}
-                        name="cardNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Card Number</FormLabel>
-                            <FormControl>
-                              <div className="relative">
-                                <Input 
-                                  {...field}
-                                  placeholder="1234 5678 9012 3456"
-                                  className="pl-10"
-                                  maxLength={19}
-                                  onChange={handleCardNumberChange}
-                                />
-                                <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                  <div className="p-6">
+                    {/* Credit Card Form */}
+                    <TabsContent value="card">
+                      <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                        <CreditCard className="inline-block mr-2 h-5 w-5 text-nimocare-600" />
+                        Credit/Debit Card
+                      </h3>
                       
-                      <FormField
-                        control={form.control}
-                        name="cardholderName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Cardholder Name</FormLabel>
-                            <FormControl>
-                              <Input 
-                                {...field}
-                                placeholder="John Doe"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="expiryDate"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Expiration Date</FormLabel>
-                              <FormControl>
-                                <div className="relative">
+                      <Form {...cardForm}>
+                        <form onSubmit={cardForm.handleSubmit(handlePaymentSubmit)} className="space-y-6">
+                          <FormField
+                            control={cardForm.control}
+                            name="cardNumber"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Card Number</FormLabel>
+                                <FormControl>
+                                  <div className="relative">
+                                    <Input 
+                                      {...field}
+                                      placeholder="1234 5678 9012 3456"
+                                      className="pl-10"
+                                      maxLength={19}
+                                      onChange={handleCardNumberChange}
+                                    />
+                                    <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={cardForm.control}
+                            name="cardholderName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Cardholder Name</FormLabel>
+                                <FormControl>
                                   <Input 
                                     {...field}
-                                    placeholder="MM/YY"
-                                    className="pl-10"
-                                    maxLength={5}
-                                    onChange={handleExpiryDateChange}
+                                    placeholder="John Doe"
                                   />
-                                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={form.control}
-                          name="cvv"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>CVV</FormLabel>
-                              <FormControl>
-                                <div className="relative">
-                                  <Input 
-                                    {...field}
-                                    type="password"
-                                    placeholder="123"
-                                    className="pl-10"
-                                    maxLength={3}
-                                  />
-                                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-                                </div>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                              control={cardForm.control}
+                              name="expiryDate"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Expiration Date</FormLabel>
+                                  <FormControl>
+                                    <div className="relative">
+                                      <Input 
+                                        {...field}
+                                        placeholder="MM/YY"
+                                        className="pl-10"
+                                        maxLength={5}
+                                        onChange={handleExpiryDateChange}
+                                      />
+                                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                    </div>
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            
+                            <FormField
+                              control={cardForm.control}
+                              name="cvv"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>CVV</FormLabel>
+                                  <FormControl>
+                                    <div className="relative">
+                                      <Input 
+                                        {...field}
+                                        type="password"
+                                        placeholder="123"
+                                        className="pl-10"
+                                        maxLength={3}
+                                      />
+                                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                    </div>
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          
+                          <div className="pt-4">
+                            <Button 
+                              type="submit" 
+                              className="w-full bg-nimocare-600 hover:bg-nimocare-700"
+                              disabled={isProcessing}
+                            >
+                              {isProcessing ? (
+                                <>
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                  Processing Payment...
+                                </>
+                              ) : (
+                                <>
+                                  Pay ${orderDetails.total.toFixed(2)}
+                                  <ArrowRight className="ml-2 h-4 w-4" />
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </form>
+                      </Form>
+                    </TabsContent>
+                    
+                    {/* UPI Form */}
+                    <TabsContent value="upi">
+                      <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline-block mr-2 h-5 w-5 text-nimocare-600">
+                          <path d="m22 2-7 20-4-9-9-4Z"></path>
+                          <path d="M22 2 11 13"></path>
+                        </svg>
+                        UPI Payment
+                      </h3>
                       
-                      <div className="pt-4">
-                        <Button 
-                          type="submit" 
-                          className="w-full bg-nimocare-600 hover:bg-nimocare-700"
-                          disabled={isProcessing}
-                        >
-                          {isProcessing ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Processing Payment...
-                            </>
-                          ) : (
-                            <>
-                              Pay ${orderDetails.total.toFixed(2)}
-                              <ArrowRight className="ml-2 h-4 w-4" />
-                            </>
-                          )}
-                        </Button>
-                      </div>
+                      <Form {...upiForm}>
+                        <form onSubmit={upiForm.handleSubmit(handlePaymentSubmit)} className="space-y-6">
+                          <FormField
+                            control={upiForm.control}
+                            name="upiId"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>UPI ID</FormLabel>
+                                <FormControl>
+                                  <div className="relative">
+                                    <Input 
+                                      {...field}
+                                      placeholder="yourname@upi"
+                                      className="pl-10"
+                                    />
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500">
+                                      <path d="m22 2-7 20-4-9-9-4Z"></path>
+                                      <path d="M22 2 11 13"></path>
+                                    </svg>
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <div className="pt-4">
+                            <Button 
+                              type="submit" 
+                              className="w-full bg-nimocare-600 hover:bg-nimocare-700"
+                              disabled={isProcessing}
+                            >
+                              {isProcessing ? (
+                                <>
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                  Processing UPI Payment...
+                                </>
+                              ) : (
+                                <>
+                                  Pay ${orderDetails.total.toFixed(2)} with UPI
+                                  <ArrowRight className="ml-2 h-4 w-4" />
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                          
+                          <div className="mt-4 p-4 bg-gray-50 rounded-md">
+                            <p className="text-sm text-gray-600">
+                              Enter your UPI ID to make a quick and secure payment. You will receive a payment request on your UPI app.
+                            </p>
+                          </div>
+                        </form>
+                      </Form>
+                    </TabsContent>
+                    
+                    {/* PayPal Form */}
+                    <TabsContent value="paypal">
+                      <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                        <Paypal className="inline-block mr-2 h-5 w-5 text-nimocare-600" />
+                        PayPal
+                      </h3>
                       
-                      <div className="flex items-center justify-center space-x-2 text-sm text-gray-500 pt-2">
-                        <Lock className="h-4 w-4" />
-                        <span>Secure Payment</span>
-                        <span>|</span>
-                        <span>256-bit SSL Encrypted</span>
-                      </div>
-                    </form>
-                  </Form>
-                </div>
+                      <Form {...paypalForm}>
+                        <form onSubmit={paypalForm.handleSubmit(handlePaymentSubmit)} className="space-y-6">
+                          <FormField
+                            control={paypalForm.control}
+                            name="email"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>PayPal Email</FormLabel>
+                                <FormControl>
+                                  <div className="relative">
+                                    <Input 
+                                      {...field}
+                                      type="email"
+                                      placeholder="email@example.com"
+                                      className="pl-10"
+                                    />
+                                    <Paypal className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <div className="pt-4">
+                            <Button 
+                              type="submit" 
+                              className="w-full bg-paypal hover:bg-paypal/90 text-white"
+                              style={{ backgroundColor: "#0070ba" }}
+                              disabled={isProcessing}
+                            >
+                              {isProcessing ? (
+                                <>
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                  Processing PayPal Payment...
+                                </>
+                              ) : (
+                                <>
+                                  Pay ${orderDetails.total.toFixed(2)} with PayPal
+                                  <ArrowRight className="ml-2 h-4 w-4" />
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                          
+                          <div className="mt-4 p-4 bg-gray-50 rounded-md">
+                            <p className="text-sm text-gray-600">
+                              You will be redirected to PayPal to complete your payment securely.
+                            </p>
+                          </div>
+                        </form>
+                      </Form>
+                    </TabsContent>
+                    
+                    {/* Crypto Form */}
+                    <TabsContent value="crypto">
+                      <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                        <Bitcoin className="inline-block mr-2 h-5 w-5 text-nimocare-600" />
+                        Cryptocurrency
+                      </h3>
+                      
+                      <Form {...cryptoForm}>
+                        <form onSubmit={cryptoForm.handleSubmit(handlePaymentSubmit)} className="space-y-6">
+                          <FormField
+                            control={cryptoForm.control}
+                            name="walletAddress"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Wallet Address</FormLabel>
+                                <FormControl>
+                                  <div className="relative">
+                                    <Input 
+                                      {...field}
+                                      placeholder="Enter your wallet address"
+                                      className="pl-10"
+                                    />
+                                    <Bitcoin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <div className="pt-4">
+                            <Button 
+                              type="submit" 
+                              className="w-full bg-bitcoin hover:bg-bitcoin/90 text-white"
+                              style={{ backgroundColor: "#f7931a" }}
+                              disabled={isProcessing}
+                            >
+                              {isProcessing ? (
+                                <>
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                  Processing Crypto Payment...
+                                </>
+                              ) : (
+                                <>
+                                  Pay ${orderDetails.total.toFixed(2)} with Crypto
+                                  <ArrowRight className="ml-2 h-4 w-4" />
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                          
+                          <div className="mt-4 p-4 bg-gray-50 rounded-md">
+                            <p className="text-sm text-gray-600">
+                              We accept Bitcoin (BTC), Ethereum (ETH), and other major cryptocurrencies.
+                            </p>
+                          </div>
+                        </form>
+                      </Form>
+                    </TabsContent>
+                  </div>
+                </Tabs>
                 
                 <div className="p-6 bg-gray-50 border-t border-gray-200">
                   <div className="flex items-center space-x-2 text-sm">
