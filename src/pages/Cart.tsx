@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
@@ -265,5 +266,92 @@ const Cart = () => {
                         )}
                       </div>
                       
-                      <
+                      <div className="space-y-4">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Subtotal</span>
+                          <span className="font-medium">${subtotal.toFixed(2)}</span>
+                        </div>
+                        
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Shipping</span>
+                          <span className="font-medium">
+                            {shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}
+                          </span>
+                        </div>
+                        
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Tax</span>
+                          <span className="font-medium">${tax.toFixed(2)}</span>
+                        </div>
+                        
+                        {discount > 0 && (
+                          <div className="flex justify-between text-green-600">
+                            <span>Discount</span>
+                            <span className="font-medium">-${discount.toFixed(2)}</span>
+                          </div>
+                        )}
+                        
+                        <div className="border-t border-gray-100 pt-4 flex justify-between">
+                          <span className="font-bold text-gray-900">Total</span>
+                          <span className="font-bold text-gray-900">${total.toFixed(2)}</span>
+                        </div>
+                      </div>
+                      
+                      <button
+                        onClick={handleCheckout}
+                        disabled={cartItems.length === 0 || isProcessing}
+                        className="w-full mt-6 bg-nimocare-600 hover:bg-nimocare-700 text-white py-3 rounded-md font-medium transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+                      >
+                        {isProcessing ? (
+                          <>
+                            <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
+                            Processing...
+                          </>
+                        ) : (
+                          <>
+                            Proceed to Checkout
+                            <ArrowRight className="w-5 h-5 ml-2" />
+                          </>
+                        )}
+                      </button>
+                      
+                      <div className="mt-6 text-center text-sm text-gray-500">
+                        <p className="mb-2">Secure checkout</p>
+                        <p>Free shipping on orders over $50</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        ) : (
+          <section className="py-16">
+            <div className="container-custom text-center">
+              <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm p-10 max-w-lg mx-auto">
+                <div className="mb-6 flex justify-center">
+                  <ShoppingCart className="w-16 h-16 text-gray-300" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
+                <p className="text-gray-600 mb-8">
+                  Looks like you haven't added any products to your cart yet.
+                </p>
+                <Link 
+                  to="/products" 
+                  className="bg-nimocare-600 text-white px-6 py-3 rounded-md font-medium hover:bg-nimocare-700 transition-colors inline-flex items-center"
+                >
+                  <ShoppingCart className="w-5 h-5 mr-2" />
+                  Browse Products
+                </Link>
+              </div>
+            </div>
+          </section>
+        )}
+      </main>
+      
+      <Footer />
+    </div>
+  );
+};
 
+export default Cart;
