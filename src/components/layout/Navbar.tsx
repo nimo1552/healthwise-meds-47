@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, ShoppingCart, User, Menu, X, Store } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, X, Store, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/ui/Logo';
@@ -25,13 +24,11 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Helper function to create a new tab link
   const openInNewTab = (url: string) => {
     const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
     if (newWindow) newWindow.opener = null;
   };
 
-  // Helper function to create a new tab link component
   const ExternalLink = ({ to, className, children }) => (
     <a 
       href={to} 
@@ -57,7 +54,6 @@ const Navbar = () => {
       )}
     >
       <div className="container-custom flex justify-between items-center">
-        {/* Logo */}
         <Link 
           to="/" 
           className="relative flex items-center"
@@ -66,7 +62,6 @@ const Navbar = () => {
           <Logo size="md" />
         </Link>
 
-        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
           <Link to="/" className="font-medium hover:text-nimocare-600 transition-colors">
             Home
@@ -77,6 +72,9 @@ const Navbar = () => {
           <Link to="/prescription" className="font-medium hover:text-nimocare-600 transition-colors">
             Upload Prescription
           </Link>
+          <Link to="/store-locator" className="font-medium hover:text-nimocare-600 transition-colors">
+            Find a Store
+          </Link>
           <Link to="/seller" className="font-medium hover:text-nimocare-600 transition-colors">
             Seller Portal
           </Link>
@@ -85,7 +83,6 @@ const Navbar = () => {
           </Link>
         </nav>
 
-        {/* Desktop Actions */}
         <div className="hidden md:flex items-center space-x-5">
           <button 
             onClick={() => setIsSearchOpen(!isSearchOpen)}
@@ -125,7 +122,6 @@ const Navbar = () => {
           </Link>
         </div>
         
-        {/* Mobile Menu Button */}
         <div className="flex items-center md:hidden space-x-4">
           <Link 
             to="/cart"
@@ -154,7 +150,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Search Bar */}
       <div
         className={cn(
           'absolute left-0 right-0 bg-white shadow-md py-3 px-4 transition-all duration-300 ease-in-out',
@@ -180,7 +175,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <div
         className={cn(
           'fixed inset-0 bg-white z-40 transition-transform duration-300 ease-in-out pt-20',
@@ -212,6 +206,16 @@ const Navbar = () => {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Upload Prescription
+            </Link>
+            <Link 
+              to="/store-locator" 
+              className="text-2xl font-medium hover:text-nimocare-600 transition-colors"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <div className="flex items-center">
+                <MapPin className="w-5 h-5 mr-2" />
+                Find a Store
+              </div>
             </Link>
             <Link 
               to="/seller" 

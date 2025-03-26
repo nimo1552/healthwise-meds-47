@@ -22,6 +22,7 @@ import CategoryPage from "./pages/CategoryPage";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import ScrollToTop from "./components/layout/ScrollToTop";
 import BackToTop from "./components/ui/BackToTop";
+import StoreLocator from "./pages/StoreLocator";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/account" element={<CustomerDashboard />} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
+          <Route path="/store-locator" element={<StoreLocator />} />
           
           {/* Category routes - now use the CategoryPage component */}
           <Route path="/categories/:categoryId" element={<CategoryPage />} />
