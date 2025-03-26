@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
@@ -15,7 +14,6 @@ import {
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
 
-// Sample cart data
 const initialCartItems = [
   {
     id: 1,
@@ -45,7 +43,6 @@ const Cart = () => {
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
   
-  // Calculate totals
   const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   const shipping = subtotal > 50 ? 0 : 4.99;
   const tax = subtotal * 0.06; // 6% tax rate
@@ -91,18 +88,18 @@ const Cart = () => {
   
   const handleCheckout = () => {
     setIsProcessing(true);
-    // Simulate processing delay
     setTimeout(() => {
       setIsProcessing(false);
-      // Navigate to order confirmation page with order details
-      navigate("/order-confirmation", { 
+      navigate("/payment", { 
         state: { 
-          orderItems: cartItems,
-          orderTotal: total,
-          orderDiscount: discount,
-          orderShipping: shipping,
-          orderTax: tax,
-          orderSubtotal: subtotal
+          orderDetails: {
+            items: cartItems,
+            total: total,
+            discount: discount,
+            shipping: shipping,
+            tax: tax,
+            subtotal: subtotal
+          }
         } 
       });
     }, 1500);
@@ -113,7 +110,6 @@ const Cart = () => {
       <Navbar />
       
       <main className="flex-grow pt-20">
-        {/* Header */}
         <section className="bg-nimocare-50/50 py-10 md:py-16">
           <div className="container-custom">
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Your Cart</h1>
@@ -129,18 +125,15 @@ const Cart = () => {
           <section className="py-10">
             <div className="container-custom">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                {/* Cart Items */}
                 <div className="lg:col-span-2">
                   <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
                     <div className="p-6 border-b border-gray-100">
                       <h2 className="text-xl font-bold text-gray-900">Shopping Cart</h2>
                     </div>
                     
-                    {/* Cart items list */}
                     <div>
                       {cartItems.map((item) => (
                         <div key={item.id} className="p-6 border-b border-gray-100 flex flex-col sm:flex-row items-start">
-                          {/* Item image */}
                           <div className="w-full sm:w-24 h-24 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden mb-4 sm:mb-0 sm:mr-6">
                             <img 
                               src={item.image} 
@@ -149,7 +142,6 @@ const Cart = () => {
                             />
                           </div>
                           
-                          {/* Item details */}
                           <div className="flex-grow">
                             <div className="flex justify-between items-start">
                               <div>
@@ -175,7 +167,6 @@ const Cart = () => {
                               </button>
                             </div>
                             
-                            {/* Quantity control and price */}
                             <div className="flex justify-between items-center mt-2">
                               <div className="flex items-center border border-gray-200 rounded-md">
                                 <button 
@@ -220,7 +211,6 @@ const Cart = () => {
                       ))}
                     </div>
                     
-                    {/* Continue shopping */}
                     <div className="p-6">
                       <Link 
                         to="/products" 
@@ -233,7 +223,6 @@ const Cart = () => {
                   </div>
                 </div>
                 
-                {/* Order Summary */}
                 <div className="lg:col-span-1">
                   <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm sticky top-24">
                     <div className="p-6 border-b border-gray-100">
@@ -241,7 +230,6 @@ const Cart = () => {
                     </div>
                     
                     <div className="p-6">
-                      {/* Coupon code */}
                       <div className="mb-6">
                         <label htmlFor="coupon" className="block text-sm font-medium text-gray-700 mb-2">
                           Apply Coupon Code
@@ -277,108 +265,5 @@ const Cart = () => {
                         )}
                       </div>
                       
-                      {/* Price breakdown */}
-                      <div className="space-y-3 text-sm mb-6">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Subtotal</span>
-                          <span className="font-medium text-gray-900">${subtotal.toFixed(2)}</span>
-                        </div>
-                        
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Shipping</span>
-                          <span className="font-medium text-gray-900">
-                            {shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}
-                          </span>
-                        </div>
-                        
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Tax</span>
-                          <span className="font-medium text-gray-900">${tax.toFixed(2)}</span>
-                        </div>
-                        
-                        {couponApplied && (
-                          <div className="flex justify-between text-green-600">
-                            <span>Discount</span>
-                            <span>-${discount.toFixed(2)}</span>
-                          </div>
-                        )}
-                        
-                        <div className="border-t border-gray-100 pt-3 mt-3"></div>
-                        
-                        <div className="flex justify-between">
-                          <span className="font-medium">Total</span>
-                          <span className="font-bold text-lg">${total.toFixed(2)}</span>
-                        </div>
-                      </div>
-                      
-                      {/* Checkout button */}
-                      <button 
-                        onClick={handleCheckout}
-                        disabled={isProcessing || cartItems.length === 0}
-                        className={cn(
-                          "w-full py-3 rounded-md font-medium text-white flex items-center justify-center",
-                          (isProcessing || cartItems.length === 0)
-                            ? "bg-gray-400 cursor-not-allowed"
-                            : "bg-nimocare-600 hover:bg-nimocare-700 transition-colors"
-                        )}
-                      >
-                        {isProcessing ? (
-                          <>
-                            <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
-                            Processing...
-                          </>
-                        ) : (
-                          <>
-                            Confirm Order
-                            <ArrowRight className="w-5 h-5 ml-2" />
-                          </>
-                        )}
-                      </button>
-                      
-                      {/* Security badges */}
-                      <div className="mt-6">
-                        <div className="flex items-center justify-center space-x-3 text-xs text-gray-500">
-                          <ShieldCheck className="w-4 h-4" />
-                          <span>Secure Checkout</span>
-                          <span>|</span>
-                          <span>SSL Encrypted</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        ) : (
-          <section className="py-20">
-            <div className="container-custom">
-              <div className="text-center max-w-md mx-auto">
-                <div className="bg-nimocare-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <ShoppingCart className="w-10 h-10 text-nimocare-600" />
-                </div>
-                
-                <h2 className="text-2xl font-bold text-gray-900 mb-3">Your Cart is Empty</h2>
-                <p className="text-gray-600 mb-8">
-                  Looks like you haven't added any items to your cart yet. Explore our products and find what you need.
-                </p>
-                
-                <Link 
-                  to="/products" 
-                  className="btn-primary inline-flex items-center"
-                >
-                  <ShoppingCart className="w-5 h-5 mr-2" />
-                  Browse Products
-                </Link>
-              </div>
-            </div>
-          </section>
-        )}
-      </main>
-      
-      <Footer />
-    </div>
-  );
-};
+                      <
 
-export default Cart;
