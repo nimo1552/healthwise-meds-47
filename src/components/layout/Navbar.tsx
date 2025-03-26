@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, ShoppingCart, User, Menu, X, Store } from 'lucide-react';
@@ -23,6 +24,19 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Helper function to create a new tab link
+  const externalLink = (to, className, children) => (
+    <a 
+      href={to} 
+      className={className}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={(e) => e.stopPropagation()}
+    >
+      {children}
+    </a>
+  );
 
   return (
     <header
