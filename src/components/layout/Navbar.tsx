@@ -26,13 +26,22 @@ const Navbar = () => {
   }, []);
 
   // Helper function to create a new tab link
-  const externalLink = (to, className, children) => (
+  const openInNewTab = (url: string) => {
+    const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+    if (newWindow) newWindow.opener = null;
+  };
+
+  // Helper function to create a new tab link component
+  const ExternalLink = ({ to, className, children }) => (
     <a 
       href={to} 
       className={className}
       target="_blank"
       rel="noopener noreferrer"
-      onClick={(e) => e.stopPropagation()}
+      onClick={(e) => {
+        e.stopPropagation();
+        openInNewTab(to);
+      }}
     >
       {children}
     </a>
