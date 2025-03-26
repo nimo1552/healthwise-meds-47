@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
@@ -19,13 +18,12 @@ import {
   ArrowRight, 
   Loader2,
   Bitcoin,
-  Paypal
+  DollarSign
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Credit Card schema
 const creditCardSchema = z.object({
   cardNumber: z.string()
     .min(16, { message: "Card number must be at least 16 digits" })
@@ -39,20 +37,17 @@ const creditCardSchema = z.object({
     .regex(/^[0-9]+$/, { message: "CVV can only contain numbers" }),
 });
 
-// UPI schema
 const upiSchema = z.object({
   upiId: z.string()
     .min(5, { message: "UPI ID is required" })
     .regex(/^[a-zA-Z0-9.\-_]{3,}@[a-zA-Z]{3,}$/, { message: "Please enter a valid UPI ID (e.g., name@upi)" }),
 });
 
-// PayPal schema
 const paypalSchema = z.object({
   email: z.string()
     .email({ message: "Please enter a valid email address" }),
 });
 
-// Crypto schema
 const cryptoSchema = z.object({
   walletAddress: z.string()
     .min(10, { message: "Wallet address is required" }),
@@ -65,7 +60,6 @@ const Payment = () => {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [activePaymentMethod, setActivePaymentMethod] = useState("card");
   
-  // Get order details from location state or use default values
   const orderDetails = location.state?.orderDetails || {
     subtotal: 89.97,
     shipping: 0,
@@ -94,7 +88,6 @@ const Payment = () => {
     ]
   };
   
-  // Credit Card form
   const cardForm = useForm<z.infer<typeof creditCardSchema>>({
     resolver: zodResolver(creditCardSchema),
     defaultValues: {
@@ -105,7 +98,6 @@ const Payment = () => {
     },
   });
   
-  // UPI form
   const upiForm = useForm<z.infer<typeof upiSchema>>({
     resolver: zodResolver(upiSchema),
     defaultValues: {
@@ -113,7 +105,6 @@ const Payment = () => {
     },
   });
   
-  // PayPal form
   const paypalForm = useForm<z.infer<typeof paypalSchema>>({
     resolver: zodResolver(paypalSchema),
     defaultValues: {
@@ -121,7 +112,6 @@ const Payment = () => {
     },
   });
   
-  // Crypto form
   const cryptoForm = useForm<z.infer<typeof cryptoSchema>>({
     resolver: zodResolver(cryptoSchema),
     defaultValues: {
@@ -130,9 +120,7 @@ const Payment = () => {
   });
   
   const formatCardNumber = (value: string) => {
-    // Remove all non-digits
     const digits = value.replace(/\D/g, "");
-    // Add a space after every 4 digits
     const formatted = digits.replace(/(\d{4})(?=\d)/g, "$1 ");
     return formatted;
   };
@@ -145,7 +133,6 @@ const Payment = () => {
   const handleExpiryDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.replace(/\D/g, "");
     
-    // Auto-format to MM/YY
     if (value.length > 2) {
       value = value.substring(0, 2) + "/" + value.substring(2, 4);
     }
@@ -156,15 +143,12 @@ const Payment = () => {
   const handlePaymentSubmit = (data: any) => {
     setIsProcessing(true);
     
-    // Log payment data based on method
     console.log(`Payment data (${activePaymentMethod}):`, data);
     
-    // Simulate payment processing
     setTimeout(() => {
       setIsProcessing(false);
       setShowSuccessDialog(true);
       
-      // Show success toast based on payment method
       toast({
         title: "Payment Successful",
         description: `Your payment using ${getPaymentMethodName(activePaymentMethod)} was successful`,
@@ -186,7 +170,6 @@ const Payment = () => {
   const handleCompleteOrder = () => {
     setShowSuccessDialog(false);
     
-    // Navigate to order confirmation with order details
     navigate("/order-confirmation", { 
       state: { 
         orderItems: orderDetails.items,
@@ -209,7 +192,6 @@ const Payment = () => {
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Payment Details</h1>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Payment Methods */}
             <div className="lg:col-span-2">
               <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
                 <Tabs defaultValue="card" value={activePaymentMethod} onValueChange={setActivePaymentMethod}>
@@ -231,7 +213,7 @@ const Payment = () => {
                         <span className="hidden sm:inline">UPI</span>
                       </TabsTrigger>
                       <TabsTrigger value="paypal" className="flex items-center gap-2">
-                        <Paypal className="h-4 w-4" />
+                        <DollarSign className="h-4 w-4" />
                         <span className="hidden sm:inline">PayPal</span>
                       </TabsTrigger>
                       <TabsTrigger value="crypto" className="flex items-center gap-2">
@@ -242,7 +224,6 @@ const Payment = () => {
                   </div>
                   
                   <div className="p-6">
-                    {/* Credit Card Form */}
                     <TabsContent value="card">
                       <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
                         <CreditCard className="inline-block mr-2 h-5 w-5 text-nimocare-600" />
@@ -362,7 +343,6 @@ const Payment = () => {
                       </Form>
                     </TabsContent>
                     
-                    {/* UPI Form */}
                     <TabsContent value="upi">
                       <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline-block mr-2 h-5 w-5 text-nimocare-600">
@@ -427,10 +407,9 @@ const Payment = () => {
                       </Form>
                     </TabsContent>
                     
-                    {/* PayPal Form */}
                     <TabsContent value="paypal">
                       <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                        <Paypal className="inline-block mr-2 h-5 w-5 text-nimocare-600" />
+                        <DollarSign className="inline-block mr-2 h-5 w-5 text-nimocare-600" />
                         PayPal
                       </h3>
                       
@@ -450,7 +429,7 @@ const Payment = () => {
                                       placeholder="email@example.com"
                                       className="pl-10"
                                     />
-                                    <Paypal className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                    <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
                                   </div>
                                 </FormControl>
                                 <FormMessage />
@@ -488,7 +467,6 @@ const Payment = () => {
                       </Form>
                     </TabsContent>
                     
-                    {/* Crypto Form */}
                     <TabsContent value="crypto">
                       <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
                         <Bitcoin className="inline-block mr-2 h-5 w-5 text-nimocare-600" />
@@ -561,7 +539,6 @@ const Payment = () => {
               </div>
             </div>
             
-            {/* Order Summary */}
             <div className="lg:col-span-1">
               <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden sticky top-24">
                 <div className="p-6 border-b border-gray-100">
@@ -621,7 +598,6 @@ const Payment = () => {
         </div>
       </main>
       
-      {/* Payment Success Dialog */}
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
