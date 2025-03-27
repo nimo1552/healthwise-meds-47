@@ -103,6 +103,7 @@ const CategorySection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ delay: 0.1 * index }}
+              whileHover={{ y: -10, transition: { duration: 0.3 } }}
             >
               <Link
                 to={category.link}
@@ -113,9 +114,13 @@ const CategorySection = () => {
                 )}
               >
                 <div className="flex items-start mb-4">
-                  <span className="text-4xl mr-4 group-hover:scale-110 transition-transform duration-300">
+                  <motion.span 
+                    className="text-4xl mr-4"
+                    whileHover={{ scale: 1.2, rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 0.5 }}
+                  >
                     {category.icon}
-                  </span>
+                  </motion.span>
                   <div>
                     <h3 className="text-xl font-medium text-gray-900 mb-1">
                       {category.name}
@@ -127,7 +132,11 @@ const CategorySection = () => {
                 </div>
                 
                 <div className="mt-auto pt-4">
-                  <span className="text-nimocare-600 text-sm font-medium flex items-center group-hover:translate-x-2 transition-transform duration-300">
+                  <motion.span 
+                    className="text-nimocare-600 text-sm font-medium flex items-center"
+                    whileHover={{ x: 5 }}
+                    transition={{ duration: 0.2 }}
+                  >
                     Browse Products
                     <svg 
                       xmlns="http://www.w3.org/2000/svg" 
@@ -138,7 +147,7 @@ const CategorySection = () => {
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                  </span>
+                  </motion.span>
                 </div>
               </Link>
             </motion.div>
