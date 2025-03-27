@@ -19,12 +19,12 @@ const LoadingSpinner = ({ size = "md", className, text }: LoadingSpinnerProps) =
     <div className={cn("flex flex-col items-center justify-center", className)}>
       <Loader2 className={cn("animate-spin text-nimocare-600", sizeClasses[size])} />
       {text && (
-        <p className="mt-2 text-sm text-gray-600 animate-pulse">
+        <p className="mt-2 text-sm text-gray-600">
           {text}
-          <span className="loading-dots">
-            <span>.</span>
-            <span>.</span>
-            <span>.</span>
+          <span className="loading-dots inline-flex ml-1">
+            <span className="mx-px">.</span>
+            <span className="mx-px">.</span>
+            <span className="mx-px">.</span>
           </span>
         </p>
       )}
