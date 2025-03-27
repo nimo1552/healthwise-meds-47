@@ -38,8 +38,31 @@ const HeroSection = () => {
   return (
     <section className="pt-28 pb-20 md:pt-36 md:pb-28 relative overflow-hidden bg-gradient-to-br from-white via-nimocare-50/30 to-white">
       {/* Abstract shapes */}
-      <div className="absolute -top-24 -right-24 w-96 h-96 bg-nimocare-200/20 rounded-full blur-3xl"></div>
-      <div className="absolute top-1/2 -left-24 w-72 h-72 bg-nimocare-100/30 rounded-full blur-3xl"></div>
+      <motion.div 
+        className="absolute -top-24 -right-24 w-96 h-96 bg-nimocare-200/20 rounded-full blur-3xl"
+        animate={{ 
+          scale: [1, 1.05, 1],
+          opacity: [0.5, 0.7, 0.5] 
+        }}
+        transition={{ 
+          duration: 8, 
+          repeat: Infinity,
+          repeatType: "reverse" 
+        }}
+      />
+      <motion.div 
+        className="absolute top-1/2 -left-24 w-72 h-72 bg-nimocare-100/30 rounded-full blur-3xl"
+        animate={{ 
+          scale: [1, 1.1, 1],
+          opacity: [0.3, 0.5, 0.3] 
+        }}
+        transition={{ 
+          duration: 10, 
+          repeat: Infinity,
+          repeatType: "reverse", 
+          delay: 2 
+        }}
+      />
       <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-full h-64 bg-gradient-to-t from-nimocare-50/20 to-transparent"></div>
       
       <div className="container-custom relative z-10">
@@ -65,7 +88,7 @@ const HeroSection = () => {
               
               <motion.h1 
                 variants={itemVariants}
-                className="header-1 text-gray-900 mb-6"
+                className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight"
               >
                 Your Health, <span className="text-nimocare-600 relative">Delivered
                   <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 358 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -76,7 +99,7 @@ const HeroSection = () => {
               
               <motion.p 
                 variants={itemVariants}
-                className="subtitle-1 mb-8"
+                className="text-lg md:text-xl text-gray-600 mb-8"
               >
                 Nimocare delivers prescription and over-the-counter medicines to your doorstep with eco-friendly practices. Fast, reliable, and secure.
               </motion.p>
@@ -112,7 +135,7 @@ const HeroSection = () => {
               >
                 <Link 
                   to="/products" 
-                  className="btn-primary flex items-center justify-center sm:justify-start space-x-2 rounded-full py-3 transition-transform hover:scale-105"
+                  className="bg-nimocare-600 text-white px-6 py-3 rounded-full font-medium hover:bg-nimocare-700 transition-all duration-300 flex items-center justify-center sm:justify-start space-x-2 hover:shadow-lg hover:scale-105"
                 >
                   <span>Browse Products</span>
                   <ArrowRight className="w-4 h-4" />
@@ -120,7 +143,7 @@ const HeroSection = () => {
                 
                 <Link 
                   to="/prescription" 
-                  className="btn-secondary flex items-center justify-center sm:justify-start space-x-2 rounded-full py-3 transition-transform hover:scale-105"
+                  className="bg-white text-nimocare-600 border border-nimocare-200 px-6 py-3 rounded-full font-medium hover:bg-nimocare-50 transition-all duration-300 flex items-center justify-center sm:justify-start space-x-2 hover:shadow-lg hover:scale-105"
                 >
                   <Upload className="w-4 h-4" />
                   <span>Upload Prescription</span>
@@ -138,10 +161,14 @@ const HeroSection = () => {
                   { icon: "🌿", text: "Eco-Friendly" },
                   { icon: "✅", text: "Verified Products" }
                 ].map((badge, index) => (
-                  <div key={index} className="flex flex-col items-center glass p-3 rounded-xl border border-gray-100 transition-transform hover:scale-105">
+                  <motion.div 
+                    key={index} 
+                    className="flex flex-col items-center glass p-3 rounded-xl border border-gray-100 transition-all duration-300 hover:shadow-md hover:scale-105 bg-white/80 backdrop-blur-sm"
+                    whileHover={{ y: -5 }}
+                  >
                     <span className="text-2xl mb-1">{badge.icon}</span>
                     <span className="text-xs text-gray-700 font-medium text-center">{badge.text}</span>
-                  </div>
+                  </motion.div>
                 ))}
               </motion.div>
             </div>
@@ -167,9 +194,9 @@ const HeroSection = () => {
                 />
               </motion.div>
               
-              {/* Floating elements */}
+              {/* Floating elements - only show on larger screens */}
               <motion.div 
-                className="absolute -bottom-6 -left-6 bg-white p-4 rounded-lg shadow-soft border border-gray-100 max-w-[200px]"
+                className="absolute -bottom-6 -left-6 bg-white p-4 rounded-lg shadow-soft border border-gray-100 max-w-[200px] hidden sm:block"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
@@ -185,7 +212,7 @@ const HeroSection = () => {
               </motion.div>
               
               <motion.div 
-                className="absolute -top-4 -right-4 bg-white p-4 rounded-lg shadow-soft border border-gray-100"
+                className="absolute -top-4 -right-4 bg-white p-4 rounded-lg shadow-soft border border-gray-100 hidden sm:block"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}

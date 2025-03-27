@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, ShoppingCart, User, Menu, X, Store, MapPin } from 'lucide-react';
@@ -21,8 +22,19 @@ const Navbar = () => {
     };
 
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    
+    // Prevent body scroll when mobile menu is open
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
 
   const openInNewTab = (url: string) => {
     const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
@@ -175,41 +187,46 @@ const Navbar = () => {
         </div>
       </div>
 
+      {/* Mobile menu overlay - Fixed position with proper z-index */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 bg-black/20 z-40 md:hidden" onClick={() => setIsMobileMenuOpen(false)} />
+      )}
+
       <div
         className={cn(
-          'fixed inset-0 bg-white z-40 transition-transform duration-300 ease-in-out pt-20',
+          'fixed inset-y-0 right-0 w-[80%] max-w-sm bg-white z-50 transition-transform duration-300 ease-in-out shadow-xl md:hidden overflow-auto',
           isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         )}
       >
-        <div className="container-custom py-8">
+        <div className="p-6 pt-20">
           <div className="flex justify-center mb-8">
             <Logo size="lg" />
           </div>
           <nav className="flex flex-col space-y-6">
             <Link 
               to="/" 
-              className="text-2xl font-medium hover:text-nimocare-600 transition-colors"
+              className="text-lg font-medium hover:text-nimocare-600 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Home
             </Link>
             <Link 
               to="/products" 
-              className="text-2xl font-medium hover:text-nimocare-600 transition-colors"
+              className="text-lg font-medium hover:text-nimocare-600 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Products
             </Link>
             <Link 
               to="/prescription" 
-              className="text-2xl font-medium hover:text-nimocare-600 transition-colors"
+              className="text-lg font-medium hover:text-nimocare-600 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Upload Prescription
             </Link>
             <Link 
               to="/store-locator" 
-              className="text-2xl font-medium hover:text-nimocare-600 transition-colors"
+              className="text-lg font-medium hover:text-nimocare-600 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               <div className="flex items-center">
@@ -219,21 +236,21 @@ const Navbar = () => {
             </Link>
             <Link 
               to="/seller" 
-              className="text-2xl font-medium hover:text-nimocare-600 transition-colors"
+              className="text-lg font-medium hover:text-nimocare-600 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Seller Portal
             </Link>
             <Link 
               to="/contact" 
-              className="text-2xl font-medium hover:text-nimocare-600 transition-colors"
+              className="text-lg font-medium hover:text-nimocare-600 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Contact
             </Link>
             <Link 
               to="/login" 
-              className="text-2xl font-medium hover:text-nimocare-600 transition-colors"
+              className="text-lg font-medium hover:text-nimocare-600 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Login / Register
