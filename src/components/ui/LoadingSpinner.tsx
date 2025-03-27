@@ -21,13 +21,21 @@ const LoadingSpinner = ({ size = "md", className, text }: LoadingSpinnerProps) =
   useEffect(() => {
     if (!text) return;
     
+    // Use a variable to track if component is mounted
+    let isMounted = true;
+    
     const interval = setInterval(() => {
-      setDots(prev => {
-        return prev.length >= 3 ? "" : prev + ".";
-      });
+      if (isMounted) {
+        setDots(prev => {
+          return prev.length >= 3 ? "" : prev + ".";
+        });
+      }
     }, 500);
     
-    return () => clearInterval(interval);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, [text]);
 
   return (
@@ -36,7 +44,7 @@ const LoadingSpinner = ({ size = "md", className, text }: LoadingSpinnerProps) =
       {text && (
         <p className="mt-2 text-sm text-gray-600">
           {text}
-          <span className="inline-block w-6">{dots}</span>
+          <span className="inline-block min-w-6">{dots}</span>
         </p>
       )}
     </div>

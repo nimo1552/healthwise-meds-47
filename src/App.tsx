@@ -6,62 +6,178 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { PageTransition } from "@/components/ui/PageTransition";
-import Index from "./pages/Index";
-import Products from "./pages/Products";
-import ProductDetail from "./pages/ProductDetail";
-import Cart from "./pages/Cart";
-import Payment from "./pages/Payment";
-import PrescriptionUpload from "./pages/PrescriptionUpload";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import NotFound from "./pages/NotFound";
-import Seller from "./pages/Seller";
-import OrderTracking from "./pages/OrderTracking";
-import Wishlist from "./pages/Wishlist";
-import CustomerDashboard from "./pages/CustomerDashboard";
-import LiveChat from "./components/ui/LiveChat";
-import CategoryPage from "./pages/CategoryPage";
-import OrderConfirmation from "./pages/OrderConfirmation";
+import { lazy, Suspense } from "react";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import ScrollToTop from "./components/layout/ScrollToTop";
 import BackToTop from "./components/ui/BackToTop";
-import StoreLocator from "./pages/StoreLocator";
+import LiveChat from "./components/ui/LiveChat";
 
+// Eager load the Index page for faster initial load
+import Index from "./pages/Index";
+
+// Lazy load other pages to improve initial load time
+const Products = lazy(() => import("./pages/Products"));
+const ProductDetail = lazy(() => import("./pages/ProductDetail"));
+const Cart = lazy(() => import("./pages/Cart"));
+const Payment = lazy(() => import("./pages/Payment"));
+const PrescriptionUpload = lazy(() => import("./pages/PrescriptionUpload"));
+const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Seller = lazy(() => import("./pages/Seller"));
+const OrderTracking = lazy(() => import("./pages/OrderTracking"));
+const Wishlist = lazy(() => import("./pages/Wishlist"));
+const CustomerDashboard = lazy(() => import("./pages/CustomerDashboard"));
+const CategoryPage = lazy(() => import("./pages/CategoryPage"));
+const OrderConfirmation = lazy(() => import("./pages/OrderConfirmation"));
+const StoreLocator = lazy(() => import("./pages/StoreLocator"));
+
+// Configure React Query with performance settings
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
       retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
     },
   },
 });
+
+// Loading fallback for lazy-loaded components
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-[50vh]">
+    <LoadingSpinner size="lg" text="Loading page" />
+  </div>
+);
 
 // Wrapper component for AnimatePresence
 const AnimatedRoutes = () => {
   const location = useLocation();
   
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="wait" initial={false}>
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageTransition><Index /></PageTransition>} />
-        <Route path="/products" element={<PageTransition><Products /></PageTransition>} />
-        <Route path="/product/:id" element={<PageTransition><ProductDetail /></PageTransition>} />
-        <Route path="/cart" element={<PageTransition><Cart /></PageTransition>} />
-        <Route path="/payment" element={<PageTransition><Payment /></PageTransition>} />
-        <Route path="/prescription" element={<PageTransition><PrescriptionUpload /></PageTransition>} />
-        <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
-        <Route path="/register" element={<PageTransition><Register /></PageTransition>} />
-        <Route path="/seller" element={<PageTransition><Seller /></PageTransition>} />
-        <Route path="/order-tracking" element={<PageTransition><OrderTracking /></PageTransition>} />
-        <Route path="/wishlist" element={<PageTransition><Wishlist /></PageTransition>} />
-        <Route path="/account" element={<PageTransition><CustomerDashboard /></PageTransition>} />
-        <Route path="/order-confirmation" element={<PageTransition><OrderConfirmation /></PageTransition>} />
-        <Route path="/store-locator" element={<PageTransition><StoreLocator /></PageTransition>} />
         
-        {/* Category routes - now use the CategoryPage component */}
-        <Route path="/categories/:categoryId" element={<PageTransition><CategoryPage /></PageTransition>} />
+        <Route path="/products" element={
+          <PageTransition>
+            <Suspense fallback={<PageLoader />}>
+              <Products />
+            </Suspense>
+          </PageTransition>
+        } />
         
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+        <Route path="/product/:id" element={
+          <PageTransition>
+            <Suspense fallback={<PageLoader />}>
+              <ProductDetail />
+            </Suspense>
+          </PageTransition>
+        } />
+        
+        <Route path="/cart" element={
+          <PageTransition>
+            <Suspense fallback={<PageLoader />}>
+              <Cart />
+            </Suspense>
+          </PageTransition>
+        } />
+        
+        <Route path="/payment" element={
+          <PageTransition>
+            <Suspense fallback={<PageLoader />}>
+              <Payment />
+            </Suspense>
+          </PageTransition>
+        } />
+        
+        <Route path="/prescription" element={
+          <PageTransition>
+            <Suspense fallback={<PageLoader />}>
+              <PrescriptionUpload />
+            </Suspense>
+          </PageTransition>
+        } />
+        
+        <Route path="/login" element={
+          <PageTransition>
+            <Suspense fallback={<PageLoader />}>
+              <Login />
+            </Suspense>
+          </PageTransition>
+        } />
+        
+        <Route path="/register" element={
+          <PageTransition>
+            <Suspense fallback={<PageLoader />}>
+              <Register />
+            </Suspense>
+          </PageTransition>
+        } />
+        
+        <Route path="/seller" element={
+          <PageTransition>
+            <Suspense fallback={<PageLoader />}>
+              <Seller />
+            </Suspense>
+          </PageTransition>
+        } />
+        
+        <Route path="/order-tracking" element={
+          <PageTransition>
+            <Suspense fallback={<PageLoader />}>
+              <OrderTracking />
+            </Suspense>
+          </PageTransition>
+        } />
+        
+        <Route path="/wishlist" element={
+          <PageTransition>
+            <Suspense fallback={<PageLoader />}>
+              <Wishlist />
+            </Suspense>
+          </PageTransition>
+        } />
+        
+        <Route path="/account" element={
+          <PageTransition>
+            <Suspense fallback={<PageLoader />}>
+              <CustomerDashboard />
+            </Suspense>
+          </PageTransition>
+        } />
+        
+        <Route path="/order-confirmation" element={
+          <PageTransition>
+            <Suspense fallback={<PageLoader />}>
+              <OrderConfirmation />
+            </Suspense>
+          </PageTransition>
+        } />
+        
+        <Route path="/store-locator" element={
+          <PageTransition>
+            <Suspense fallback={<PageLoader />}>
+              <StoreLocator />
+            </Suspense>
+          </PageTransition>
+        } />
+        
+        <Route path="/categories/:categoryId" element={
+          <PageTransition>
+            <Suspense fallback={<PageLoader />}>
+              <CategoryPage />
+            </Suspense>
+          </PageTransition>
+        } />
+        
+        <Route path="*" element={
+          <PageTransition>
+            <Suspense fallback={<PageLoader />}>
+              <NotFound />
+            </Suspense>
+          </PageTransition>
+        } />
       </Routes>
     </AnimatePresence>
   );
