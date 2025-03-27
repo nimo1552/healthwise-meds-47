@@ -1,10 +1,12 @@
-
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import ProductCard from '@/components/ui/ProductCard';
 import RecentlyViewedProducts from '@/components/products/RecentlyViewedProducts';
 import { Search, Filter, ChevronDown, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { ContentSkeleton } from '@/components/ui/ContentSkeleton';
 
 // Sample product data
 const allProducts = [
@@ -133,6 +135,16 @@ const Products = () => {
   const [showPrescriptionOnly, setShowPrescriptionOnly] = useState(false);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 50]);
   const [showFilters, setShowFilters] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Simulate loading state
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   // Filter and sort products
   const filteredProducts = allProducts.filter(product => {
@@ -173,25 +185,37 @@ const Products = () => {
   };
   
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       
       <main className="flex-grow pt-20">
         {/* Header */}
-        <section className="bg-nimocare-50/50 py-10 md:py-16">
+        <section className="bg-nimocare-50/50 py-8 md:py-12">
           <div className="container-custom">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Products</h1>
-            <p className="text-lg text-gray-600 max-w-2xl">
+            <motion.h1 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
+            >
+              Products
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="text-lg text-gray-600 max-w-2xl"
+            >
               Browse our wide range of pharmaceutical products and health supplements.
-            </p>
+            </motion.p>
           </div>
         </section>
         
         {/* Recently Viewed Products */}
-        <RecentlyViewedProducts />
+        {!isLoading && <RecentlyViewedProducts />}
         
         {/* Filters and Search */}
-        <section className="py-8 border-b border-gray-200">
+        <section className="py-6 border-b border-gray-200">
           <div className="container-custom">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               {/* Search Bar */}
@@ -230,6 +254,11 @@ const Products = () => {
                 >
                   <Filter className="w-4 h-4" />
                   <span>Filters</span>
+                  {showPrescriptionOnly && (
+                    <span className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-nimocare-100 text-xs font-medium text-nimocare-600">
+                      Rx
+                    </span>
+                  )}
                 </button>
                 
                 {/* Clear filters */}
@@ -246,93 +275,140 @@ const Products = () => {
             </div>
             
             {/* Expanded Filters */}
-            {showFilters && (
-              <div className="mt-6 p-4 border border-gray-200 rounded-lg bg-white grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Categories */}
-                <div>
-                  <h3 className="font-medium mb-3 text-gray-900">Categories</h3>
-                  <div className="space-y-2">
-                    {categories.map((category) => (
-                      <label key={category} className="flex items-center">
-                        <input
-                          type="radio"
-                          checked={selectedCategory === category}
-                          onChange={() => setSelectedCategory(category)}
-                          className="w-4 h-4 text-nimocare-600 border-gray-300 focus:ring-nimocare-500"
-                        />
-                        <span className="ml-2 text-gray-700 text-sm">{category}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-                
-                {/* Price Range */}
-                <div>
-                  <h3 className="font-medium mb-3 text-gray-900">Price Range</h3>
-                  <div className="px-2">
-                    <div className="flex justify-between text-sm text-gray-600 mb-2">
-                      <span>${priceRange[0]}</span>
-                      <span>${priceRange[1]}</span>
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-6 p-4 border border-gray-200 rounded-lg bg-white grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Categories */}
+                    <div>
+                      <h3 className="font-medium mb-3 text-gray-900">Categories</h3>
+                      <div className="space-y-2">
+                        {categories.map((category) => (
+                          <label key={category} className="flex items-center">
+                            <input
+                              type="radio"
+                              checked={selectedCategory === category}
+                              onChange={() => setSelectedCategory(category)}
+                              className="w-4 h-4 text-nimocare-600 border-gray-300 focus:ring-nimocare-500"
+                            />
+                            <span className="ml-2 text-gray-700 text-sm">{category}</span>
+                          </label>
+                        ))}
+                      </div>
                     </div>
-                    <input
-                      type="range"
-                      min="0"
-                      max="50"
-                      step="5"
-                      value={priceRange[1]}
-                      onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                    />
+                    
+                    {/* Price Range */}
+                    <div>
+                      <h3 className="font-medium mb-3 text-gray-900">Price Range</h3>
+                      <div className="px-2">
+                        <div className="flex justify-between text-sm text-gray-600 mb-2">
+                          <span>${priceRange[0]}</span>
+                          <span>${priceRange[1]}</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="50"
+                          step="5"
+                          value={priceRange[1]}
+                          onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
+                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-nimocare-600"
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Other Filters */}
+                    <div>
+                      <h3 className="font-medium mb-3 text-gray-900">Other Filters</h3>
+                      <div className="space-y-2">
+                        <label className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={showPrescriptionOnly}
+                            onChange={() => setShowPrescriptionOnly(!showPrescriptionOnly)}
+                            className="w-4 h-4 text-nimocare-600 border-gray-300 rounded focus:ring-nimocare-500"
+                          />
+                          <span className="ml-2 text-gray-700 text-sm">Prescription Required Only</span>
+                        </label>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                
-                {/* Other Filters */}
-                <div>
-                  <h3 className="font-medium mb-3 text-gray-900">Other Filters</h3>
-                  <div className="space-y-2">
-                    <label className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={showPrescriptionOnly}
-                        onChange={() => setShowPrescriptionOnly(!showPrescriptionOnly)}
-                        className="w-4 h-4 text-nimocare-600 border-gray-300 rounded focus:ring-nimocare-500"
-                      />
-                      <span className="ml-2 text-gray-700 text-sm">Prescription Required Only</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </section>
         
         {/* Product Grid */}
         <section className="py-10">
           <div className="container-custom">
-            {filteredProducts.length > 0 ? (
+            {isLoading ? (
+              <div className="animate-fade-in">
+                <ContentSkeleton type="card" count={8} />
+              </div>
+            ) : filteredProducts.length > 0 ? (
               <>
                 <p className="text-gray-600 mb-6">{filteredProducts.length} products found</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {filteredProducts.map((product) => (
-                    <ProductCard key={product.id} {...product} />
+                  {filteredProducts.map((product, index) => (
+                    <motion.div
+                      key={product.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ 
+                        duration: 0.4,
+                        delay: index * 0.05,
+                        ease: [0.25, 0.1, 0.25, 1.0]
+                      }}
+                    >
+                      <ProductCard key={product.id} {...product} />
+                    </motion.div>
                   ))}
                 </div>
               </>
             ) : (
               <div className="text-center py-16">
-                <div className="mb-4 text-nimocare-400">
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="mb-4 text-nimocare-400"
+                >
                   <Search className="w-12 h-12 mx-auto" />
-                </div>
-                <h3 className="text-xl font-medium text-gray-900 mb-2">No products found</h3>
-                <p className="text-gray-600 mb-4">
+                </motion.div>
+                <motion.h3 
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                  className="text-xl font-medium text-gray-900 mb-2"
+                >
+                  No products found
+                </motion.h3>
+                <motion.p
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="text-gray-600 mb-4"
+                >
                   Try adjusting your search or filter criteria to find what you're looking for.
-                </p>
-                <button
+                </motion.p>
+                <motion.button
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={handleClearFilters}
                   className="btn-primary"
                 >
                   Clear All Filters
-                </button>
+                </motion.button>
               </div>
             )}
           </div>

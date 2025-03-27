@@ -1,6 +1,8 @@
 
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { keyframes } from "tailwindcss/defaultTheme";
+import { useEffect, useState } from "react";
 
 interface LoadingSpinnerProps {
   size?: "sm" | "md" | "lg";
@@ -14,6 +16,23 @@ const LoadingSpinner = ({ size = "md", className, text }: LoadingSpinnerProps) =
     md: "w-8 h-8",
     lg: "w-12 h-12",
   };
+  
+  const [dots, setDots] = useState("");
+  
+  useEffect(() => {
+    if (!text) return;
+    
+    const interval = setInterval(() => {
+      setDots(prev => {
+        if (prev === "...") return "";
+        if (prev === "..") return "...";
+        if (prev === ".") return "..";
+        return ".";
+      });
+    }, 500);
+    
+    return () => clearInterval(interval);
+  }, [text]);
 
   return (
     <div className={cn("flex flex-col items-center justify-center", className)}>
@@ -21,11 +40,7 @@ const LoadingSpinner = ({ size = "md", className, text }: LoadingSpinnerProps) =
       {text && (
         <p className="mt-2 text-sm text-gray-600">
           {text}
-          <span className="loading-dots inline-flex ml-1">
-            <span className="mx-px">.</span>
-            <span className="mx-px">.</span>
-            <span className="mx-px">.</span>
-          </span>
+          <span className="inline-block min-w-[18px]">{dots}</span>
         </p>
       )}
     </div>

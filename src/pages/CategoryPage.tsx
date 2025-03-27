@@ -6,7 +6,8 @@ import Footer from '@/components/layout/Footer';
 import ProductCard from '@/components/ui/ProductCard';
 import { ArrowLeft, Filter, ChevronDown, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ContentSkeleton } from '@/components/ui/ContentSkeleton';
 
 // Define category data structure
 interface CategoryInfo {
@@ -202,15 +203,23 @@ const CategoryPage = () => {
   const [sortBy, setSortBy] = useState("relevance");
   const [showFilters, setShowFilters] = useState(false);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 100]);
+  const [isLoading, setIsLoading] = useState(true);
   
   const category = categoryId ? categoryData[categoryId] : null;
   
   useEffect(() => {
+    // Simulate loading
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+    
     // If category doesn't exist, show error toast and redirect to products page
     if (categoryId && !category) {
       toast.error("Category not found");
       navigate("/products");
     }
+    
+    return () => clearTimeout(timer);
   }, [categoryId, category, navigate]);
   
   if (!category) {
@@ -252,34 +261,47 @@ const CategoryPage = () => {
   };
   
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       
       <main className="flex-grow pt-20">
         {/* Category Header */}
-        <section className={`py-10 md:py-16 ${category.backgroundColor}`}>
+        <section className={`py-8 md:py-12 ${category.backgroundColor}`}>
           <div className="container-custom">
-            <button 
+            <motion.button 
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3 }}
               onClick={() => navigate(-1)} 
               className="flex items-center text-gray-600 hover:text-gray-900 mb-4 transition-colors"
             >
               <ArrowLeft className="w-4 h-4 mr-1" />
               <span>Back</span>
-            </button>
+            </motion.button>
             
-            <div className="flex items-center mb-4">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="flex items-center mb-4"
+            >
               <span className="text-4xl mr-4">{category.icon}</span>
               <h1 className="text-3xl md:text-4xl font-bold text-gray-900">{category.name}</h1>
-            </div>
+            </motion.div>
             
-            <p className="text-lg text-gray-600 max-w-2xl">
+            <motion.p 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              className="text-lg text-gray-600 max-w-2xl"
+            >
               {category.description}
-            </p>
+            </motion.p>
           </div>
         </section>
         
         {/* Filters and Search */}
-        <section className="py-8 border-b border-gray-200">
+        <section className="py-6 border-b border-gray-200">
           <div className="container-custom">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               {/* Search Bar */}
@@ -326,52 +348,70 @@ const CategoryPage = () => {
                     className="flex items-center space-x-1 text-nimocare-600 hover:text-nimocare-800 transition-colors text-sm"
                   >
                     <X className="w-4 h-4" />
-                    <span>Clear Filters</span>
+                    <span>Clear</span>
                   </button>
                 )}
               </div>
             </div>
             
             {/* Expanded Filters */}
-            {showFilters && (
-              <div className="mt-6 p-4 border border-gray-200 rounded-lg bg-white grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Price Range */}
-                <div>
-                  <h3 className="font-medium mb-3 text-gray-900">Price Range</h3>
-                  <div className="px-2">
-                    <div className="flex justify-between text-sm text-gray-600 mb-2">
-                      <span>${priceRange[0]}</span>
-                      <span>${priceRange[1]}</span>
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-6 p-4 border border-gray-200 rounded-lg bg-white grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Price Range */}
+                    <div>
+                      <h3 className="font-medium mb-3 text-gray-900">Price Range</h3>
+                      <div className="px-2">
+                        <div className="flex justify-between text-sm text-gray-600 mb-2">
+                          <span>${priceRange[0]}</span>
+                          <span>${priceRange[1]}</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          step="5"
+                          value={priceRange[1]}
+                          onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
+                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-nimocare-600"
+                        />
+                      </div>
                     </div>
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      step="5"
-                      value={priceRange[1]}
-                      onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                    />
                   </div>
-                </div>
-              </div>
-            )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </section>
         
         {/* Product Grid */}
         <section className="py-10">
           <div className="container-custom">
-            {filteredProducts.length > 0 ? (
+            {isLoading ? (
+              <div className="animate-fade-in">
+                <ContentSkeleton type="card" count={8} />
+              </div>
+            ) : filteredProducts.length > 0 ? (
               <>
                 <p className="text-gray-600 mb-6">{filteredProducts.length} products found</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {filteredProducts.map((product) => (
+                  {filteredProducts.map((product, index) => (
                     <motion.div
                       key={product.id}
-                      initial={{ opacity: 0, y: 10 }}
+                      initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
+                      transition={{ 
+                        duration: 0.4,
+                        delay: index * 0.05,
+                        ease: [0.25, 0.1, 0.25, 1.0]
+                      }}
                     >
                       <ProductCard {...product} />
                     </motion.div>
@@ -380,19 +420,41 @@ const CategoryPage = () => {
               </>
             ) : (
               <div className="text-center py-16">
-                <div className="mb-4 text-nimocare-400">
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="mb-4 text-nimocare-400"
+                >
                   <X className="w-12 h-12 mx-auto" />
-                </div>
-                <h3 className="text-xl font-medium text-gray-900 mb-2">No products found</h3>
-                <p className="text-gray-600 mb-4">
+                </motion.div>
+                <motion.h3 
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                  className="text-xl font-medium text-gray-900 mb-2"
+                >
+                  No products found
+                </motion.h3>
+                <motion.p
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="text-gray-600 mb-4"
+                >
                   We couldn't find any products matching your criteria in this category.
-                </p>
-                <button
+                </motion.p>
+                <motion.button
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={handleClearFilters}
                   className="btn-primary"
                 >
                   Clear All Filters
-                </button>
+                </motion.button>
               </div>
             )}
           </div>
