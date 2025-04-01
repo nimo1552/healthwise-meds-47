@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
@@ -24,16 +24,17 @@ import Seller from "./pages/Seller";
 import SystemOptimization from "./pages/SystemOptimization";
 import UserManagement from "./pages/UserManagement";
 import { runGarbageCollection } from "./utils/garbageCollection";
+import LiveChat from "./components/ui/LiveChat";
 
 function App() {
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [theme, setTheme] = React.useState(localStorage.getItem("theme") || "light");
 
-  useEffect(() => {
+  React.useEffect(() => {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
   // Set up periodic garbage collection
-  useEffect(() => {
+  React.useEffect(() => {
     // Run garbage collection every 5 minutes
     const gcInterval = setInterval(() => {
       runGarbageCollection();
@@ -82,6 +83,7 @@ function App() {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </PageTransition>
+        <LiveChat />
       </Router>
     </ThemeProvider>
   );
