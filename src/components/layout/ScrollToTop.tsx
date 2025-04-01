@@ -9,10 +9,7 @@ const ScrollToTop = () => {
   useEffect(() => {
     // Only scroll to top if the path has changed
     if (prevPathRef.current !== pathname) {
-      window.scrollTo({
-        top: 0,
-        behavior: "instant" // Use instant instead of smooth for better performance
-      });
+      window.scrollTo(0, 0);
       prevPathRef.current = pathname;
     }
   }, [pathname]);

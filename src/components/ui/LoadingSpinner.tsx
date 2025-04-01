@@ -23,12 +23,12 @@ const LoadingSpinner = ({ size = "md", className, text }: LoadingSpinnerProps) =
     
     // Use a variable to track if component is mounted
     let isMounted = true;
+    let dotsCount = 0;
     
     const interval = setInterval(() => {
       if (isMounted) {
-        setDots(prev => {
-          return prev.length >= 3 ? "" : prev + ".";
-        });
+        dotsCount = (dotsCount + 1) % 4;
+        setDots(".".repeat(dotsCount));
       }
     }, 500);
     
