@@ -8,18 +8,24 @@ import UserAccountSettings from '@/components/account/UserAccountSettings';
 import AddressManagement from '@/components/addresses/AddressManagement';
 import LoyaltyProgram from '@/components/loyalty/LoyaltyProgram';
 import PharmacyLocator from '@/components/pharmacy/PharmacyLocator';
-import { Clock, FileText, MapPin, Settings, Award, Map } from 'lucide-react';
+import UserProfile from '@/components/users/UserProfile';
+import { Clock, FileText, MapPin, Settings, Award, Map, UserRound } from 'lucide-react';
 
 const DashboardTabs = () => {
-  const [activeTab, setActiveTab] = useState('orders');
+  const [activeTab, setActiveTab] = useState('profile');
   
   return (
     <div className="container mx-auto py-10 px-4">
       <h1 className="text-3xl font-bold mb-2">My Account</h1>
-      <p className="text-gray-600 mb-8">Manage your orders, prescriptions, and account settings</p>
+      <p className="text-gray-600 mb-8">Manage your profile, orders, prescriptions, and account settings</p>
       
       <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="space-y-8">
-        <TabsList className="grid grid-cols-3 md:grid-cols-6 h-auto p-1 gap-2">
+        <TabsList className="grid grid-cols-3 md:grid-cols-7 h-auto p-1 gap-2">
+          <TabsTrigger value="profile" className="flex flex-col items-center py-3 px-2 h-auto data-[state=active]:bg-nimocare-50 data-[state=active]:text-nimocare-700">
+            <UserRound className="h-5 w-5 mb-1" />
+            <span className="text-xs">Profile</span>
+          </TabsTrigger>
+          
           <TabsTrigger value="orders" className="flex flex-col items-center py-3 px-2 h-auto data-[state=active]:bg-nimocare-50 data-[state=active]:text-nimocare-700">
             <Clock className="h-5 w-5 mb-1" />
             <span className="text-xs">Orders</span>
@@ -52,6 +58,10 @@ const DashboardTabs = () => {
         </TabsList>
         
         <Separator />
+        
+        <TabsContent value="profile" className="mt-6">
+          <UserProfile />
+        </TabsContent>
         
         <TabsContent value="orders" className="mt-6">
           <OrderHistory />

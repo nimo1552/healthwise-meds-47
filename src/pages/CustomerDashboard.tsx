@@ -13,7 +13,7 @@ const CustomerDashboard = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-grow">
+      <main className="flex-grow bg-gray-50">
         <DashboardTabs />
       </main>
       <Footer />

@@ -22,6 +22,7 @@ import { ThemeProvider } from "./components/theme-provider";
 import AdminAI from "./pages/AdminAI";
 import Seller from "./pages/Seller";
 import SystemOptimization from "./pages/SystemOptimization";
+import UserManagement from "./pages/UserManagement";
 import { runGarbageCollection } from "./utils/garbageCollection";
 
 function App() {
@@ -77,6 +78,7 @@ function App() {
             <Route path="/admin-ai" element={<AdminAI />} />
             <Route path="/seller" element={<Seller />} />
             <Route path="/system" element={<SystemOptimization />} />
+            <Route path="/user-management" element={<UserManagement />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </PageTransition>

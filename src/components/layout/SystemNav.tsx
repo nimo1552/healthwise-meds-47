@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Cpu, Activity, Settings } from 'lucide-react';
+import { Cpu, Activity, Settings, UsersRound } from 'lucide-react';
 
 const SystemNav = () => {
   return (
@@ -18,6 +18,13 @@ const SystemNav = () => {
             <Link to="/admin-ai">
               <Settings className="h-4 w-4 mr-1" />
               Admin
+            </Link>
+          </Button>
+          
+          <Button asChild variant="ghost" size="sm">
+            <Link to="/user-management">
+              <UsersRound className="h-4 w-4 mr-1" />
+              Users
             </Link>
           </Button>
           
