@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import Index from "./pages/Index";
@@ -17,7 +18,7 @@ import StoreLocator from "./pages/StoreLocator";
 import NotFound from "./pages/NotFound";
 import { PageTransition } from "./components/ui/PageTransition";
 import ScrollToTop from "./components/layout/ScrollToTop";
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "./components/theme-provider";
 import AdminAI from "./pages/AdminAI";
 import Seller from "./pages/Seller";
 
