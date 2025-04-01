@@ -21,6 +21,7 @@ import ScrollToTop from "./components/layout/ScrollToTop";
 import { ThemeProvider } from "./components/theme-provider";
 import AdminAI from "./pages/AdminAI";
 import Seller from "./pages/Seller";
+import { runGarbageCollection } from "./utils/garbageCollection";
 
 function App() {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
@@ -28,6 +29,29 @@ function App() {
   useEffect(() => {
     localStorage.setItem("theme", theme);
   }, [theme]);
+
+  // Set up periodic garbage collection
+  useEffect(() => {
+    // Run garbage collection every 5 minutes
+    const gcInterval = setInterval(() => {
+      runGarbageCollection();
+    }, 5 * 60 * 1000);
+    
+    // Run garbage collection when the app becomes visible again
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        runGarbageCollection();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // Clean up on unmount
+    return () => {
+      clearInterval(gcInterval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-react-theme">
