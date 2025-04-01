@@ -21,6 +21,7 @@ import ScrollToTop from "./components/layout/ScrollToTop";
 import { ThemeProvider } from "./components/theme-provider";
 import AdminAI from "./pages/AdminAI";
 import Seller from "./pages/Seller";
+import SystemOptimization from "./pages/SystemOptimization";
 import { runGarbageCollection } from "./utils/garbageCollection";
 
 function App() {
@@ -75,6 +76,7 @@ function App() {
             <Route path="/store-locator" element={<StoreLocator />} />
             <Route path="/admin-ai" element={<AdminAI />} />
             <Route path="/seller" element={<Seller />} />
+            <Route path="/system" element={<SystemOptimization />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </PageTransition>
