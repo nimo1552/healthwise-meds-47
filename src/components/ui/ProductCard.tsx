@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Heart, ShoppingCart, AlertCircle, Star, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useGarbageCollection } from '@/hooks/use-garbage-collection';
 
 interface ProductCardProps {
   id: number;
@@ -31,7 +33,27 @@ const ProductCard = ({
 }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const imageRef = useRef<HTMLImageElement>(null);
   const navigate = useNavigate();
+  
+  // Register this component with the garbage collector
+  const { touch } = useGarbageCollection(
+    `product-card-${id}`,
+    () => {
+      // Clean up any resources when component is disposed
+      if (imageRef.current) {
+        // Clear image source to release memory
+        imageRef.current.src = '';
+      }
+      
+      // Clean up any cached data
+      const cachedDataKey = `product-detail-${id}`;
+      if (sessionStorage.getItem(cachedDataKey)) {
+        sessionStorage.removeItem(cachedDataKey);
+      }
+    },
+    { touchOnRender: false, verbose: false }
+  );
 
   useEffect(() => {
     try {
@@ -40,10 +62,13 @@ const ProductCard = ({
         : [];
       
       setIsFavorite(favorites.some((favId: number) => favId === id));
+      
+      // Touch the resource whenever it's checked for favorites
+      touch();
     } catch (error) {
       console.error('Error checking favorites:', error);
     }
-  }, [id]);
+  }, [id, touch]);
 
   const addToRecentlyViewed = () => {
     try {
@@ -58,6 +83,9 @@ const ProductCard = ({
       const updatedProducts = [product, ...filteredProducts].slice(0, 10);
       
       localStorage.setItem('recentlyViewedProducts', JSON.stringify(updatedProducts));
+      
+      // Touch the resource when it's viewed
+      touch();
     } catch (error) {
       console.error('Error adding to recently viewed:', error);
     }
@@ -66,12 +94,18 @@ const ProductCard = ({
   const handleProductClick = (e: React.MouseEvent) => {
     if (e.defaultPrevented) return;
     addToRecentlyViewed();
+    
+    // Touch the resource on click
+    touch();
   };
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     toast.success(`Added ${name} to cart`);
+    
+    // Touch the resource on interaction
+    touch();
   };
 
   const handleToggleFavorite = (e: React.MouseEvent) => {
@@ -94,6 +128,9 @@ const ProductCard = ({
       setIsFavorite(!isFavorite);
       
       toast.success(isFavorite ? `Removed ${name} from wishlist` : `Added ${name} to wishlist`);
+      
+      // Touch the resource on interaction
+      touch();
     } catch (error) {
       console.error('Error updating favorites:', error);
     }
@@ -103,7 +140,16 @@ const ProductCard = ({
     e.preventDefault();
     e.stopPropagation();
     addToRecentlyViewed();
+    
+    // Touch the resource on quick view
+    touch();
+    
     navigate(`/product/${id}?quickView=true`);
+  };
+
+  // When mouse interaction occurs, touch the resource
+  const handleInteraction = () => {
+    touch();
   };
 
   const renderStars = () => {
@@ -148,18 +194,24 @@ const ProductCard = ({
         "relative flex flex-col bg-white rounded-xl overflow-hidden shadow-soft transition-all duration-300",
         isHovered ? "shadow-medium -translate-y-1" : ""
       )}
-      onMouseEnter={() => setIsHovered(true)}
+      onMouseEnter={() => {
+        setIsHovered(true);
+        handleInteraction();
+      }}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleProductClick}
+      onFocus={handleInteraction}
     >
       <div className="relative aspect-square overflow-hidden bg-gray-100">
         <img 
+          ref={imageRef}
           src={image} 
           alt={name} 
           className={cn(
             "object-cover w-full h-full transition-transform duration-400",
             isHovered ? "scale-105" : ""
-          )} 
+          )}
+          onLoad={handleInteraction}
         />
         
         {isPrescriptionRequired && (

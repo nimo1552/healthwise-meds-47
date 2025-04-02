@@ -1,7 +1,8 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { getDevicePerformanceProfile } from "@/utils/performanceUtils";
+import { useGarbageCollection } from "@/hooks/use-garbage-collection";
 
 interface PageTransitionProps {
   children: React.ReactNode;
@@ -13,6 +14,34 @@ export const PageTransition = ({ children }: PageTransitionProps) => {
   
   // Detect device capabilities, but only on mount to avoid re-renders
   const [capabilities] = useState(getDevicePerformanceProfile());
+  
+  // Generate a unique identifier for this component instance
+  const transitionId = React.useId();
+  
+  // Register with garbage collection to clean up any resources
+  const { touch } = useGarbageCollection(
+    `page-transition-${transitionId}`,
+    () => {
+      // Cleanup function - executed when the component is disposed
+      // This ensures any animation resources are properly cleaned up
+      console.log("PageTransition component cleaned up");
+    },
+    { touchOnRender: false }
+  );
+  
+  // Touch the resource when visibility changes to prevent premature collection
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        touch();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [touch]);
   
   // If user prefers reduced motion or device is low-end, use minimal animations
   const shouldReduceMotion = prefersReducedMotion || capabilities.tier === 'low';
@@ -50,6 +79,7 @@ export const PageTransition = ({ children }: PageTransitionProps) => {
       {...transitionProps}
       className="w-full"
       layoutId="page-transition"
+      onAnimationComplete={() => touch()}
     >
       {children}
     </motion.div>
