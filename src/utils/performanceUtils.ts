@@ -1,3 +1,4 @@
+
 // Utility function to throttle function calls
 export function throttle<T extends (...args: any[]) => any>(func: T, limit: number): T {
   let lastFunc: ReturnType<typeof setTimeout> | null;
@@ -19,10 +20,10 @@ export function throttle<T extends (...args: any[]) => any>(func: T, limit: numb
 }
 
 // Add the correct type for device performance tiers
-type PerformanceTier = "low" | "medium" | "high";
+export type PerformanceTier = "low" | "medium" | "high";
 
 // Properly type the performance profile
-interface PerformanceProfile {
+export interface PerformanceProfile {
   tier: PerformanceTier;
   canUseHeavyAnimations: boolean;
   recommendedImagesQuality: PerformanceTier;
@@ -45,7 +46,8 @@ export function getDevicePerformanceProfile(): PerformanceProfile {
   // Low-end device detection
   const isLowEndDevice = () => {
     // Check memory (less than 4GB suggests a lower-end device)
-    if (navigator.deviceMemory && navigator.deviceMemory < 4) {
+    // Use optional chaining for deviceMemory which is not standard in all browsers
+    if ((navigator as any).deviceMemory && (navigator as any).deviceMemory < 4) {
       return true;
     }
     
@@ -55,8 +57,8 @@ export function getDevicePerformanceProfile(): PerformanceProfile {
     }
     
     // Check for battery status if available
-    if (navigator.getBattery) {
-      navigator.getBattery().then(battery => {
+    if ((navigator as any).getBattery) {
+      (navigator as any).getBattery().then((battery: any) => {
         // If battery is low and not charging, consider it a constraint
         if (battery.level < 0.2 && !battery.charging) {
           return true;
@@ -72,7 +74,7 @@ export function getDevicePerformanceProfile(): PerformanceProfile {
   // High-end device detection
   const isHighEndDevice = () => {
     // Check memory (8GB or more suggests a higher-end device)
-    if (navigator.deviceMemory && navigator.deviceMemory >= 8) {
+    if ((navigator as any).deviceMemory && (navigator as any).deviceMemory >= 8) {
       return true;
     }
     

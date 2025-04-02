@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef, memo } from 'react';
 import { useGarbageCollection } from '@/hooks/use-garbage-collection';
-import { throttle, detectDeviceCapabilities } from '@/utils/performanceUtils';
+import { throttle, getDevicePerformanceProfile } from '@/utils/performanceUtils';
 
 type OptimizedImageProps = {
   src: string;
@@ -36,7 +36,7 @@ const OptimizedImage = memo(({
   const uniqueId = `image-${src.split('/').pop() || Math.random().toString(36).substring(7)}`;
   
   // Get device capabilities once on mount
-  const capabilities = detectDeviceCapabilities();
+  const capabilities = getDevicePerformanceProfile();
   
   // Use the enhanced garbage collection hook with less frequent touches
   const { touch } = useGarbageCollection(

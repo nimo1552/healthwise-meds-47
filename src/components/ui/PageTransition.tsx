@@ -1,7 +1,7 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { detectDeviceCapabilities } from "@/utils/performanceUtils";
+import { getDevicePerformanceProfile } from "@/utils/performanceUtils";
 
 interface PageTransitionProps {
   children: React.ReactNode;
@@ -12,7 +12,7 @@ export const PageTransition = ({ children }: PageTransitionProps) => {
   const prefersReducedMotion = useReducedMotion();
   
   // Detect device capabilities, but only on mount to avoid re-renders
-  const [capabilities] = useState(detectDeviceCapabilities());
+  const [capabilities] = useState(getDevicePerformanceProfile());
   
   // If user prefers reduced motion or device is low-end, use minimal animations
   const shouldReduceMotion = prefersReducedMotion || capabilities.tier === 'low';
