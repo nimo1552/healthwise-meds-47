@@ -56,6 +56,10 @@ const Navbar = () => {
     </a>
   );
 
+  const handleMobileMenuToggle = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
     <header
       className={cn(
@@ -148,9 +152,11 @@ const Navbar = () => {
             )}
           </Link>
           
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 rounded-full hover:bg-nimocare-50 transition-colors"
+          <Button
+            onClick={handleMobileMenuToggle}
+            className="p-2 rounded-full hover:bg-nimocare-50 transition-colors flex items-center justify-center"
+            variant="ghost"
+            size="icon"
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
           >
             {isMobileMenuOpen ? (
@@ -158,7 +164,7 @@ const Navbar = () => {
             ) : (
               <Menu className="w-5 h-5" />
             )}
-          </button>
+          </Button>
         </div>
       </div>
 
