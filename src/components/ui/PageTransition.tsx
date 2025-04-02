@@ -1,6 +1,6 @@
 
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { detectDeviceCapabilities } from "@/utils/performanceUtils";
 
 interface PageTransitionProps {
@@ -8,20 +8,34 @@ interface PageTransitionProps {
 }
 
 export const PageTransition = ({ children }: PageTransitionProps) => {
-  // Detect device capabilities
-  const [capabilities] = React.useState(detectDeviceCapabilities());
+  // Use useReducedMotion hook to respect user's system preferences
+  const prefersReducedMotion = useReducedMotion();
   
-  // Simplify animations for low-end devices
-  const transitionProps = capabilities.tier === 'low' 
+  // Detect device capabilities, but only on mount to avoid re-renders
+  const [capabilities] = useState(detectDeviceCapabilities());
+  
+  // If user prefers reduced motion or device is low-end, use minimal animations
+  const shouldReduceMotion = prefersReducedMotion || capabilities.tier === 'low';
+  
+  // Create transition properties based on device capabilities
+  const transitionProps = shouldReduceMotion 
     ? {
-        // Simplified animations for low-end devices
-        initial: { opacity: 0.9 },
+        // Almost no animation for reduced motion preference or low-end devices
+        initial: { opacity: 0.95 },
         animate: { opacity: 1 },
-        exit: { opacity: 0.9 },
-        transition: { duration: 0.1 }
+        exit: { opacity: 0.95 },
+        transition: { duration: 0.05 }
+      }
+    : capabilities.tier === 'medium'
+    ? {
+        // Simplified animations for medium-tier devices
+        initial: { opacity: 0.8 },
+        animate: { opacity: 1 },
+        exit: { opacity: 0.8 },
+        transition: { duration: 0.15 }
       }
     : {
-        // Full animations for mid to high-end devices
+        // Full animations only for high-end devices
         initial: { opacity: 0 },
         animate: { opacity: 1 },
         exit: { opacity: 0 },
@@ -35,6 +49,7 @@ export const PageTransition = ({ children }: PageTransitionProps) => {
     <motion.div
       {...transitionProps}
       className="w-full"
+      layoutId="page-transition"
     >
       {children}
     </motion.div>

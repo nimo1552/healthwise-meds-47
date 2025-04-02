@@ -3,7 +3,7 @@
  * Performance optimization utilities
  */
 
-// Debouncing function
+// More efficient debouncing function with proper typing
 export const debounce = <F extends (...args: any[]) => any>(
   func: F,
   waitFor: number
@@ -18,7 +18,7 @@ export const debounce = <F extends (...args: any[]) => any>(
   };
 };
 
-// Throttling function
+// More efficient throttling function with proper typing
 export const throttle = <F extends (...args: any[]) => any>(
   func: F,
   waitFor: number
@@ -44,31 +44,42 @@ export const optimizeGCInterval = (
   // Adjust interval based on performance
   // Lower performance = less frequent GC to reduce overhead
   if (performanceScore < 30) {
-    return Math.min(currentInterval * 2, 10 * 60 * 1000); // Max 10 minutes
+    return Math.min(currentInterval * 2, 15 * 60 * 1000); // Max 15 minutes (increased)
   } else if (performanceScore > 70) {
     return Math.max(currentInterval / 1.5, 30 * 1000); // Min 30 seconds
   }
   return currentInterval;
 };
 
-// Batch DOM updates to reduce reflow/repaint
+// More efficient DOM batch updates
 export const batchDOMUpdates = (updates: (() => void)[]) => {
-  // Request animation frame to batch updates in the next frame
+  // Use requestAnimationFrame to batch updates in the next frame
+  if (updates.length === 0) return;
+  
   requestAnimationFrame(() => {
-    // Force a style recalculation to batch all updates together
-    document.body.getBoundingClientRect();
-    
     // Apply all updates
     updates.forEach(update => update());
   });
 };
 
-// Detect performance capabilities of the device
+// Cache for device capabilities to avoid recalculating
+let deviceCapabilitiesCache: {
+  tier: 'low' | 'medium' | 'high',
+  canUseHeavyAnimations: boolean,
+  recommendedImagesQuality: 'low' | 'medium' | 'high'
+} | null = null;
+
+// Detect performance capabilities of the device with caching
 export const detectDeviceCapabilities = (): {
   tier: 'low' | 'medium' | 'high',
   canUseHeavyAnimations: boolean,
   recommendedImagesQuality: 'low' | 'medium' | 'high'
 } => {
+  // Return cached result if available to avoid expensive calculations
+  if (deviceCapabilitiesCache !== null) {
+    return deviceCapabilitiesCache;
+  }
+  
   // Default to medium tier
   let tier: 'low' | 'medium' | 'high' = 'medium';
   
@@ -83,13 +94,24 @@ export const detectDeviceCapabilities = (): {
     tier = 'high';
   } else if (cores <= 2 || memory <= 2) {
     tier = 'low';
+  } else if (
+    // Check for mobile devices which typically have worse performance
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  ) {
+    tier = 'medium'; // Default mobile to medium tier at most
   }
   
-  return {
+  // Create the result
+  const result = {
     tier,
     canUseHeavyAnimations: tier !== 'low',
     recommendedImagesQuality: tier === 'high' ? 'high' : (tier === 'medium' ? 'medium' : 'low')
   };
+  
+  // Cache the result
+  deviceCapabilitiesCache = result;
+  
+  return result;
 };
 
 // Calculate performance score based on various metrics
@@ -105,4 +127,10 @@ export const calculatePerformanceScore = (
   
   // Weighted average
   return (fpsScore * 0.4) + (memoryScore * 0.3) + (interactionScore * 0.3);
+};
+
+// Clear animation frames utility to prevent memory leaks
+export const clearAllAnimationFrames = (frameIds: number[]) => {
+  frameIds.forEach(id => cancelAnimationFrame(id));
+  return [];
 };

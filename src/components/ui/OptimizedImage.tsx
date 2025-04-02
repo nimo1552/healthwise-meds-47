@@ -1,7 +1,7 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { useGarbageCollection } from '@/hooks/use-garbage-collection';
-import { throttle } from '@/utils/performanceUtils';
+import { throttle, detectDeviceCapabilities } from '@/utils/performanceUtils';
 
 type OptimizedImageProps = {
   src: string;
@@ -19,7 +19,7 @@ type OptimizedImageProps = {
  * An optimized image component that uses garbage collection
  * to clean up resources when the component is unmounted
  */
-const OptimizedImage = ({
+const OptimizedImage = memo(({
   src,
   alt,
   width,
@@ -35,29 +35,44 @@ const OptimizedImage = ({
   const imgRef = useRef<HTMLImageElement>(null);
   const uniqueId = `image-${src.split('/').pop() || Math.random().toString(36).substring(7)}`;
   
+  // Get device capabilities once on mount
+  const capabilities = detectDeviceCapabilities();
+  
   // Use the enhanced garbage collection hook with less frequent touches
   const { touch } = useGarbageCollection(
     uniqueId,
     () => {
       // Cleanup function - executed when the resource is disposed
       if (imgRef.current) {
-        // In a real application, you might want to do more cleanup
         imgRef.current.src = '';
       }
     },
-    { touchOnRender: true, verbose: false }
+    { touchOnRender: false, verbose: false } // Don't touch on every render to reduce overhead
   );
   
   // Throttle the interaction handler to reduce performance impact
   const handleInteraction = throttle(() => {
     touch();
-  }, 1000); // Only run at most once per second
+  }, 2000); // Only run at most once per 2 seconds (reduced frequency)
   
   useEffect(() => {
     // Reset states when src changes
     setIsLoaded(false);
     setError(false);
   }, [src]);
+  
+  // Preload priority images
+  useEffect(() => {
+    if (priority && !isLoaded) {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {
+        if (imgRef.current) {
+          imgRef.current.src = src;
+        }
+      };
+    }
+  }, [priority, src, isLoaded]);
   
   const handleLoad = () => {
     setIsLoaded(true);
@@ -81,6 +96,9 @@ const OptimizedImage = ({
     aspectRatio: width && height ? `${width} / ${height}` : undefined,
   };
   
+  // For low-end devices, only use simple fade transitions
+  const transitionDuration = capabilities.tier === 'low' ? '0.1s' : '0.3s';
+  
   return (
     <div 
       className={`optimized-image-container relative ${className}`}
@@ -99,7 +117,8 @@ const OptimizedImage = ({
       ) : (
         <img
           ref={imgRef}
-          src={src}
+          src={priority ? src : lazyLoad ? undefined : src} // Only set src immediately if not lazy loading
+          data-src={lazyLoad && !priority ? src : undefined} // Use data-src for lazy loading
           alt={alt}
           width={width}
           height={height}
@@ -107,11 +126,17 @@ const OptimizedImage = ({
           fetchPriority={fetchPriority as 'high' | 'low' | 'auto'}
           onLoad={handleLoad}
           onError={handleError}
-          className={`${isLoaded ? 'opacity-100' : 'opacity-0'} rounded`}
+          className={`rounded transition-opacity`}
+          style={{
+            opacity: isLoaded ? 1 : 0,
+            transitionDuration: transitionDuration,
+          }}
         />
       )}
     </div>
   );
-};
+});
+
+OptimizedImage.displayName = 'OptimizedImage';
 
 export default OptimizedImage;

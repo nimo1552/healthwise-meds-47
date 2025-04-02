@@ -6,8 +6,11 @@
 // Track objects that need cleanup
 const trackedObjects: Map<string, { dispose: () => void; lastAccessed: number }> = new Map();
 
-// Default TTL (time to live) in milliseconds (5 minutes)
-const DEFAULT_TTL = 5 * 60 * 1000;
+// Default TTL (time to live) in milliseconds (10 minutes - increased from 5 minutes)
+const DEFAULT_TTL = 10 * 60 * 1000;
+
+// Track if garbage collection is running to prevent overlapping calls
+let isRunningGC = false;
 
 /**
  * Register an object for garbage collection
@@ -15,11 +18,18 @@ const DEFAULT_TTL = 5 * 60 * 1000;
  * @param disposeFunction Function to call when the object is disposed
  */
 export const registerForCleanup = (id: string, disposeFunction: () => void): void => {
-  trackedObjects.set(id, {
-    dispose: disposeFunction,
-    lastAccessed: Date.now(),
-  });
-  console.log(`Registered object for cleanup: ${id}`);
+  // If already tracked, don't overwrite the last accessed time
+  if (trackedObjects.has(id)) {
+    trackedObjects.set(id, {
+      dispose: disposeFunction,
+      lastAccessed: trackedObjects.get(id)!.lastAccessed
+    });
+  } else {
+    trackedObjects.set(id, {
+      dispose: disposeFunction,
+      lastAccessed: Date.now(),
+    });
+  }
 };
 
 /**
@@ -42,7 +52,6 @@ export const disposeObject = (id: string): void => {
   if (obj) {
     try {
       obj.dispose();
-      console.log(`Successfully disposed object: ${id}`);
     } catch (e) {
       console.error(`Error disposing object ${id}:`, e);
     }
@@ -55,23 +64,41 @@ export const disposeObject = (id: string): void => {
  * @param maxAge Maximum age in milliseconds before an object is considered unused
  */
 export const runGarbageCollection = (maxAge: number = DEFAULT_TTL): void => {
-  const now = Date.now();
-  let collectedCount = 0;
+  // Prevent multiple GC runs at the same time
+  if (isRunningGC) return;
   
-  trackedObjects.forEach((obj, id) => {
-    if (now - obj.lastAccessed > maxAge) {
-      try {
-        obj.dispose();
-        trackedObjects.delete(id);
-        collectedCount++;
-      } catch (e) {
-        console.error(`Error during garbage collection for ${id}:`, e);
+  try {
+    isRunningGC = true;
+    const now = Date.now();
+    let collectedCount = 0;
+    const objectsToDispose: string[] = [];
+    
+    // First identify objects to dispose
+    trackedObjects.forEach((obj, id) => {
+      if (now - obj.lastAccessed > maxAge) {
+        objectsToDispose.push(id);
+      }
+    });
+    
+    // Then dispose them
+    for (const id of objectsToDispose) {
+      const obj = trackedObjects.get(id);
+      if (obj) {
+        try {
+          obj.dispose();
+          trackedObjects.delete(id);
+          collectedCount++;
+        } catch (e) {
+          console.error(`Error during garbage collection for ${id}:`, e);
+        }
       }
     }
-  });
-  
-  if (collectedCount > 0) {
-    console.log(`Garbage collection completed. Disposed ${collectedCount} objects.`);
+    
+    if (collectedCount > 0) {
+      console.log(`Garbage collection completed. Disposed ${collectedCount} objects.`);
+    }
+  } finally {
+    isRunningGC = false;
   }
 };
 
