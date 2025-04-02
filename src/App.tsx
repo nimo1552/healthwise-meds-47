@@ -25,6 +25,8 @@ import SystemOptimization from "./pages/SystemOptimization";
 import UserManagement from "./pages/UserManagement";
 import { runGarbageCollection } from "./utils/garbageCollection";
 import LiveChat from "./components/ui/LiveChat";
+import PerformanceMonitor from "./components/performance/PerformanceMonitor"; 
+import { throttle } from "./utils/performanceUtils";
 
 function App() {
   const [theme, setTheme] = React.useState(localStorage.getItem("theme") || "light");
@@ -33,19 +35,24 @@ function App() {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  // Set up periodic garbage collection
+  // Set up periodic garbage collection with improved throttling
   React.useEffect(() => {
-    // Run garbage collection every 5 minutes
-    const gcInterval = setInterval(() => {
+    // Use throttled function for garbage collection to prevent excessive runs
+    const throttledGC = throttle(() => {
+      console.log("Running garbage collection...");
       runGarbageCollection();
-    }, 5 * 60 * 1000);
+    }, 10 * 60 * 1000); // Run at most once every 10 minutes instead of 5
     
-    // Run garbage collection when the app becomes visible again
-    const handleVisibilityChange = () => {
+    // Run garbage collection every 10 minutes (increased from 5 minutes)
+    const gcInterval = setInterval(throttledGC, 10 * 60 * 1000);
+    
+    // Throttled visibility change handler
+    const handleVisibilityChange = throttle(() => {
       if (document.visibilityState === 'visible') {
+        console.log("Running garbage collection on visibility change...");
         runGarbageCollection();
       }
-    };
+    }, 60 * 1000); // At most once per minute
     
     document.addEventListener('visibilitychange', handleVisibilityChange);
     
@@ -84,6 +91,7 @@ function App() {
           </Routes>
         </PageTransition>
         <LiveChat />
+        <PerformanceMonitor />
       </Router>
     </ThemeProvider>
   );

@@ -1,6 +1,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useGarbageCollection } from '@/hooks/use-garbage-collection';
+import { throttle } from '@/utils/performanceUtils';
 
 type OptimizedImageProps = {
   src: string;
@@ -34,7 +35,7 @@ const OptimizedImage = ({
   const imgRef = useRef<HTMLImageElement>(null);
   const uniqueId = `image-${src.split('/').pop() || Math.random().toString(36).substring(7)}`;
   
-  // Use the enhanced garbage collection hook
+  // Use the enhanced garbage collection hook with less frequent touches
   const { touch } = useGarbageCollection(
     uniqueId,
     () => {
@@ -47,10 +48,10 @@ const OptimizedImage = ({
     { touchOnRender: true, verbose: false }
   );
   
-  // Touch the resource when the image is interacted with
-  const handleInteraction = () => {
+  // Throttle the interaction handler to reduce performance impact
+  const handleInteraction = throttle(() => {
     touch();
-  };
+  }, 1000); // Only run at most once per second
   
   useEffect(() => {
     // Reset states when src changes
@@ -73,18 +74,26 @@ const OptimizedImage = ({
   const loadingAttribute = lazyLoad && !priority ? 'lazy' : undefined;
   const fetchPriority = priority ? 'high' : 'auto';
   
+  // Calculate a reasonable size for the placeholder to avoid layout shifts
+  const placeholderStyle = {
+    width: width ? `${width}px` : undefined,
+    height: height ? `${height}px` : undefined,
+    aspectRatio: width && height ? `${width} / ${height}` : undefined,
+  };
+  
   return (
     <div 
       className={`optimized-image-container relative ${className}`}
       onMouseOver={handleInteraction}
       onFocus={handleInteraction}
+      style={placeholderStyle}
     >
       {!isLoaded && !error && (
-        <div className="absolute inset-0 bg-gray-100 animate-pulse rounded" />
+        <div className="absolute inset-0 bg-gray-100 rounded" style={placeholderStyle} />
       )}
       
       {error ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded">
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded" style={placeholderStyle}>
           <span className="text-gray-500 text-sm">Failed to load image</span>
         </div>
       ) : (
@@ -98,7 +107,7 @@ const OptimizedImage = ({
           fetchPriority={fetchPriority as 'high' | 'low' | 'auto'}
           onLoad={handleLoad}
           onError={handleError}
-          className={`transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'} rounded`}
+          className={`${isLoaded ? 'opacity-100' : 'opacity-0'} rounded`}
         />
       )}
     </div>
