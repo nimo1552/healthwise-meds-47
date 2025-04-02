@@ -1,136 +1,104 @@
-
-/**
- * Performance optimization utilities
- */
-
-// More efficient debouncing function with proper typing
-export const debounce = <F extends (...args: any[]) => any>(
-  func: F,
-  waitFor: number
-): ((...args: Parameters<F>) => void) => {
-  let timeout: ReturnType<typeof setTimeout> | null = null;
-
-  return (...args: Parameters<F>): void => {
-    if (timeout !== null) {
-      clearTimeout(timeout);
+// Utility function to throttle function calls
+export function throttle<T extends (...args: any[]) => any>(func: T, limit: number): T {
+  let lastFunc: ReturnType<typeof setTimeout> | null;
+  let lastRan: number;
+  return function(this: any, ...args: Parameters<T>) {
+    if (!lastRan) {
+      func.apply(this, args);
+      lastRan = Date.now();
+    } else {
+      if (lastFunc) clearTimeout(lastFunc);
+      lastFunc = setTimeout(() => {
+        if ((Date.now() - lastRan) >= limit) {
+          func.apply(this, args);
+          lastRan = Date.now();
+        }
+      }, limit - (Date.now() - lastRan));
     }
-    timeout = setTimeout(() => func(...args), waitFor);
+  } as T;
+}
+
+// Add the correct type for device performance tiers
+type PerformanceTier = "low" | "medium" | "high";
+
+// Properly type the performance profile
+interface PerformanceProfile {
+  tier: PerformanceTier;
+  canUseHeavyAnimations: boolean;
+  recommendedImagesQuality: PerformanceTier;
+}
+
+// Return a performance profile based on the device's capabilities
+export function getDevicePerformanceProfile(): PerformanceProfile {
+  // Default to medium if we can't determine
+  const defaultProfile: PerformanceProfile = {
+    tier: "medium",
+    canUseHeavyAnimations: true,
+    recommendedImagesQuality: "medium"
   };
-};
 
-// More efficient throttling function with proper typing
-export const throttle = <F extends (...args: any[]) => any>(
-  func: F,
-  waitFor: number
-): ((...args: Parameters<F>) => ReturnType<F> | void) => {
-  let lastTime = 0;
-  let result: ReturnType<F>;
+  // If we can't detect features, return default profile
+  if (typeof window === 'undefined' || !navigator) {
+    return defaultProfile;
+  }
 
-  return (...args: Parameters<F>): ReturnType<F> | void => {
-    const now = Date.now();
-    if (now - lastTime >= waitFor) {
-      result = func(...args);
-      lastTime = now;
-      return result;
+  // Low-end device detection
+  const isLowEndDevice = () => {
+    // Check memory (less than 4GB suggests a lower-end device)
+    if (navigator.deviceMemory && navigator.deviceMemory < 4) {
+      return true;
     }
-  };
-};
-
-// Optimize garbage collection interval based on system performance
-export const optimizeGCInterval = (
-  currentInterval: number,
-  performanceScore: number // 0-100, higher is better
-): number => {
-  // Adjust interval based on performance
-  // Lower performance = less frequent GC to reduce overhead
-  if (performanceScore < 30) {
-    return Math.min(currentInterval * 2, 15 * 60 * 1000); // Max 15 minutes (increased)
-  } else if (performanceScore > 70) {
-    return Math.max(currentInterval / 1.5, 30 * 1000); // Min 30 seconds
-  }
-  return currentInterval;
-};
-
-// More efficient DOM batch updates
-export const batchDOMUpdates = (updates: (() => void)[]) => {
-  // Use requestAnimationFrame to batch updates in the next frame
-  if (updates.length === 0) return;
-  
-  requestAnimationFrame(() => {
-    // Apply all updates
-    updates.forEach(update => update());
-  });
-};
-
-// Cache for device capabilities to avoid recalculating
-let deviceCapabilitiesCache: {
-  tier: 'low' | 'medium' | 'high',
-  canUseHeavyAnimations: boolean,
-  recommendedImagesQuality: 'low' | 'medium' | 'high'
-} | null = null;
-
-// Detect performance capabilities of the device with caching
-export const detectDeviceCapabilities = (): {
-  tier: 'low' | 'medium' | 'high',
-  canUseHeavyAnimations: boolean,
-  recommendedImagesQuality: 'low' | 'medium' | 'high'
-} => {
-  // Return cached result if available to avoid expensive calculations
-  if (deviceCapabilitiesCache !== null) {
-    return deviceCapabilitiesCache;
-  }
-  
-  // Default to medium tier
-  let tier: 'low' | 'medium' | 'high' = 'medium';
-  
-  // Check for hardware concurrency (CPU cores)
-  const cores = navigator.hardwareConcurrency || 2;
-  
-  // Check for device memory (in GB)
-  const memory = (navigator as any).deviceMemory || 4;
-  
-  // Device with many cores and good memory is likely high end
-  if (cores >= 8 && memory >= 8) {
-    tier = 'high';
-  } else if (cores <= 2 || memory <= 2) {
-    tier = 'low';
-  } else if (
-    // Check for mobile devices which typically have worse performance
-    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-  ) {
-    tier = 'medium'; // Default mobile to medium tier at most
-  }
-  
-  // Create the result
-  const result = {
-    tier,
-    canUseHeavyAnimations: tier !== 'low',
-    recommendedImagesQuality: tier === 'high' ? 'high' : (tier === 'medium' ? 'medium' : 'low')
+    
+    // Check number of logical processor cores
+    if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) {
+      return true;
+    }
+    
+    // Check for battery status if available
+    if (navigator.getBattery) {
+      navigator.getBattery().then(battery => {
+        // If battery is low and not charging, consider it a constraint
+        if (battery.level < 0.2 && !battery.charging) {
+          return true;
+        }
+      }).catch(() => {
+        // If we can't get battery info, ignore this check
+      });
+    }
+    
+    return false;
   };
   
-  // Cache the result
-  deviceCapabilitiesCache = result;
+  // High-end device detection
+  const isHighEndDevice = () => {
+    // Check memory (8GB or more suggests a higher-end device)
+    if (navigator.deviceMemory && navigator.deviceMemory >= 8) {
+      return true;
+    }
+    
+    // Check number of logical processor cores
+    if (navigator.hardwareConcurrency && navigator.hardwareConcurrency >= 8) {
+      return true;
+    }
+    
+    return false;
+  };
   
-  return result;
-};
-
-// Calculate performance score based on various metrics
-export const calculatePerformanceScore = (
-  fps: number, 
-  memoryUsage: number, 
-  interactionDelay: number
-): number => {
-  // Normalize values to 0-100 scale
-  const fpsScore = Math.min(100, (fps / 60) * 100);
-  const memoryScore = Math.max(0, 100 - memoryUsage);
-  const interactionScore = Math.max(0, 100 - (interactionDelay / 100) * 100);
+  // Create profile based on device capabilities
+  if (isLowEndDevice()) {
+    return {
+      tier: "low",
+      canUseHeavyAnimations: false,
+      recommendedImagesQuality: "low"
+    };
+  } else if (isHighEndDevice()) {
+    return {
+      tier: "high",
+      canUseHeavyAnimations: true,
+      recommendedImagesQuality: "high"
+    };
+  }
   
-  // Weighted average
-  return (fpsScore * 0.4) + (memoryScore * 0.3) + (interactionScore * 0.3);
-};
-
-// Clear animation frames utility to prevent memory leaks
-export const clearAllAnimationFrames = (frameIds: number[]) => {
-  frameIds.forEach(id => cancelAnimationFrame(id));
-  return [];
-};
+  // Return medium profile as default
+  return defaultProfile;
+}

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, ShoppingCart, User, Menu, X, Store, MapPin } from 'lucide-react';
@@ -115,7 +114,7 @@ const Navbar = () => {
           >
             <ShoppingCart className="w-5 h-5" />
             {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-nimocare-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-fade-in">
+              <span className="absolute -top-1 -right-1 bg-nimocare-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                 {cartCount}
               </span>
             )}
@@ -193,21 +192,31 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile menu overlay - Fixed position with proper z-index */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 bg-black/20 z-40 md:hidden" onClick={() => setIsMobileMenuOpen(false)} />
+        <div className="fixed inset-0 bg-black/20 z-[100] md:hidden" onClick={() => setIsMobileMenuOpen(false)} />
       )}
 
       <div
         className={cn(
-          'fixed inset-y-0 right-0 w-[80%] max-w-sm bg-white z-50 transition-transform duration-300 ease-in-out shadow-xl md:hidden overflow-auto',
+          'fixed inset-y-0 right-0 w-[80%] max-w-sm bg-white z-[101] transition-transform duration-300 ease-in-out shadow-xl md:hidden overflow-auto',
           isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         )}
       >
-        <div className="p-6 pt-20">
+        <div className="p-6 pt-16">
+          <Button
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="absolute right-4 top-4 p-2 rounded-full hover:bg-nimocare-50 transition-colors flex items-center justify-center"
+            variant="ghost"
+            size="icon"
+            aria-label="Close menu"
+          >
+            <X className="w-5 h-5" />
+          </Button>
+          
           <div className="flex justify-center mb-8">
             <Logo size="lg" />
           </div>
+          
           <nav className="flex flex-col space-y-6">
             <Link 
               to="/" 
