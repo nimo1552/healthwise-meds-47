@@ -1,14 +1,14 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, UserPlus, Edit, Trash2, CheckCircle, XCircle } from 'lucide-react';
+import { Search, UserPlus, Edit, Trash2, CheckCircle, XCircle, Copy, Mail } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { MoreOptionsMenu } from '@/components/ui/more-options-menu';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([
@@ -28,7 +28,6 @@ const UserManagement = () => {
   
   const { toast } = useToast();
   
-  // Filter users based on search term and filters
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -79,6 +78,35 @@ const UserManagement = () => {
   const handleDeleteUser = (id: number) => {
     setUserToDelete(id);
     setIsDeleteDialogOpen(true);
+  };
+  
+  const handleEditUser = (id: number) => {
+    toast({
+      title: "Edit user",
+      description: `Opening edit form for user ID: ${id}`,
+    });
+  };
+
+  const handleCopyEmail = (email: string) => {
+    navigator.clipboard.writeText(email).then(() => {
+      toast({
+        title: "Email copied",
+        description: "Email address copied to clipboard",
+      });
+    }, (err) => {
+      toast({
+        title: "Failed to copy",
+        description: "Could not copy the email address",
+        variant: "destructive",
+      });
+    });
+  };
+
+  const handleSendEmail = (email: string) => {
+    toast({
+      title: "Compose email",
+      description: `Opening email composition to: ${email}`,
+    });
   };
   
   const confirmDelete = () => {
@@ -195,17 +223,31 @@ const UserManagement = () => {
                   <TableCell>{user.lastLogin}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button variant="outline" size="icon" className="h-8 w-8">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="icon" 
-                        className="h-8 w-8 text-red-500 hover:text-red-600"
-                        onClick={() => handleDeleteUser(user.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <MoreOptionsMenu 
+                        items={[
+                          {
+                            label: "Edit User",
+                            onClick: () => handleEditUser(user.id),
+                            icon: <Edit className="h-4 w-4" />
+                          },
+                          {
+                            label: "Copy Email",
+                            onClick: () => handleCopyEmail(user.email),
+                            icon: <Copy className="h-4 w-4" />
+                          },
+                          {
+                            label: "Send Email",
+                            onClick: () => handleSendEmail(user.email),
+                            icon: <Mail className="h-4 w-4" />
+                          },
+                          {
+                            label: "Delete User",
+                            onClick: () => handleDeleteUser(user.id),
+                            icon: <Trash2 className="h-4 w-4" />,
+                            variant: "destructive"
+                          }
+                        ]}
+                      />
                     </div>
                   </TableCell>
                 </TableRow>
