@@ -37,12 +37,21 @@ export const MoreOptionsMenu = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size={size} className="focus:ring-0">
+        <Button 
+          variant="ghost" 
+          size={size} 
+          className="focus:ring-0"
+          onClick={(e) => e.stopPropagation()}
+        >
           <MoreHorizontal className="h-4 w-4" />
           <span className="sr-only">More options</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align={align} className="w-[180px] bg-white z-50">
+      <DropdownMenuContent 
+        align={align} 
+        className="w-[180px] bg-white shadow-lg z-[100]"
+        sideOffset={5}
+      >
         {items.map((item, index) => (
           <React.Fragment key={`${item.label}-${index}`}>
             <DropdownMenuItem
