@@ -59,7 +59,7 @@ export const MoreOptionsMenu = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         align={align} 
-        className="w-[180px] border border-gray-200 bg-white shadow-lg z-[9999]"
+        className="w-[180px] border border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700 shadow-lg z-[9999]"
         sideOffset={8}
         onClick={(e) => e.stopPropagation()}
       >
@@ -71,14 +71,14 @@ export const MoreOptionsMenu = ({
                 e.preventDefault();
               }}
               onClick={(e) => handleItemClick(e, item.onClick)}
-              className={`flex cursor-pointer items-center px-3 py-2 hover:bg-gray-100 ${
-                item.variant === "destructive" ? "text-red-600" : ""
+              className={`flex cursor-pointer items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+                item.variant === "destructive" ? "text-red-600 dark:text-red-400" : ""
               }`}
             >
               {item.icon && <span className="mr-2">{item.icon}</span>}
               {item.label}
             </DropdownMenuItem>
-            {index < items.length - 1 && <DropdownMenuSeparator />}
+            {index < items.length - 1 && <DropdownMenuSeparator className="dark:bg-gray-700" />}
           </React.Fragment>
         ))}
       </DropdownMenuContent>

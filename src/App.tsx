@@ -29,12 +29,6 @@ import PerformanceMonitor from "./components/performance/PerformanceMonitor";
 import { throttle } from "./utils/performanceUtils";
 
 function App() {
-  const [theme, setTheme] = React.useState(localStorage.getItem("theme") || "light");
-
-  React.useEffect(() => {
-    localStorage.setItem("theme", theme);
-  }, [theme]);
-
   // Set up an enhanced garbage collection system
   useEffect(() => {
     // Define collection strategies based on different scenarios
@@ -119,7 +113,7 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider defaultTheme="system" storageKey="vite-react-theme">
+    <ThemeProvider defaultTheme="system" storageKey="vite-react-theme" attribute="class">
       <Router>
         <ScrollToTop />
         <PageTransition>

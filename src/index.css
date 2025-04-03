@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
@@ -37,6 +38,36 @@
 
     --radius: 0.75rem;
   }
+
+  .dark {
+    --background: 222 14% 15%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 14% 18%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 14% 18%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 174 70% 45%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 174 50% 30%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 174 70% 45%;
+  }
 }
 
 @layer base {
@@ -60,7 +91,7 @@
 
 @layer components {
   .glass {
-    @apply backdrop-blur-md bg-white/70 border border-white/20 shadow-soft;
+    @apply backdrop-blur-md bg-white/70 dark:bg-black/40 border border-white/20 dark:border-white/10 shadow-soft;
   }
 
   .glass-dark {
@@ -72,11 +103,11 @@
   }
 
   .btn-secondary {
-    @apply bg-white border border-nimocare-200 text-nimocare-800 hover:bg-nimocare-50 transition-all duration-300 rounded-md px-6 py-2.5 font-medium;
+    @apply bg-white dark:bg-gray-800 border border-nimocare-200 dark:border-gray-700 text-nimocare-800 dark:text-nimocare-200 hover:bg-nimocare-50 dark:hover:bg-gray-700 transition-all duration-300 rounded-md px-6 py-2.5 font-medium;
   }
 
   .btn-text {
-    @apply text-nimocare-600 hover:text-nimocare-800 transition-all duration-300 font-medium;
+    @apply text-nimocare-600 dark:text-nimocare-300 hover:text-nimocare-800 dark:hover:text-nimocare-200 transition-all duration-300 font-medium;
   }
 
   .header-1 {
@@ -92,7 +123,7 @@
   }
 
   .subtitle-1 {
-    @apply text-lg text-gray-600 max-w-2xl;
+    @apply text-lg text-gray-600 dark:text-gray-300 max-w-2xl;
   }
 
   .container-custom {
@@ -112,7 +143,7 @@
   }
   
   .subtle-ring-focus {
-    @apply focus:outline-none focus:ring-2 focus:ring-nimocare-200 focus:ring-offset-2;
+    @apply focus:outline-none focus:ring-2 focus:ring-nimocare-200 dark:focus:ring-nimocare-700 focus:ring-offset-2;
   }
   
   /* New utility classes */
@@ -125,15 +156,28 @@
   }
   
   .text-gradient {
-    @apply bg-gradient-to-r from-nimocare-600 to-nimocare-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-nimocare-600 to-nimocare-400 dark:from-nimocare-400 dark:to-nimocare-200 bg-clip-text text-transparent;
   }
   
   .bg-gradient-soft {
-    @apply bg-gradient-to-br from-gray-50 via-white to-gray-50;
+    @apply bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900;
   }
   
   .bg-gradient-primary {
-    @apply bg-gradient-to-br from-nimocare-500 to-nimocare-700;
+    @apply bg-gradient-to-br from-nimocare-500 to-nimocare-700 dark:from-nimocare-600 dark:to-nimocare-800;
+  }
+  
+  /* Dark mode enhanced components */
+  .card-dark {
+    @apply bg-gray-800 border border-gray-700 shadow-md;
+  }
+  
+  .input-dark {
+    @apply bg-gray-700 border-gray-600 text-white placeholder-gray-400;
+  }
+  
+  .dropdown-dark {
+    @apply bg-gray-800 border-gray-700;
   }
   
   /* Loading spinner classes */
@@ -167,6 +211,15 @@
     );
     background-size: 200% 100%;
     animation: shimmer 2s infinite;
+  }
+  
+  .dark .shimmer {
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
   }
 }
 
