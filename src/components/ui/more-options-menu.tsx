@@ -34,6 +34,13 @@ export const MoreOptionsMenu = ({
     touchOnRender: true,
   });
   
+  // Prevent menu from closing when clicking inside
+  const handleItemClick = (e: React.MouseEvent, callback: () => void) => {
+    e.preventDefault();
+    e.stopPropagation();
+    callback();
+  };
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -41,7 +48,10 @@ export const MoreOptionsMenu = ({
           variant="ghost" 
           size={size} 
           className="focus:ring-0"
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
         >
           <MoreHorizontal className="h-4 w-4" />
           <span className="sr-only">More options</span>
@@ -49,18 +59,19 @@ export const MoreOptionsMenu = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         align={align} 
-        className="w-[180px] bg-white shadow-lg z-[100]"
-        sideOffset={5}
+        className="w-[180px] border border-gray-200 bg-white shadow-lg z-[9999]"
+        sideOffset={8}
+        onClick={(e) => e.stopPropagation()}
       >
         {items.map((item, index) => (
           <React.Fragment key={`${item.label}-${index}`}>
             <DropdownMenuItem
-              onClick={(e) => {
+              onSelect={(e) => {
+                // Prevent default select behavior
                 e.preventDefault();
-                e.stopPropagation();
-                item.onClick();
               }}
-              className={`flex cursor-pointer items-center ${
+              onClick={(e) => handleItemClick(e, item.onClick)}
+              className={`flex cursor-pointer items-center px-3 py-2 hover:bg-gray-100 ${
                 item.variant === "destructive" ? "text-red-600" : ""
               }`}
             >
