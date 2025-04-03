@@ -42,11 +42,15 @@ export const MoreOptionsMenu = ({
           <span className="sr-only">More options</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align={align} className="w-[180px] bg-white">
+      <DropdownMenuContent align={align} className="w-[180px] bg-white z-50">
         {items.map((item, index) => (
           <React.Fragment key={`${item.label}-${index}`}>
             <DropdownMenuItem
-              onClick={item.onClick}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                item.onClick();
+              }}
               className={`flex cursor-pointer items-center ${
                 item.variant === "destructive" ? "text-red-600" : ""
               }`}
