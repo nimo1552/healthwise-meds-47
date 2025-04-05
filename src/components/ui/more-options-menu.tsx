@@ -49,23 +49,23 @@ export const MoreOptionsMenu = ({
         <Button 
           variant="ghost" 
           size={size} 
-          className="focus:ring-0 relative"
+          className="focus:ring-0 relative hover:bg-nimocare-50 rounded-full p-2"
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
           }}
         >
           {orientation === "horizontal" ? (
-            <MoreHorizontal className="h-4 w-4" />
+            <MoreHorizontal className="h-4 w-4 text-gray-600 hover:text-nimocare-600 transition-colors" />
           ) : (
-            <EllipsisVertical className="h-4 w-4" />
+            <EllipsisVertical className="h-4 w-4 text-gray-600 hover:text-nimocare-600 transition-colors" />
           )}
           <span className="sr-only">More options</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         align={align} 
-        className="w-[180px] border border-gray-200 bg-white shadow-lg z-[9999]"
+        className="w-[200px] border border-gray-200 bg-white shadow-medium rounded-xl z-[9999] py-2"
         sideOffset={8}
         onClick={(e) => e.stopPropagation()}
       >
@@ -77,14 +77,14 @@ export const MoreOptionsMenu = ({
                 e.preventDefault();
               }}
               onClick={(e) => handleItemClick(e, item.onClick)}
-              className={`flex cursor-pointer items-center px-3 py-2 hover:bg-gray-100 ${
-                item.variant === "destructive" ? "text-red-600" : ""
+              className={`flex cursor-pointer items-center px-4 py-2.5 mx-1 my-0.5 hover:bg-nimocare-50 rounded-lg transition-colors ${
+                item.variant === "destructive" ? "text-red-600" : "text-gray-700"
               }`}
             >
-              {item.icon && <span className="mr-2">{item.icon}</span>}
-              {item.label}
+              {item.icon && <span className="mr-3 text-gray-500">{item.icon}</span>}
+              <span className="font-medium text-sm">{item.label}</span>
             </DropdownMenuItem>
-            {index < items.length - 1 && <DropdownMenuSeparator />}
+            {index < items.length - 1 && <DropdownMenuSeparator className="my-1 mx-3 bg-gray-100" />}
           </React.Fragment>
         ))}
       </DropdownMenuContent>
