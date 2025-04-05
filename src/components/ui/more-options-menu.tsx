@@ -1,6 +1,6 @@
 
 import * as React from "react";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, EllipsisVertical } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,12 +20,14 @@ interface MoreOptionsMenuProps {
   }[];
   align?: "start" | "center" | "end";
   size?: "icon" | "sm" | "default" | "lg";
+  orientation?: "horizontal" | "vertical";
 }
 
 export const MoreOptionsMenu = ({
   items,
   align = "end",
   size = "icon",
+  orientation = "horizontal",
 }: MoreOptionsMenuProps) => {
   const menuId = React.useId();
   
@@ -47,19 +49,23 @@ export const MoreOptionsMenu = ({
         <Button 
           variant="ghost" 
           size={size} 
-          className="focus:ring-0"
+          className="focus:ring-0 relative"
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
           }}
         >
-          <MoreHorizontal className="h-4 w-4" />
+          {orientation === "horizontal" ? (
+            <MoreHorizontal className="h-4 w-4" />
+          ) : (
+            <EllipsisVertical className="h-4 w-4" />
+          )}
           <span className="sr-only">More options</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         align={align} 
-        className="w-[180px] border border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700 shadow-lg z-[9999]"
+        className="w-[180px] border border-gray-200 bg-white shadow-lg z-[9999]"
         sideOffset={8}
         onClick={(e) => e.stopPropagation()}
       >
@@ -71,14 +77,14 @@ export const MoreOptionsMenu = ({
                 e.preventDefault();
               }}
               onClick={(e) => handleItemClick(e, item.onClick)}
-              className={`flex cursor-pointer items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                item.variant === "destructive" ? "text-red-600 dark:text-red-400" : ""
+              className={`flex cursor-pointer items-center px-3 py-2 hover:bg-gray-100 ${
+                item.variant === "destructive" ? "text-red-600" : ""
               }`}
             >
               {item.icon && <span className="mr-2">{item.icon}</span>}
               {item.label}
             </DropdownMenuItem>
-            {index < items.length - 1 && <DropdownMenuSeparator className="dark:bg-gray-700" />}
+            {index < items.length - 1 && <DropdownMenuSeparator />}
           </React.Fragment>
         ))}
       </DropdownMenuContent>
