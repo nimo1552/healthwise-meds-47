@@ -367,7 +367,7 @@ const Index = () => {
         </section>
         
         {/* CTA Section */}
-        <section className="py-16 md:py-24 bg-gradient-to-r from-nimocare-600 to-nimocare-700 text-white relative overflow-hidden">
+        <section className="py-16 md:py-24 bg-gradient-to-r from-nimocare-400 to-nimocare-500 text-white relative overflow-hidden">
           {/* Abstract shapes */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20">
             <div className="absolute -top-24 -right-24 w-96 h-96 bg-white rounded-full blur-3xl"></div>
@@ -385,7 +385,7 @@ const Index = () => {
               <h2 className="text-3xl md:text-4xl font-bold font-display mb-6">
                 Ready to experience healthcare delivered with care?
               </h2>
-              <p className="text-nimocare-100 text-lg mb-8 max-w-2xl mx-auto">
+              <p className="text-white text-lg mb-8 max-w-2xl mx-auto">
                 Join thousands of satisfied customers who trust Nimocare for their medication needs. Fast, reliable, and secure.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -397,7 +397,7 @@ const Index = () => {
                 </Link>
                 <Link 
                   to="/products" 
-                  className="bg-nimocare-700 hover:bg-nimocare-800 text-white border border-nimocare-500 px-8 py-3 rounded-lg font-medium transition-all duration-300 hover:shadow-lg pill-button"
+                  className="bg-nimocare-500 hover:bg-nimocare-400 text-white border border-nimocare-300 px-8 py-3 rounded-lg font-medium transition-all duration-300 hover:shadow-lg pill-button"
                 >
                   Browse Products
                 </Link>
