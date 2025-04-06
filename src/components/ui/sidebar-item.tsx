@@ -25,14 +25,14 @@ export const SidebarItem = ({
       className={cn(
         "flex items-center w-full p-2 rounded-lg transition-colors",
         active 
-          ? "bg-nimocare-50 text-nimocare-600" 
-          : "text-gray-600 hover:bg-gray-100",
+          ? "bg-gray-100 text-gray-800" 
+          : "text-gray-600 hover:bg-gray-50",
         collapsed ? "justify-center" : ""
       )}
     >
       <span className={cn(
         "inline-flex items-center justify-center",
-        active ? "text-nimocare-600" : "text-gray-500"
+        active ? "text-gray-800" : "text-gray-500"
       )}>
         {icon}
       </span>
@@ -42,13 +42,13 @@ export const SidebarItem = ({
       )}
       
       {badge && !collapsed && (
-        <span className="ml-auto bg-red-100 text-red-600 text-xs font-medium px-2 py-0.5 rounded-full">
+        <span className="ml-auto bg-red-50 text-red-600 text-xs font-medium px-2 py-0.5 rounded-full">
           {badge}
         </span>
       )}
       
       {badge && collapsed && (
-        <span className="absolute top-0 right-0 -mt-1 -mr-1 bg-red-100 text-red-600 text-xs font-medium w-4 h-4 flex items-center justify-center rounded-full">
+        <span className="absolute top-0 right-0 -mt-1 -mr-1 bg-red-50 text-red-600 text-xs font-medium w-4 h-4 flex items-center justify-center rounded-full">
           {badge}
         </span>
       )}
