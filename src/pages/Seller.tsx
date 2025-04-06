@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -16,6 +17,8 @@ import * as z from 'zod';
 import { toast } from 'sonner';
 import { Progress } from '@/components/ui/progress';
 import { MoreOptionsMenu } from '@/components/ui/more-options-menu';
+import { SidebarItem } from '@/components/ui/sidebar-item';
+import { StatCard } from '@/components/ui/stat-card';
 
 // Create a schema for product form validation
 const productFormSchema = z.object({
@@ -695,4 +698,48 @@ const Seller = () => {
                             <th className="text-left p-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
                             <th className="text-left p-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
                             <th className="text-left p-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                            <th className="text-left
+                            <th className="text-left p-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {filteredProducts.map((product) => (
+                            <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+                              <td className="p-4 text-sm text-gray-500">#{product.id}</td>
+                              <td className="p-4">
+                                <div className="h-10 w-10 rounded-lg overflow-hidden bg-gray-100">
+                                  <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+                                </div>
+                              </td>
+                              <td className="p-4 text-sm font-medium text-gray-900">{product.name}</td>
+                              <td className="p-4 text-sm text-gray-500">${product.price.toFixed(2)}</td>
+                              <td className="p-4 text-sm text-gray-500">{product.category}</td>
+                              <td className="p-4 text-sm text-gray-500">{product.stock}</td>
+                              <td className="p-4">
+                                <MoreOptionsMenu 
+                                  items={[
+                                    { label: "Edit", onClick: () => {} },
+                                    { label: "View Details", onClick: () => {} },
+                                    { label: "Delete", onClick: () => handleDeleteProduct(product.id), variant: "destructive" }
+                                  ]}
+                                />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+            
+            {/* Additional tabs content would go here */}
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Seller;
