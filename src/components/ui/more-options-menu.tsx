@@ -49,16 +49,17 @@ export const MoreOptionsMenu = ({
         <Button 
           variant="ghost" 
           size={size} 
-          className="focus:ring-0 relative hover:bg-nimocare-50 rounded-full p-2"
+          className="focus:ring-0 relative hover:bg-gray-100 rounded-full p-2"
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
           }}
+          aria-label="More options"
         >
           {orientation === "horizontal" ? (
-            <MoreHorizontal className="h-4 w-4 text-gray-600 hover:text-nimocare-600 transition-colors" />
+            <MoreHorizontal className="h-5 w-5 text-gray-700" />
           ) : (
-            <EllipsisVertical className="h-4 w-4 text-gray-600 hover:text-nimocare-600 transition-colors" />
+            <EllipsisVertical className="h-5 w-5 text-gray-700" />
           )}
           <span className="sr-only">More options</span>
         </Button>
@@ -77,7 +78,7 @@ export const MoreOptionsMenu = ({
                 e.preventDefault();
               }}
               onClick={(e) => handleItemClick(e, item.onClick)}
-              className={`flex cursor-pointer items-center px-4 py-2.5 mx-1 my-0.5 hover:bg-nimocare-50 rounded-lg transition-colors ${
+              className={`flex cursor-pointer items-center px-4 py-2.5 mx-1 my-0.5 hover:bg-gray-100 rounded-lg transition-colors ${
                 item.variant === "destructive" ? "text-red-600" : "text-gray-700"
               }`}
             >
