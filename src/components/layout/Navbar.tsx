@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, User, Menu, X, Store, MapPin } from 'lucide-react';
@@ -83,6 +84,7 @@ const Navbar = () => {
           <Logo size="md" />
         </Link>
 
+        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
           <Link to="/" className="font-medium hover:text-nimocare-600 transition-colors">
             Home
@@ -104,6 +106,7 @@ const Navbar = () => {
           </Link>
         </nav>
 
+        {/* Desktop Action Icons */}
         <div className="hidden md:flex items-center space-x-5">
           <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="p-2 rounded-full hover:bg-nimocare-50 transition-colors" aria-label="Search">
             <Search className="w-5 h-5" />
@@ -125,6 +128,7 @@ const Navbar = () => {
           </Link>
         </div>
         
+        {/* Mobile Action Icons */}
         <div className="flex items-center md:hidden space-x-4">
           <Link to="/cart" className="p-2 rounded-full hover:bg-nimocare-50 transition-colors relative" aria-label="Cart">
             <ShoppingCart className="w-5 h-5" />
@@ -139,6 +143,7 @@ const Navbar = () => {
         </div>
       </div>
 
+      {/* Search Overlay */}
       <div className={cn('absolute left-0 right-0 bg-white shadow-md py-3 px-4 transition-all duration-300 ease-in-out', isSearchOpen ? 'top-full opacity-100' : '-top-20 opacity-0 pointer-events-none')}>
         <div className="container-custom">
           <div className="relative">
@@ -161,18 +166,39 @@ const Navbar = () => {
         </div>
       </div>
 
-      {isMobileMenuOpen && <div className="fixed inset-0 bg-black/20 z-[100] md:hidden" onClick={() => setIsMobileMenuOpen(false)} />}
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/20 z-[100] md:hidden" 
+          onClick={() => setIsMobileMenuOpen(false)} 
+        />
+      )}
 
-      <div className={cn('fixed inset-y-0 right-0 w-[80%] max-w-sm bg-white z-[101] transition-transform duration-300 ease-in-out shadow-xl md:hidden overflow-auto', isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full')}>
-        <div className="p-6 space-y-6">
-          <Button onClick={() => setIsMobileMenuOpen(false)} className="absolute right-4 top-4 p-2 rounded-full hover:bg-nimocare-50 transition-colors flex items-center justify-center" variant="ghost" size="icon" aria-label="Close menu">
+      {/* Mobile Menu Panel */}
+      <div 
+        className={cn(
+          'fixed inset-y-0 right-0 w-[80%] max-w-sm bg-white z-[101] transition-transform duration-300 ease-in-out shadow-xl md:hidden overflow-y-auto', 
+          isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        )}
+      >
+        <div className="p-6 space-y-6 pt-14">
+          {/* Close button */}
+          <Button 
+            onClick={() => setIsMobileMenuOpen(false)} 
+            className="absolute right-4 top-4 p-2 rounded-full hover:bg-nimocare-50 transition-colors flex items-center justify-center" 
+            variant="ghost" 
+            size="icon" 
+            aria-label="Close menu"
+          >
             <X className="w-5 h-5" />
           </Button>
           
-          <div className="flex justify-center">
+          {/* Logo */}
+          <div className="flex justify-center mb-6">
             <Logo size="lg" />
           </div>
           
+          {/* Mobile Navigation */}
           <nav className="flex flex-col space-y-6">
             <Link to="/" className="text-lg font-medium hover:text-nimocare-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
               Home
