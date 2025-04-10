@@ -22,37 +22,17 @@ export const PageTransition = ({ children }: PageTransitionProps) => {
     { touchOnRender: true }
   );
   
-  // If user prefers reduced motion, use minimal animations
-  const shouldReduceMotion = prefersReducedMotion;
-  
-  // Create lighter transition properties
-  const transitionProps = shouldReduceMotion 
-    ? {
-        // Almost no animation for reduced motion preference
-        initial: { opacity: 0.98 },
-        animate: { opacity: 1 },
-        exit: { opacity: 0.98 },
-        transition: { duration: 0.05 }
-      }
-    : {
-        // Light animations for everyone else
-        initial: { opacity: 0.95 },
-        animate: { opacity: 1 },
-        exit: { opacity: 0.95 },
-        transition: { 
-          duration: 0.15,
-          ease: "easeInOut",
-        }
-      };
+  // Simplified transition for better performance - practically no animation
+  const transitionProps = {
+    initial: { opacity: 0.99 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0.99 },
+    transition: { duration: 0.05 }
+  };
 
   return (
-    <motion.div
-      {...transitionProps}
-      className="w-full"
-      layoutId="page-transition"
-      onAnimationComplete={() => touch()}
-    >
+    <div className="w-full">
       {children}
-    </motion.div>
+    </div>
   );
 };
