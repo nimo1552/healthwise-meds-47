@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SearchRecommendations } from '@/components/ui/SearchRecommendations';
 
 interface UserFiltersProps {
   searchTerm: string;
@@ -21,6 +22,17 @@ const UserFilters: React.FC<UserFiltersProps> = ({
   onStatusFilterChange,
   onRoleFilterChange
 }) => {
+  const [showRecommendations, setShowRecommendations] = useState(false);
+
+  const handleSearchFocus = () => {
+    setShowRecommendations(true);
+  };
+
+  const handleSelectRecommendation = (selected: string) => {
+    onSearchChange(selected);
+    setShowRecommendations(false);
+  };
+
   return (
     <div className="flex flex-col sm:flex-row items-center gap-4 pb-4">
       <div className="relative w-full sm:w-auto flex-1">
@@ -30,7 +42,18 @@ const UserFilters: React.FC<UserFiltersProps> = ({
           className="pl-10 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-500"
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
+          onFocus={handleSearchFocus}
         />
+        
+        {/* Search recommendations */}
+        <div className="absolute mt-1 w-full z-20">
+          <SearchRecommendations 
+            query={searchTerm}
+            onSelect={handleSelectRecommendation}
+            isVisible={showRecommendations}
+            onClose={() => setShowRecommendations(false)}
+          />
+        </div>
       </div>
       
       <div className="flex gap-2 w-full sm:w-auto">

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
@@ -8,8 +7,8 @@ import { ArrowLeft, Filter, ChevronDown, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ContentSkeleton } from '@/components/ui/ContentSkeleton';
+import { SearchRecommendations } from '@/components/ui/SearchRecommendations';
 
-// Define category data structure
 interface CategoryInfo {
   id: number;
   name: string;
@@ -18,7 +17,6 @@ interface CategoryInfo {
   backgroundColor: string;
 }
 
-// Sample category data - matching with CategorySection
 const categoryData: Record<string, CategoryInfo> = {
   "prescription": {
     id: 1,
@@ -64,7 +62,6 @@ const categoryData: Record<string, CategoryInfo> = {
   }
 };
 
-// Sample product data - similar to Products.tsx
 const allProducts = [
   {
     id: 1,
@@ -200,6 +197,7 @@ const CategoryPage = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const [showRecommendations, setShowRecommendations] = useState(false);
   const [sortBy, setSortBy] = useState("relevance");
   const [showFilters, setShowFilters] = useState(false);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 100]);
@@ -208,12 +206,10 @@ const CategoryPage = () => {
   const category = categoryId ? categoryData[categoryId] : null;
   
   useEffect(() => {
-    // Simulate loading
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 800);
     
-    // If category doesn't exist, show error toast and redirect to products page
     if (categoryId && !category) {
       toast.error("Category not found");
       navigate("/products");
@@ -223,10 +219,9 @@ const CategoryPage = () => {
   }, [categoryId, category, navigate]);
   
   if (!category) {
-    return null; // Don't render anything while redirecting
+    return null;
   }
   
-  // Filter products by category and search query
   const filteredProducts = allProducts
     .filter(product => 
       product.category === categoryId && 
@@ -252,6 +247,16 @@ const CategoryPage = () => {
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    setShowRecommendations(false);
+  };
+  
+  const handleSearchFocus = () => {
+    setShowRecommendations(true);
+  };
+
+  const handleSelectRecommendation = (selected: string) => {
+    setSearchQuery(selected);
+    setShowRecommendations(false);
   };
   
   const handleClearFilters = () => {
@@ -265,7 +270,6 @@ const CategoryPage = () => {
       <Navbar />
       
       <main className="flex-grow pt-20">
-        {/* Category Header */}
         <section className={`py-8 md:py-12 ${category.backgroundColor}`}>
           <div className="container-custom">
             <motion.button 
@@ -300,23 +304,30 @@ const CategoryPage = () => {
           </div>
         </section>
         
-        {/* Filters and Search */}
         <section className="py-6 border-b border-gray-200">
           <div className="container-custom">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              {/* Search Bar */}
               <form onSubmit={handleSearch} className="relative max-w-md w-full">
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={handleSearchFocus}
                   placeholder={`Search in ${category.name}...`}
                   className="w-full py-2 pl-4 pr-4 border border-gray-200 rounded-lg focus:outline-none focus:border-nimocare-400 transition-colors"
                 />
+                
+                <div className="absolute mt-1 w-full z-20">
+                  <SearchRecommendations 
+                    query={searchQuery}
+                    onSelect={handleSelectRecommendation}
+                    isVisible={showRecommendations}
+                    onClose={() => setShowRecommendations(false)}
+                  />
+                </div>
               </form>
               
               <div className="flex flex-wrap gap-3 items-center">
-                {/* Sort dropdown */}
                 <div className="relative">
                   <select
                     value={sortBy}
@@ -332,7 +343,6 @@ const CategoryPage = () => {
                   <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
                 </div>
                 
-                {/* Filter button */}
                 <button
                   onClick={() => setShowFilters(!showFilters)}
                   className="flex items-center space-x-1 bg-white border border-gray-200 rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors text-sm"
@@ -341,7 +351,6 @@ const CategoryPage = () => {
                   <span>Filters</span>
                 </button>
                 
-                {/* Clear filters */}
                 {(searchQuery || sortBy !== "relevance" || priceRange[0] > 0 || priceRange[1] < 100) && (
                   <button
                     onClick={handleClearFilters}
@@ -354,7 +363,6 @@ const CategoryPage = () => {
               </div>
             </div>
             
-            {/* Expanded Filters */}
             <AnimatePresence>
               {showFilters && (
                 <motion.div 
@@ -365,7 +373,6 @@ const CategoryPage = () => {
                   className="overflow-hidden"
                 >
                   <div className="mt-6 p-4 border border-gray-200 rounded-lg bg-white grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Price Range */}
                     <div>
                       <h3 className="font-medium mb-3 text-gray-900">Price Range</h3>
                       <div className="px-2">
@@ -391,7 +398,6 @@ const CategoryPage = () => {
           </div>
         </section>
         
-        {/* Product Grid */}
         <section className="py-10">
           <div className="container-custom">
             {isLoading ? (

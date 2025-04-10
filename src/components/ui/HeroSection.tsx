@@ -1,18 +1,32 @@
-
 import { useState } from 'react';
 import { ArrowRight, Search, Upload } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { motion } from 'framer-motion';
+import { SearchRecommendations } from '@/components/ui/SearchRecommendations';
 
 const HeroSection = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [showRecommendations, setShowRecommendations] = useState(false);
+  const navigate = useNavigate();
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Searching for:', searchQuery);
-    // Implement search functionality
+    if (searchQuery.trim()) {
+      setShowRecommendations(false);
+      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleSearchFocus = () => {
+    setShowRecommendations(true);
+  };
+
+  const handleSelectRecommendation = (selected: string) => {
+    setSearchQuery(selected);
+    setShowRecommendations(false);
+    navigate(`/products?search=${encodeURIComponent(selected)}`);
   };
 
   const containerVariants = {
@@ -116,6 +130,7 @@ const HeroSection = () => {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={handleSearchFocus}
                     placeholder="Search for medicines, health products..."
                     className="w-full py-6 pl-12 pr-36 bg-white border border-gray-200 rounded-full shadow-sm focus:border-nimocare-400"
                   />
@@ -125,6 +140,16 @@ const HeroSection = () => {
                   >
                     Search
                   </button>
+
+                  {/* Search recommendations */}
+                  <div className="absolute mt-2 w-full z-20">
+                    <SearchRecommendations 
+                      query={searchQuery}
+                      onSelect={handleSelectRecommendation}
+                      isVisible={showRecommendations}
+                      onClose={() => setShowRecommendations(false)}
+                    />
+                  </div>
                 </div>
               </motion.form>
               

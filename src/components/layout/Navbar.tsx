@@ -1,15 +1,20 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, User, Menu, X, Store, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/ui/Logo';
+import { SearchRecommendations } from '@/components/ui/SearchRecommendations';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showRecommendations, setShowRecommendations] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -57,6 +62,25 @@ const Navbar = () => {
 
   const handleMobileMenuToggle = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (searchQuery.trim()) {
+      setIsSearchOpen(false);
+      setShowRecommendations(false);
+      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleSearchFocus = () => {
+    setShowRecommendations(true);
+  };
+
+  const handleSelectRecommendation = (selected: string) => {
+    setSearchQuery(selected);
+    setShowRecommendations(false);
+    setIsSearchOpen(false);
   };
 
   return (
@@ -175,19 +199,41 @@ const Navbar = () => {
       >
         <div className="container-custom">
           <div className="relative">
-            <input
-              type="text"
-              placeholder="Search for medicines, brands, health products..."
-              className="w-full py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:outline-none focus:border-nimocare-400 transition-colors"
-              autoFocus={isSearchOpen}
-            />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <button
-              onClick={() => setIsSearchOpen(false)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <form onSubmit={handleSearchSubmit}>
+              <input
+                type="text"
+                ref={searchInputRef}
+                placeholder="Search for medicines, brands, health products..."
+                className="w-full py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:outline-none focus:border-nimocare-400 transition-colors"
+                autoFocus={isSearchOpen}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={handleSearchFocus}
+              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  setIsSearchOpen(false);
+                  setShowRecommendations(false);
+                }}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </form>
+            
+            {isSearchOpen && (
+              <div className="relative">
+                <SearchRecommendations 
+                  query={searchQuery}
+                  onSelect={handleSelectRecommendation}
+                  isVisible={showRecommendations}
+                  onClose={() => setShowRecommendations(false)}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>

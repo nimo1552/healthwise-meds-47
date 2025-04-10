@@ -7,6 +7,7 @@ import { Search, Filter, ChevronDown, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ContentSkeleton } from '@/components/ui/ContentSkeleton';
+import { SearchRecommendations } from '@/components/ui/SearchRecommendations';
 
 // Sample product data
 const allProducts = [
@@ -130,6 +131,7 @@ const sortOptions = [
 
 const Products = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [showRecommendations, setShowRecommendations] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [sortBy, setSortBy] = useState("relevance");
   const [showPrescriptionOnly, setShowPrescriptionOnly] = useState(false);
@@ -174,6 +176,16 @@ const Products = () => {
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    setShowRecommendations(false);
+  };
+  
+  const handleSearchFocus = () => {
+    setShowRecommendations(true);
+  };
+
+  const handleSelectRecommendation = (selected: string) => {
+    setSearchQuery(selected);
+    setShowRecommendations(false);
   };
   
   const handleClearFilters = () => {
@@ -225,9 +237,20 @@ const Products = () => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={handleSearchFocus}
                   placeholder="Search products..."
                   className="w-full py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:outline-none focus:border-nimocare-400 transition-colors"
                 />
+                
+                {/* Search recommendations */}
+                <div className="absolute mt-1 w-full z-20">
+                  <SearchRecommendations 
+                    query={searchQuery}
+                    onSelect={handleSelectRecommendation}
+                    isVisible={showRecommendations}
+                    onClose={() => setShowRecommendations(false)}
+                  />
+                </div>
               </form>
               
               <div className="flex flex-wrap gap-3 items-center">
