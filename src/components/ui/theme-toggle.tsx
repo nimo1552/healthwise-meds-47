@@ -1,49 +1,55 @@
 
 import * as React from "react"
 import { Moon, Sun } from "lucide-react"
-import { useTheme } from "next-themes"
+import { useTheme as useNextTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
-
+  const { theme, setTheme } = useNextTheme()
+  
   return (
-    <Button
-      variant="outline"
-      size="icon"
-      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-      className="rounded-full bg-white text-gray-800 border border-gray-200 shadow-sm"
-    >
-      <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-orange-500" />
-      <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-blue-700" />
-      <span className="sr-only">Toggle theme</span>
-    </Button>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="h-9 w-9 rounded-md"
+          >
+            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+            <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            <span className="sr-only">Toggle theme</span>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">
+          <p>Toggle theme</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   )
 }
 
 export function ThemeToggleAdvanced() {
-  const { theme, setTheme } = useTheme()
-
+  const { theme, setTheme } = useNextTheme()
+  
   return (
     <div className="flex items-center space-x-2">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => setTheme("light")}
-        className={`px-3 py-1.5 text-gray-800 ${theme === 'light' ? 'bg-white shadow-sm border-gray-300' : 'text-gray-600'}`}
-      >
-        <Sun className="h-4 w-4 mr-1.5 text-orange-500" />
-        Light
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => setTheme("dark")}
-        className={`px-3 py-1.5 ${theme === 'dark' ? 'bg-gray-800 text-white shadow-sm' : 'text-gray-600'}`}
-      >
-        <Moon className="h-4 w-4 mr-1.5 text-blue-400" />
-        Dark
-      </Button>
+      <ToggleGroup type="single" value={theme} onValueChange={(value) => value && setTheme(value)}>
+        <ToggleGroupItem value="light" aria-label="Light mode">
+          <Sun className="h-4 w-4 mr-2" />
+          Light
+        </ToggleGroupItem>
+        <ToggleGroupItem value="dark" aria-label="Dark mode">
+          <Moon className="h-4 w-4 mr-2" />
+          Dark
+        </ToggleGroupItem>
+        <ToggleGroupItem value="system" aria-label="System preference">
+          System
+        </ToggleGroupItem>
+      </ToggleGroup>
     </div>
   )
 }

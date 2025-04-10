@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Index from "./pages/Index";
@@ -28,54 +29,74 @@ import PerformanceMonitor from "./components/performance/PerformanceMonitor";
 import { throttle } from "./utils/performanceUtils";
 
 function App() {
+  // Set up an enhanced garbage collection system
   useEffect(() => {
+    // Define collection strategies based on different scenarios
     const strategies = {
+      // Regular interval collection - less frequent for better performance
       regular: throttle(() => {
         console.log("Running regular garbage collection...");
-        runGarbageCollection(15 * 60 * 1000);
-      }, 15 * 60 * 1000),
+        runGarbageCollection(15 * 60 * 1000); // Use 15 minute TTL for regular collections
+      }, 15 * 60 * 1000), // Run at most once every 15 minutes
+      
+      // Collection when tab becomes visible again after being hidden
       onVisibilityChange: throttle(() => {
         if (document.visibilityState === 'visible') {
           console.log("Running garbage collection on visibility change...");
-          runGarbageCollection(10 * 60 * 1000);
+          runGarbageCollection(10 * 60 * 1000); // Use 10 minute TTL for visibility triggered collections
         }
-      }, 2 * 60 * 1000),
+      }, 2 * 60 * 1000), // At most once per 2 minutes
+      
+      // Collection on low memory conditions (Chrome only)
       onLowMemory: () => {
         console.log("Running urgent garbage collection due to low memory...");
-        runGarbageCollection(5 * 60 * 1000);
+        runGarbageCollection(5 * 60 * 1000); // Use 5 minute TTL for low memory collections
       },
+      
+      // Collection when the user has been idle
       onUserIdle: throttle(() => {
         console.log("Running garbage collection during user idle time...");
-        runGarbageCollection(8 * 60 * 1000);
-      }, 5 * 60 * 1000),
+        runGarbageCollection(8 * 60 * 1000); // Use 8 minute TTL for idle collections
+      }, 5 * 60 * 1000), // At most once every 5 minutes
     };
     
+    // Set up regular interval garbage collection
     const gcInterval = setInterval(strategies.regular, 15 * 60 * 1000);
+    
+    // Set up visibility change handler
     document.addEventListener('visibilitychange', strategies.onVisibilityChange);
     
+    // Set up idle detection for garbage collection during user inactivity
     let idleTimeout: number;
     const resetIdleTimer = throttle(() => {
       window.clearTimeout(idleTimeout);
-      idleTimeout = window.setTimeout(strategies.onUserIdle, 2 * 60 * 1000);
-    }, 10000);
+      idleTimeout = window.setTimeout(strategies.onUserIdle, 2 * 60 * 1000); // 2 minutes of inactivity
+    }, 10000); // Throttle to every 10 seconds to avoid performance impact
     
+    // Listen for user activity to reset idle timer
     window.addEventListener('mousemove', resetIdleTimer);
     window.addEventListener('keypress', resetIdleTimer);
     window.addEventListener('scroll', resetIdleTimer);
     window.addEventListener('touchstart', resetIdleTimer);
     
+    // Start the idle timer
     resetIdleTimer();
     
+    // Listen for low memory conditions in Chrome
     if ('onlowmemory' in window) {
       (window as any).addEventListener('lowmemory', strategies.onLowMemory);
     } else {
+      // Fallback for browsers that don't support onlowmemory
+      // Run an additional collection every 30 minutes
       const fallbackInterval = setInterval(() => {
         strategies.onLowMemory();
       }, 30 * 60 * 1000);
       
+      // Clean up fallback interval
       return () => clearInterval(fallbackInterval);
     }
     
+    // Clean up all event listeners and intervals on unmount
     return () => {
       clearInterval(gcInterval);
       document.removeEventListener('visibilitychange', strategies.onVisibilityChange);
@@ -92,7 +113,7 @@ function App() {
   }, []);
 
   return (
-    <ThemeProvider defaultTheme="light" storageKey="nimocare-theme" attribute="class">
+    <ThemeProvider defaultTheme="system" storageKey="vite-react-theme" attribute="class">
       <Router>
         <ScrollToTop />
         <PageTransition>

@@ -1,6 +1,6 @@
 
 import * as React from "react";
-import { MoreHorizontal, EllipsisVertical } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,14 +20,12 @@ interface MoreOptionsMenuProps {
   }[];
   align?: "start" | "center" | "end";
   size?: "icon" | "sm" | "default" | "lg";
-  orientation?: "horizontal" | "vertical";
 }
 
 export const MoreOptionsMenu = ({
   items,
   align = "end",
   size = "icon",
-  orientation = "horizontal",
 }: MoreOptionsMenuProps) => {
   const menuId = React.useId();
   
@@ -49,24 +47,19 @@ export const MoreOptionsMenu = ({
         <Button 
           variant="ghost" 
           size={size} 
-          className="focus:ring-0 relative hover:bg-gray-100 rounded-full p-2"
+          className="focus:ring-0"
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
           }}
-          aria-label="More options"
         >
-          {orientation === "horizontal" ? (
-            <MoreHorizontal className="h-5 w-5 text-gray-700" />
-          ) : (
-            <EllipsisVertical className="h-5 w-5 text-gray-700" />
-          )}
+          <MoreHorizontal className="h-4 w-4" />
           <span className="sr-only">More options</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         align={align} 
-        className="w-[200px] border border-gray-200 bg-white shadow-medium rounded-xl z-[9999] py-2"
+        className="w-[180px] border border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700 shadow-lg z-[9999]"
         sideOffset={8}
         onClick={(e) => e.stopPropagation()}
       >
@@ -78,14 +71,14 @@ export const MoreOptionsMenu = ({
                 e.preventDefault();
               }}
               onClick={(e) => handleItemClick(e, item.onClick)}
-              className={`flex cursor-pointer items-center px-4 py-2.5 mx-1 my-0.5 hover:bg-gray-100 rounded-lg transition-colors ${
-                item.variant === "destructive" ? "text-red-600" : "text-gray-700"
+              className={`flex cursor-pointer items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+                item.variant === "destructive" ? "text-red-600 dark:text-red-400" : ""
               }`}
             >
-              {item.icon && <span className="mr-3 text-gray-500">{item.icon}</span>}
-              <span className="font-medium text-sm">{item.label}</span>
+              {item.icon && <span className="mr-2">{item.icon}</span>}
+              {item.label}
             </DropdownMenuItem>
-            {index < items.length - 1 && <DropdownMenuSeparator className="my-1 mx-3 bg-gray-100" />}
+            {index < items.length - 1 && <DropdownMenuSeparator className="dark:bg-gray-700" />}
           </React.Fragment>
         ))}
       </DropdownMenuContent>
