@@ -88,23 +88,23 @@ export const SearchRecommendations: React.FC<SearchRecommendationsProps> = ({
   return (
     <div 
       ref={containerRef}
-      className="absolute left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 z-50 max-h-60 overflow-auto"
+      className="absolute left-0 right-0 bg-white border border-nimocare-100 rounded-lg shadow-lg mt-1 z-50 max-h-60 overflow-auto"
     >
       {recommendations.length > 0 ? (
         <ul className="py-2">
           {recommendations.map((recommendation, index) => (
             <li key={index}>
               <button
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center justify-between group"
+                className="w-full text-left px-4 py-2 hover:bg-nimocare-50 flex items-center justify-between group"
                 onClick={() => handleSelectRecommendation(recommendation)}
               >
                 <div className="flex items-center">
-                  <Search className="w-4 h-4 text-gray-400 mr-2" />
+                  <Search className="w-4 h-4 text-nimocare-400 mr-2" />
                   <span className="text-gray-700">
                     {recommendation}
                   </span>
                 </div>
-                <ArrowRight className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ArrowRight className="w-4 h-4 text-nimocare-400 opacity-0 group-hover:opacity-100 transition-opacity" />
               </button>
             </li>
           ))}
@@ -113,7 +113,7 @@ export const SearchRecommendations: React.FC<SearchRecommendationsProps> = ({
         <div className="py-2 px-4 text-gray-500">No suggestions found</div>
       )}
       
-      <div className="border-t border-gray-100 px-4 py-2 text-xs text-gray-500 bg-gray-50">
+      <div className="border-t border-nimocare-100 px-4 py-2 text-xs text-gray-500 bg-nimocare-50">
         Press Enter to search
       </div>
     </div>
