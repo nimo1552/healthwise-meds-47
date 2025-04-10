@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/ui/Logo';
 import { SearchRecommendations } from '@/components/ui/SearchRecommendations';
+
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -14,6 +15,7 @@ const Navbar = () => {
   const [showRecommendations, setShowRecommendations] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 20) {
@@ -35,10 +37,12 @@ const Navbar = () => {
       document.body.style.overflow = '';
     };
   }, [isMobileMenuOpen]);
+
   const openInNewTab = (url: string) => {
     const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
     if (newWindow) newWindow.opener = null;
   };
+
   const ExternalLink = ({
     to,
     className,
@@ -49,9 +53,11 @@ const Navbar = () => {
   }}>
       {children}
     </a>;
+
   const handleMobileMenuToggle = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
   const handleSearchSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (searchQuery.trim()) {
@@ -60,14 +66,17 @@ const Navbar = () => {
       navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
+
   const handleSearchFocus = () => {
     setShowRecommendations(true);
   };
+
   const handleSelectRecommendation = (selected: string) => {
     setSearchQuery(selected);
     setShowRecommendations(false);
     setIsSearchOpen(false);
   };
+
   return <header className={cn('fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3', isScrolled ? 'bg-white/90 backdrop-blur-md shadow-sm' : 'bg-transparent')}>
       <div className="container-custom flex justify-between items-center">
         <Link to="/" className="relative flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
@@ -155,12 +164,12 @@ const Navbar = () => {
       {isMobileMenuOpen && <div className="fixed inset-0 bg-black/20 z-[100] md:hidden" onClick={() => setIsMobileMenuOpen(false)} />}
 
       <div className={cn('fixed inset-y-0 right-0 w-[80%] max-w-sm bg-white z-[101] transition-transform duration-300 ease-in-out shadow-xl md:hidden overflow-auto', isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full')}>
-        <div className="p-6 pt-16 fix it">
+        <div className="p-6 space-y-6">
           <Button onClick={() => setIsMobileMenuOpen(false)} className="absolute right-4 top-4 p-2 rounded-full hover:bg-nimocare-50 transition-colors flex items-center justify-center" variant="ghost" size="icon" aria-label="Close menu">
             <X className="w-5 h-5" />
           </Button>
           
-          <div className="flex justify-center mb-8">
+          <div className="flex justify-center">
             <Logo size="lg" />
           </div>
           
@@ -204,4 +213,5 @@ const Navbar = () => {
       </div>
     </header>;
 };
+
 export default Navbar;
