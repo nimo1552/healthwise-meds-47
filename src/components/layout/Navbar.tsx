@@ -84,10 +84,7 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6 my-0 mx-0 py-0 px-[5px]">
-          <Link to="/" className="font-medium hover:text-nimocare-600 transition-colors">
-            Home
-          </Link>
+        <nav className="hidden md:flex items-center space-x-8 my-0 mx-0 py-0 px-[5px]">
           <Link to="/products" className="font-medium hover:text-nimocare-600 transition-colors">
             Products
           </Link>
@@ -183,9 +180,6 @@ const Navbar = () => {
           
           {/* Mobile Navigation */}
           <nav className="flex flex-col space-y-6">
-            <Link to="/" className="text-lg font-medium hover:text-nimocare-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-              Home
-            </Link>
             <Link to="/products" className="text-lg font-medium hover:text-nimocare-600 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
               Products
             </Link>
