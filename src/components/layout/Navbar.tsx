@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/ui/Logo';
 import { SearchRecommendations } from '@/components/ui/SearchRecommendations';
+
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -14,6 +15,7 @@ const Navbar = () => {
   const [showRecommendations, setShowRecommendations] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 20) {
@@ -35,10 +37,12 @@ const Navbar = () => {
       document.body.style.overflow = '';
     };
   }, [isMobileMenuOpen]);
+
   const openInNewTab = (url: string) => {
     const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
     if (newWindow) newWindow.opener = null;
   };
+
   const ExternalLink = ({
     to,
     className,
@@ -49,9 +53,11 @@ const Navbar = () => {
   }}>
       {children}
     </a>;
+
   const handleMobileMenuToggle = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
   const handleSearchSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (searchQuery.trim()) {
@@ -60,14 +66,17 @@ const Navbar = () => {
       navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
+
   const handleSearchFocus = () => {
     setShowRecommendations(true);
   };
+
   const handleSelectRecommendation = (selected: string) => {
     setSearchQuery(selected);
     setShowRecommendations(false);
     setIsSearchOpen(false);
   };
+
   return <header className={cn('fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3', isScrolled ? 'bg-white/90 backdrop-blur-md shadow-sm' : 'bg-transparent')}>
       <div className="container-custom flex justify-between items-center">
         <Link to="/" className="relative flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
@@ -75,7 +84,7 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8 my-0 mx-0 py-0 px-[5px]">
+        <nav className="hidden md:flex items-center space-x-6 my-0 mx-0 py-0 px-[5px]">
           <Link to="/" className="font-medium hover:text-nimocare-600 transition-colors">
             Home
           </Link>
@@ -213,4 +222,5 @@ const Navbar = () => {
       </div>
     </header>;
 };
+
 export default Navbar;
