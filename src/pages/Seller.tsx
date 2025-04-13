@@ -1,7 +1,6 @@
-
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Package, List, ChartBar, Plus, User, Store, LogOut, Upload, MessageSquare, Bell, Mail, Users, Star } from 'lucide-react';
+import { Package, List, ChartBar, Plus, User, Store, LogOut, Upload, MessageSquare, Bell, Mail, Users, Star, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -12,8 +11,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'sonner';
 import { Progress } from '@/components/ui/progress';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
-// Create a schema for product form validation
 const productFormSchema = z.object({
   name: z.string().min(2, { message: 'Product name must be at least 2 characters.' }),
   price: z.coerce.number().min(0.01, { message: 'Price must be greater than 0.' }),
@@ -24,7 +23,6 @@ const productFormSchema = z.object({
 
 type ProductFormValues = z.infer<typeof productFormSchema>;
 
-// SidebarItem component
 const SidebarItem = ({ icon, text, active, onClick, collapsed }: {
   icon: React.ReactNode;
   text: string;
@@ -47,7 +45,6 @@ const SidebarItem = ({ icon, text, active, onClick, collapsed }: {
   );
 };
 
-// DashboardCard component
 const DashboardCard = ({ title, value, icon }: { 
   title: string; 
   value: string | number; 
@@ -70,7 +67,6 @@ const DashboardCard = ({ title, value, icon }: {
   );
 };
 
-// Mock data for products
 const mockProducts = [
   { id: 1, name: 'Paracetamol 500mg', price: 5.99, category: 'Pain Relief', stock: 100, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=200&auto=format&fit=crop' },
   { id: 2, name: 'Vitamin C 1000mg', price: 12.99, category: 'Vitamins', stock: 75, image: 'https://images.unsplash.com/photo-1577401239170-897942555fb3?q=80&w=200&auto=format&fit=crop' },
@@ -79,7 +75,6 @@ const mockProducts = [
   { id: 5, name: 'Thermometer', price: 15.99, category: 'Devices', stock: 35, image: 'https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?q=80&w=200&auto=format&fit=crop' },
 ];
 
-// Mock data for dashboard
 const dashboardStats = {
   products: 5,
   orders: 32,
@@ -87,14 +82,12 @@ const dashboardStats = {
   customers: 28
 };
 
-// Mock data for testimonials
 const testimonials = [
   { id: 1, name: 'John Smith', rating: 5, comment: 'Great service! My medications always arrive on time.', date: '2023-05-15' },
   { id: 2, name: 'Sarah Johnson', rating: 4, comment: 'Good selection of products and competitive prices.', date: '2023-05-12' },
   { id: 3, name: 'Robert Lee', rating: 5, comment: 'The prescription verification process is smooth and efficient.', date: '2023-05-10' },
 ];
 
-// Mock data for newsletter subscribers
 const subscribers = [
   { id: 1, email: 'john@example.com', subscribed: '2023-04-15' },
   { id: 2, email: 'sarah@example.com', subscribed: '2023-04-20' },
@@ -111,8 +104,9 @@ const Seller = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [productToDelete, setProductToDelete] = useState<number | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  // For the add product form
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
     defaultValues: {
@@ -124,7 +118,6 @@ const Seller = () => {
     },
   });
 
-  // For testimonial form if needed
   const testimonialForm = useForm({
     defaultValues: {
       name: '',
@@ -137,7 +130,6 @@ const Seller = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Simulate upload progress
     setUploading(true);
     setUploadProgress(0);
     
@@ -154,7 +146,6 @@ const Seller = () => {
         });
       }, 200);
       
-      // After "upload" completes
       setTimeout(() => {
         if (reader.result) {
           setSelectedImage(reader.result.toString());
@@ -171,7 +162,6 @@ const Seller = () => {
   };
 
   const onSubmit = (data: ProductFormValues) => {
-    // Add new product to list
     const newProduct = {
       id: products.length + 1,
       name: data.name,
@@ -188,9 +178,26 @@ const Seller = () => {
     setUploadProgress(0);
   };
 
+  const handleDeleteProduct = (id: number) => {
+    setProductToDelete(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteProduct = () => {
+    if (productToDelete) {
+      const productToRemove = products.find(product => product.id === productToDelete);
+      
+      setProducts(products.filter(product => product.id !== productToDelete));
+      
+      toast.success(`${productToRemove?.name} has been deleted successfully.`);
+      
+      setIsDeleteDialogOpen(false);
+      setProductToDelete(null);
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar */}
       <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-white h-screen shadow-md transition-all duration-300 p-4 flex flex-col`}>
         <div className="flex items-center justify-between mb-10">
           <h2 className={`text-xl font-bold text-nimocare-600 ${!sidebarOpen && 'hidden'}`}>Seller Dashboard</h2>
@@ -264,7 +271,6 @@ const Seller = () => {
         </div>
       </div>
       
-      {/* Main content */}
       <div className="flex-1 p-8 overflow-auto">
         <div className="max-w-7xl mx-auto">
           {activeTab === 'dashboard' && (
@@ -423,7 +429,6 @@ const Seller = () => {
                           )}
                         />
                         
-                        {/* Product Image Upload */}
                         <div className="space-y-2">
                           <div className="text-sm font-medium text-gray-700">Product Image</div>
                           <div 
@@ -508,7 +513,15 @@ const Seller = () => {
                             <td className="p-4">{product.stock}</td>
                             <td className="p-4">
                               <Button variant="outline" size="sm" className="mr-2">Edit</Button>
-                              <Button variant="outline" size="sm" className="text-red-500">Delete</Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="text-red-500"
+                                onClick={() => handleDeleteProduct(product.id)}
+                              >
+                                <Trash2 className="w-4 h-4 mr-1" />
+                                Delete
+                              </Button>
                             </td>
                           </tr>
                         ))}
@@ -780,9 +793,26 @@ const Seller = () => {
           )}
         </div>
       </div>
+      
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the product
+              and remove it from your inventory.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteProduct} className="bg-red-500 hover:bg-red-600">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
 
 export default Seller;
-
