@@ -24,6 +24,52 @@ const productFormSchema = z.object({
 
 type ProductFormValues = z.infer<typeof productFormSchema>;
 
+// SidebarItem component
+const SidebarItem = ({ icon, text, active, onClick, collapsed }: {
+  icon: React.ReactNode;
+  text: string;
+  active: boolean;
+  onClick: () => void;
+  collapsed: boolean;
+}) => {
+  return (
+    <button
+      className={`flex items-center w-full p-2 rounded-md transition-colors ${
+        active ? 'bg-nimocare-50 text-nimocare-600' : 'text-gray-600 hover:bg-gray-100'
+      }`}
+      onClick={onClick}
+    >
+      <div className="flex items-center">
+        <span className="flex-shrink-0">{icon}</span>
+        {!collapsed && <span className="ml-3">{text}</span>}
+      </div>
+    </button>
+  );
+};
+
+// DashboardCard component
+const DashboardCard = ({ title, value, icon }: { 
+  title: string; 
+  value: string | number; 
+  icon: React.ReactNode;
+}) => {
+  return (
+    <Card>
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-500">{title}</p>
+            <h3 className="text-2xl font-bold mt-1">{value}</h3>
+          </div>
+          <div className="p-3 bg-nimocare-50 rounded-full">
+            {icon}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
 // Mock data for products
 const mockProducts = [
   { id: 1, name: 'Paracetamol 500mg', price: 5.99, category: 'Pain Relief', stock: 100, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=200&auto=format&fit=crop' },
@@ -76,6 +122,15 @@ const Seller = () => {
       category: '',
       stock: 0,
     },
+  });
+
+  // For testimonial form if needed
+  const testimonialForm = useForm({
+    defaultValues: {
+      name: '',
+      rating: 5,
+      comment: '',
+    }
   });
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -370,7 +425,7 @@ const Seller = () => {
                         
                         {/* Product Image Upload */}
                         <div className="space-y-2">
-                          <FormLabel>Product Image</FormLabel>
+                          <div className="text-sm font-medium text-gray-700">Product Image</div>
                           <div 
                             className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:bg-gray-50 transition-colors"
                             onClick={triggerFileInput}
@@ -542,10 +597,10 @@ const Seller = () => {
                                   className={`w-4 h-4 ${i < testimonial.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
                                 />
                               ))}
-                              <span className="text-sm text-gray-500 ml-2">{testimonial.date}</span>
+                              <span className="ml-2 text-sm text-gray-500">{testimonial.date}</span>
                             </div>
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex space-x-2">
                             <Button variant="outline" size="sm">Edit</Button>
                             <Button variant="outline" size="sm" className="text-red-500">Delete</Button>
                           </div>
@@ -556,97 +611,21 @@ const Seller = () => {
                   </div>
                 </CardContent>
               </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Testimonial Settings</CardTitle>
-                  <CardDescription>Manage how testimonials are displayed on your store</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium">Enable Testimonials</h3>
-                        <p className="text-sm text-gray-500">Show testimonials on your store front page</p>
-                      </div>
-                      <div className="flex items-center h-6">
-                        <input type="checkbox" defaultChecked className="w-4 h-4" />
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium">Require Approval</h3>
-                        <p className="text-sm text-gray-500">Review testimonials before they appear on your site</p>
-                      </div>
-                      <div className="flex items-center h-6">
-                        <input type="checkbox" defaultChecked className="w-4 h-4" />
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium">Allow Images</h3>
-                        <p className="text-sm text-gray-500">Let customers upload images with their testimonials</p>
-                      </div>
-                      <div className="flex items-center h-6">
-                        <input type="checkbox" className="w-4 h-4" />
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           )}
           
           {activeTab === 'newsletter' && (
             <div className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold">Newsletter Management</h1>
-                <Button className="bg-nimocare-600 hover:bg-nimocare-700">
-                  <Mail className="mr-2 h-4 w-4" /> Send Newsletter
-                </Button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card>
-                  <CardContent className="p-6 flex flex-col items-center justify-center text-center">
-                    <Users className="w-10 h-10 text-nimocare-600 mb-2" />
-                    <h2 className="text-3xl font-bold">{subscribers.length}</h2>
-                    <p className="text-gray-500">Total Subscribers</p>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardContent className="p-6 flex flex-col items-center justify-center text-center">
-                    <Mail className="w-10 h-10 text-nimocare-600 mb-2" />
-                    <h2 className="text-3xl font-bold">12</h2>
-                    <p className="text-gray-500">Newsletters Sent</p>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardContent className="p-6 flex flex-col items-center justify-center text-center">
-                    <ChartBar className="w-10 h-10 text-nimocare-600 mb-2" />
-                    <h2 className="text-3xl font-bold">68%</h2>
-                    <p className="text-gray-500">Average Open Rate</p>
-                  </CardContent>
-                </Card>
-              </div>
-              
+              <h1 className="text-3xl font-bold">Newsletter Subscribers</h1>
               <Card>
-                <CardHeader>
-                  <CardTitle>Subscribers</CardTitle>
-                  <CardDescription>Manage your newsletter subscribers</CardDescription>
-                </CardHeader>
-                <CardContent>
+                <CardContent className="p-6">
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead className="border-b">
                         <tr>
                           <th className="text-left p-2">ID</th>
                           <th className="text-left p-2">Email</th>
-                          <th className="text-left p-2">Date Subscribed</th>
+                          <th className="text-left p-2">Subscribed Date</th>
                           <th className="text-left p-2">Actions</th>
                         </tr>
                       </thead>
@@ -666,210 +645,137 @@ const Seller = () => {
                   </div>
                 </CardContent>
               </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Newsletter Signup Form</CardTitle>
-                  <CardDescription>Customize your newsletter signup form</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <FormLabel>Heading</FormLabel>
-                      <Input defaultValue="Join Our Newsletter" />
-                    </div>
-                    <div>
-                      <FormLabel>Description</FormLabel>
-                      <Input defaultValue="Stay updated with our latest products and health tips" />
-                    </div>
-                    <div>
-                      <FormLabel>Button Text</FormLabel>
-                      <Input defaultValue="Subscribe" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium">Show on Homepage</h3>
-                        <p className="text-sm text-gray-500">Display newsletter signup on the homepage</p>
-                      </div>
-                      <div className="flex items-center h-6">
-                        <input type="checkbox" defaultChecked className="w-4 h-4" />
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           )}
           
           {activeTab === 'store' && (
             <div className="space-y-6">
               <h1 className="text-3xl font-bold">Store Settings</h1>
-              <Card>
-                <CardContent className="p-6">
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="font-medium text-gray-900 mb-2">Store Information</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <FormLabel>Store Name</FormLabel>
-                          <Input defaultValue="NimoCare Pharmacy" />
-                        </div>
-                        <div>
-                          <FormLabel>Store Email</FormLabel>
-                          <Input defaultValue="contact@nimocare.com" />
-                        </div>
-                        <div>
-                          <FormLabel>Phone Number</FormLabel>
-                          <Input defaultValue="+1 (555) 123-4567" />
-                        </div>
-                        <div>
-                          <FormLabel>Business Hours</FormLabel>
-                          <Input defaultValue="Mon-Fri: 9AM-6PM, Sat: 10AM-4PM" />
-                        </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Store Information</CardTitle>
+                    <CardDescription>Manage your store details</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Store Name</label>
+                        <Input defaultValue="Nimocare Pharmacy" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Store Email</label>
+                        <Input defaultValue="store@nimocare.com" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                        <Input defaultValue="+1 (800) 555-0123" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Store Address</label>
+                        <Input defaultValue="123 Pharmacy Street, Medicine Town, 90210" />
+                      </div>
+                      <div className="pt-4">
+                        <Button className="bg-nimocare-600 hover:bg-nimocare-700">Save Changes</Button>
                       </div>
                     </div>
-                    
-                    <div className="pt-4 border-t">
-                      <h3 className="font-medium text-gray-900 mb-2">Shipping Settings</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <FormLabel>Shipping Method</FormLabel>
-                          <select className="w-full p-2 border rounded">
-                            <option>Standard Shipping</option>
-                            <option>Express Shipping</option>
-                            <option>Free Shipping</option>
-                          </select>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Business Hours</CardTitle>
+                    <CardDescription>Set your pharmacy operating hours</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[
+                        { day: 'Monday', open: '8:00 AM', close: '8:00 PM' },
+                        { day: 'Tuesday', open: '8:00 AM', close: '8:00 PM' },
+                        { day: 'Wednesday', open: '8:00 AM', close: '8:00 PM' },
+                        { day: 'Thursday', open: '8:00 AM', close: '8:00 PM' },
+                        { day: 'Friday', open: '8:00 AM', close: '8:00 PM' },
+                        { day: 'Saturday', open: '9:00 AM', close: '6:00 PM' },
+                        { day: 'Sunday', open: '9:00 AM', close: '6:00 PM' }
+                      ].map((hours, index) => (
+                        <div key={index} className="grid grid-cols-3 gap-2 items-center">
+                          <div className="font-medium">{hours.day}</div>
+                          <Input defaultValue={hours.open} className="text-sm" />
+                          <Input defaultValue={hours.close} className="text-sm" />
                         </div>
-                        <div>
-                          <FormLabel>Shipping Fee</FormLabel>
-                          <Input type="number" defaultValue="5.99" />
-                        </div>
-                        <div>
-                          <FormLabel>Free Shipping Threshold</FormLabel>
-                          <Input type="number" defaultValue="50" />
-                        </div>
-                        <div>
-                          <FormLabel>Estimated Delivery Time</FormLabel>
-                          <Input defaultValue="1-3 business days" />
-                        </div>
+                      ))}
+                      <div className="pt-4">
+                        <Button className="bg-nimocare-600 hover:bg-nimocare-700">Update Hours</Button>
                       </div>
                     </div>
-                    
-                    <div className="pt-4 border-t">
-                      <h3 className="font-medium text-gray-900 mb-2">Payment Settings</h3>
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-medium">Credit Card Payments</h4>
-                            <p className="text-sm text-gray-500">Accept Visa, Mastercard, Amex</p>
-                          </div>
-                          <div className="flex items-center h-6">
-                            <input type="checkbox" defaultChecked className="w-4 h-4" />
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-medium">PayPal</h4>
-                            <p className="text-sm text-gray-500">Accept PayPal payments</p>
-                          </div>
-                          <div className="flex items-center h-6">
-                            <input type="checkbox" defaultChecked className="w-4 h-4" />
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-medium">Apple Pay</h4>
-                            <p className="text-sm text-gray-500">Accept Apple Pay payments</p>
-                          </div>
-                          <div className="flex items-center h-6">
-                            <input type="checkbox" className="w-4 h-4" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <Button className="mt-4 bg-nimocare-600 hover:bg-nimocare-700">Save Settings</Button>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           )}
           
           {activeTab === 'account' && (
             <div className="space-y-6">
               <h1 className="text-3xl font-bold">Account Settings</h1>
-              <Card>
-                <CardContent className="p-6">
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="font-medium text-gray-900 mb-2">Personal Information</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <FormLabel>First Name</FormLabel>
-                          <Input defaultValue="John" />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="md:col-span-1">
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex flex-col items-center">
+                        <div className="relative">
+                          <div className="w-32 h-32 rounded-full bg-nimocare-100 flex items-center justify-center text-nimocare-600 text-4xl font-bold overflow-hidden">
+                            <img 
+                              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=120&q=80" 
+                              alt="Profile" 
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <button className="absolute bottom-0 right-0 bg-nimocare-600 text-white p-2 rounded-full">
+                            <Upload className="h-4 w-4" />
+                          </button>
+                        </div>
+                        <h2 className="mt-4 text-xl font-semibold">Jane Doe</h2>
+                        <p className="text-sm text-gray-500">Store Owner</p>
+                        <Button className="mt-4 w-full" variant="outline">View Public Profile</Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+                
+                <div className="md:col-span-2">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Personal Information</CardTitle>
+                      <CardDescription>Update your account information</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                            <Input defaultValue="Jane" />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                            <Input defaultValue="Doe" />
+                          </div>
                         </div>
                         <div>
-                          <FormLabel>Last Name</FormLabel>
-                          <Input defaultValue="Doe" />
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                          <Input defaultValue="jane.doe@example.com" />
                         </div>
                         <div>
-                          <FormLabel>Email Address</FormLabel>
-                          <Input defaultValue="john.doe@example.com" />
-                        </div>
-                        <div>
-                          <FormLabel>Phone Number</FormLabel>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
                           <Input defaultValue="+1 (555) 987-6543" />
                         </div>
-                      </div>
-                    </div>
-                    
-                    <div className="pt-4 border-t">
-                      <h3 className="font-medium text-gray-900 mb-2">Change Password</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <FormLabel>Current Password</FormLabel>
-                          <Input type="password" />
-                        </div>
-                        <div></div>
-                        <div>
-                          <FormLabel>New Password</FormLabel>
-                          <Input type="password" />
-                        </div>
-                        <div>
-                          <FormLabel>Confirm New Password</FormLabel>
-                          <Input type="password" />
+                        <div className="pt-4">
+                          <Button className="bg-nimocare-600 hover:bg-nimocare-700">Save Changes</Button>
                         </div>
                       </div>
-                    </div>
-                    
-                    <div className="pt-4 border-t">
-                      <h3 className="font-medium text-gray-900 mb-2">Notification Preferences</h3>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium">Order Updates</p>
-                            <p className="text-sm text-gray-500">Receive updates about your orders</p>
-                          </div>
-                          <div className="flex items-center h-6">
-                            <input type="checkbox" defaultChecked className="w-4 h-4" />
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-medium">Promotional Emails</p>
-                            <p className="text-sm text-gray-500">Receive emails about sales and special offers</p>
-                          </div>
-                          <div className="flex items-center h-6">
-                            <input type="checkbox" defaultChecked className="w-4 h-4" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <Button className="mt-4 bg-nimocare-600 hover:bg-nimocare-700">Save Changes</Button>
-                  </div>
-                </CardContent>
-              </Card>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -878,58 +784,5 @@ const Seller = () => {
   );
 };
 
-// Helper component for sidebar items
-const SidebarItem = ({ 
-  icon, 
-  text, 
-  active, 
-  onClick, 
-  collapsed 
-}: { 
-  icon: React.ReactNode; 
-  text: string; 
-  active: boolean; 
-  onClick: () => void; 
-  collapsed: boolean;
-}) => {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex items-center gap-3 w-full p-3 rounded-md transition-all ${
-        active 
-          ? 'bg-nimocare-50 text-nimocare-600 font-medium' 
-          : 'text-gray-600 hover:bg-gray-100'
-      }`}
-    >
-      {icon}
-      {!collapsed && <span>{text}</span>}
-    </button>
-  );
-};
-
-// Helper component for dashboard stat cards
-const DashboardCard = ({ 
-  title, 
-  value, 
-  icon 
-}: { 
-  title: string; 
-  value: string | number; 
-  icon: React.ReactNode;
-}) => {
-  return (
-    <Card>
-      <CardContent className="flex items-center justify-between p-6">
-        <div>
-          <p className="text-sm font-medium text-gray-500">{title}</p>
-          <p className="text-2xl font-bold mt-1">{value}</p>
-        </div>
-        <div>
-          {icon}
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
 export default Seller;
+
