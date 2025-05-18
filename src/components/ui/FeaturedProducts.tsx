@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ProductCard from './ProductCard';
@@ -15,10 +15,78 @@ const categories = [
   "Skin Care"
 ];
 
+// Sample product data
+const sampleProducts = [
+  {
+    id: 1,
+    name: "Paracetamol 500mg Tablets",
+    image: "https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?q=80&w=400&auto=format&fit=crop",
+    price: 9.99,
+    oldPrice: 12.99,
+    discount: 23,
+    rating: 4.8,
+    isPrescriptionRequired: false,
+    description: "Pain reliever and fever reducer for adults and children.",
+    category: "Pain Relief",
+    isBestseller: true
+  },
+  {
+    id: 2,
+    name: "Vitamin D3 5000IU Capsules",
+    image: "https://images.unsplash.com/photo-1550572017-edd951b55104?q=80&w=400&auto=format&fit=crop",
+    price: 14.99,
+    oldPrice: null,
+    discount: null,
+    rating: 4.6,
+    isPrescriptionRequired: false,
+    description: "Supports bone health, immune function, and overall wellness.",
+    category: "Vitamins & Supplements"
+  },
+  {
+    id: 3,
+    name: "Amoxicillin 500mg Capsules",
+    image: "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?q=80&w=400&auto=format&fit=crop",
+    price: 19.99,
+    oldPrice: 25.99,
+    discount: 23,
+    rating: 4.5,
+    isPrescriptionRequired: true,
+    description: "Antibiotic used to treat bacterial infections.",
+    category: "Antibiotics"
+  },
+  {
+    id: 4,
+    name: "Omega-3 Fish Oil Softgels",
+    image: "https://images.unsplash.com/photo-1577174881658-0f30ed549adc?q=80&w=400&auto=format&fit=crop",
+    price: 12.99,
+    oldPrice: null,
+    discount: null,
+    rating: 4.7,
+    isPrescriptionRequired: false,
+    description: "Supports heart health, brain function, and reduces inflammation.",
+    category: "Vitamins & Supplements"
+  }
+];
+
 const FeaturedProducts = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [products, setProducts] = useState([]);
   
+  // Load products based on active category
+  useEffect(() => {
+    // In a real app, this would be fetched from a backend API
+    // For now, we'll filter the sample products based on the selected category
+    let filtered = [...sampleProducts];
+    if (activeCategory !== "All") {
+      filtered = sampleProducts.filter(product => 
+        product.category === activeCategory ||
+        (activeCategory === "Bestsellers" && product.isBestseller)
+      );
+    }
+    
+    setProducts(filtered);
+  }, [activeCategory]);
+
   return (
     <section className="section-padding bg-gradient-to-b from-gray-50 to-white">
       <div className="container-custom">
@@ -117,7 +185,7 @@ const FeaturedProducts = () => {
               transition={{ duration: 0.5 }}
               className="text-gray-600 mb-4"
             >
-              No products available yet. Please upload your products.
+              No products available for this category.
             </motion.p>
           </div>
         )}

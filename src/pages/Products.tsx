@@ -28,8 +28,109 @@ const sortOptions = [
   { value: "newest", label: "Newest First" }
 ];
 
+// Sample product data
+const sampleProducts = [
+  {
+    id: 1,
+    name: "Paracetamol 500mg Tablets",
+    image: "https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?q=80&w=400&auto=format&fit=crop",
+    price: 9.99,
+    oldPrice: 12.99,
+    discount: 23,
+    rating: 4.8,
+    isPrescriptionRequired: false,
+    description: "Pain reliever and fever reducer for adults and children.",
+    category: "Pain Relief",
+    isBestseller: true
+  },
+  {
+    id: 2,
+    name: "Vitamin D3 5000IU Capsules",
+    image: "https://images.unsplash.com/photo-1550572017-edd951b55104?q=80&w=400&auto=format&fit=crop",
+    price: 14.99,
+    oldPrice: null,
+    discount: null,
+    rating: 4.6,
+    isPrescriptionRequired: false,
+    description: "Supports bone health, immune function, and overall wellness.",
+    category: "Vitamins & Supplements"
+  },
+  {
+    id: 3,
+    name: "Amoxicillin 500mg Capsules",
+    image: "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?q=80&w=400&auto=format&fit=crop",
+    price: 19.99,
+    oldPrice: 25.99,
+    discount: 23,
+    rating: 4.5,
+    isPrescriptionRequired: true,
+    description: "Antibiotic used to treat bacterial infections.",
+    category: "Antibiotics"
+  },
+  {
+    id: 4,
+    name: "Omega-3 Fish Oil Softgels",
+    image: "https://images.unsplash.com/photo-1577174881658-0f30ed549adc?q=80&w=400&auto=format&fit=crop",
+    price: 12.99,
+    oldPrice: null,
+    discount: null,
+    rating: 4.7,
+    isPrescriptionRequired: false,
+    description: "Supports heart health, brain function, and reduces inflammation.",
+    category: "Vitamins & Supplements"
+  },
+  {
+    id: 5,
+    name: "Hydrocortisone Cream 1%",
+    image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=400&auto=format&fit=crop",
+    price: 8.99,
+    oldPrice: null,
+    discount: null,
+    rating: 4.3,
+    isPrescriptionRequired: false,
+    description: "Temporarily relieves itching, redness, and swelling due to skin conditions.",
+    category: "Skin Care"
+  },
+  {
+    id: 6,
+    name: "Ibuprofen 200mg Tablets",
+    image: "https://images.unsplash.com/photo-1550170081-7d6e5629c6b6?q=80&w=400&auto=format&fit=crop",
+    price: 7.99,
+    oldPrice: 9.99,
+    discount: 20,
+    rating: 4.6,
+    isPrescriptionRequired: false,
+    description: "Nonsteroidal anti-inflammatory for pain relief and reducing fever.",
+    category: "Pain Relief"
+  },
+  {
+    id: 7,
+    name: "Digital Blood Pressure Monitor",
+    image: "https://images.unsplash.com/photo-1612771409641-97f10a5374e2?q=80&w=400&auto=format&fit=crop",
+    price: 45.99,
+    oldPrice: 59.99,
+    discount: 23,
+    rating: 4.8,
+    isPrescriptionRequired: false,
+    description: "Accurate blood pressure monitoring for home use",
+    category: "Devices"
+  },
+  {
+    id: 8,
+    name: "Baby Diaper Rash Cream",
+    image: "https://images.unsplash.com/photo-1599217394824-e8d19c3a6776?q=80&w=400&auto=format&fit=crop",
+    price: 12.99,
+    oldPrice: null,
+    discount: null,
+    rating: 4.9,
+    isPrescriptionRequired: false,
+    description: "Gentle, protective formula for sensitive baby skin",
+    category: "Baby Care"
+  }
+];
+
 const Products = () => {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState(sampleProducts);
   const [searchQuery, setSearchQuery] = useState("");
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
@@ -50,7 +151,8 @@ const Products = () => {
   
   // Filter and sort products
   const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    const matchesSearch = searchQuery === "" || 
+                          product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           product.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === "All Categories" || product.category === selectedCategory;
     const matchesPrescription = !showPrescriptionOnly || product.isPrescriptionRequired;
@@ -311,7 +413,7 @@ const Products = () => {
                   transition={{ duration: 0.5, delay: 0.1 }}
                   className="text-xl font-medium text-gray-900 mb-2"
                 >
-                  No products available yet
+                  No products found
                 </motion.h3>
                 <motion.p
                   initial={{ y: 10, opacity: 0 }}
@@ -319,7 +421,7 @@ const Products = () => {
                   transition={{ duration: 0.5, delay: 0.2 }}
                   className="text-gray-600 mb-4"
                 >
-                  Please upload your products to see them here.
+                  We couldn't find any products matching your criteria.
                 </motion.p>
               </div>
             )}
