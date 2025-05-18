@@ -5,348 +5,290 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { 
   ShoppingCart, 
-  Plus, 
-  Minus, 
-  X, 
-  ArrowRight, 
-  ShieldCheck,
-  RefreshCw
+  Trash, 
+  ChevronRight, 
+  TruckIcon, 
+  ShieldCheck, 
+  Clock
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { toast } from '@/hooks/use-toast';
-
-const initialCartItems = [
-  {
-    id: 1,
-    name: "Paracetamol 500mg Tablets",
-    image: "https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?q=80&w=400&auto=format&fit=crop",
-    price: 9.99,
-    quantity: 2,
-    stock: 50,
-    isPrescriptionRequired: false
-  },
-  {
-    id: 3,
-    name: "Amoxicillin 500mg Capsules",
-    image: "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?q=80&w=400&auto=format&fit=crop",
-    price: 19.99,
-    quantity: 1,
-    stock: 20,
-    isPrescriptionRequired: false
-  }
-];
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { motion } from 'framer-motion';
+import { useCart } from '@/contexts/CartContext';
 
 const Cart = () => {
+  const { cartItems, updateQuantity, removeFromCart, clearCart, cartTotal } = useCart();
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState(initialCartItems);
-  const [couponCode, setCouponCode] = useState("");
-  const [couponApplied, setCouponApplied] = useState(false);
-  const [couponDiscount, setCouponDiscount] = useState(0);
-  const [isProcessing, setIsProcessing] = useState(false);
   
-  const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  const shipping = subtotal > 50 ? 0 : 4.99;
-  const tax = subtotal * 0.06; // 6% tax rate
-  const discount = couponApplied ? couponDiscount : 0;
-  const total = subtotal + shipping + tax - discount;
-  
-  const updateQuantity = (id: number, amount: number) => {
-    setCartItems(prevItems =>
-      prevItems.map(item => {
-        if (item.id === id) {
-          const newQuantity = item.quantity + amount;
-          if (newQuantity < 1 || newQuantity > item.stock) return item;
-          return { ...item, quantity: newQuantity };
-        }
-        return item;
-      })
-    );
-  };
-  
-  const removeItem = (id: number) => {
-    setCartItems(prevItems => prevItems.filter(item => item.id !== id));
-  };
-  
-  const handleApplyCoupon = () => {
-    if (couponCode.toLowerCase() === "welcome10") {
-      setCouponApplied(true);
-      setCouponDiscount(subtotal * 0.1); // 10% discount
-      toast({
-        title: "Coupon Applied",
-        description: "10% discount has been applied to your order.",
-        variant: "default"
-      });
-    } else {
-      setCouponApplied(false);
-      setCouponDiscount(0);
-      toast({
-        title: "Invalid Coupon",
-        description: "The coupon code you entered is not valid.",
-        variant: "destructive"
-      });
+  const handleQuantityChange = (productId: number, newQuantity: number) => {
+    if (newQuantity > 0) {
+      updateQuantity(productId, newQuantity);
     }
   };
   
-  const handleCheckout = () => {
-    setIsProcessing(true);
-    setTimeout(() => {
-      setIsProcessing(false);
-      navigate("/payment", { 
-        state: { 
-          orderDetails: {
-            items: cartItems,
-            total: total,
-            discount: discount,
-            shipping: shipping,
-            tax: tax,
-            subtotal: subtotal
-          }
-        } 
-      });
-    }, 1500);
+  const handleRemoveFromCart = (productId: number) => {
+    removeFromCart(productId);
   };
   
+  const handleClearCart = () => {
+    if (window.confirm('Are you sure you want to clear your cart?')) {
+      clearCart();
+    }
+  };
+  
+  const handleApplyCoupon = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsApplyingCoupon(true);
+    
+    setTimeout(() => {
+      setIsApplyingCoupon(false);
+      if (couponCode.toLowerCase() === 'discount10') {
+        toast.success('Coupon applied: 10% discount');
+      } else {
+        toast.error('Invalid coupon code');
+      }
+    }, 1000);
+  };
+  
+  const handleCheckout = () => {
+    setIsCheckingOut(true);
+    
+    setTimeout(() => {
+      setIsCheckingOut(false);
+      navigate('/payment');
+    }, 800);
+  };
+  
+  // Calculate cart summary values
+  const shippingCost = cartTotal >= 50 ? 0 : 5.99;
+  const discount = couponCode.toLowerCase() === 'discount10' ? cartTotal * 0.10 : 0;
+  const taxRate = 0.08; // 8% tax
+  const tax = (cartTotal - discount) * taxRate;
+  const orderTotal = cartTotal + shippingCost + tax - discount;
+  
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       
       <main className="flex-grow pt-20">
-        <section className="bg-nimocare-50/50 py-10 md:py-16">
-          <div className="container-custom">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Your Cart</h1>
-            <p className="text-lg text-gray-600">
-              {cartItems.length > 0 
-                ? `You have ${cartItems.length} item${cartItems.length !== 1 ? 's' : ''} in your cart.`
-                : "Your cart is empty."}
-            </p>
+        <div className="container-custom py-8">
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-3xl font-bold">Your Cart</h1>
+            {cartItems.length > 0 && (
+              <Button variant="ghost" onClick={handleClearCart} className="text-red-600 hover:text-red-700">
+                <Trash className="w-4 h-4 mr-2" />
+                Clear Cart
+              </Button>
+            )}
           </div>
-        </section>
-        
-        {cartItems.length > 0 ? (
-          <section className="py-10">
-            <div className="container-custom">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                <div className="lg:col-span-2">
-                  <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-                    <div className="p-6 border-b border-gray-100">
-                      <h2 className="text-xl font-bold text-gray-900">Shopping Cart</h2>
-                    </div>
-                    
-                    <div>
-                      {cartItems.map((item) => (
-                        <div key={item.id} className="p-6 border-b border-gray-100 flex flex-col sm:flex-row items-start">
-                          <div className="w-full sm:w-24 h-24 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden mb-4 sm:mb-0 sm:mr-6">
-                            <img 
-                              src={item.image} 
-                              alt={item.name} 
-                              className="w-full h-full object-cover"
-                            />
+          
+          {cartItems.length === 0 ? (
+            <div className="text-center py-20">
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <ShoppingCart className="w-20 h-20 mx-auto text-gray-300" />
+              </motion.div>
+              <motion.h2
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                className="text-2xl font-semibold mt-4"
+              >
+                Your cart is empty
+              </motion.h2>
+              <motion.p
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                className="text-gray-500 mt-2 mb-8"
+              >
+                Looks like you haven't added any products to your cart yet.
+              </motion.p>
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+              >
+                <Link to="/products" className="btn-primary">
+                  Browse Products
+                </Link>
+              </motion.div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Cart Items */}
+              <div className="lg:col-span-2">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                  {cartItems.map((item) => (
+                    <motion.div
+                      key={item.product.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="p-4 border-b border-gray-200 last:border-b-0"
+                    >
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="w-24 h-24 flex-shrink-0 bg-gray-50 rounded-md overflow-hidden">
+                          <img 
+                            src={item.product.image} 
+                            alt={item.product.name} 
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        
+                        <div className="flex-grow flex flex-col">
+                          <div className="flex justify-between">
+                            <Link 
+                              to={`/product/${item.product.id}`}
+                              className="text-lg font-medium text-gray-900 hover:text-nimocare-600 transition-colors"
+                            >
+                              {item.product.name}
+                            </Link>
+                            <button 
+                              onClick={() => handleRemoveFromCart(item.product.id)}
+                              className="text-gray-400 hover:text-red-600 transition-colors p-1"
+                            >
+                              <Trash className="w-4 h-4" />
+                            </button>
                           </div>
                           
-                          <div className="flex-grow">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <h3 className="font-medium text-gray-900 mb-1">
-                                  <Link 
-                                    to={`/product/${item.id}`}
-                                    className="hover:text-nimocare-600 transition-colors"
-                                  >
-                                    {item.name}
-                                  </Link>
-                                </h3>
-                                <p className="text-sm text-gray-600 mb-2">
-                                  ${item.price.toFixed(2)} each
-                                </p>
-                              </div>
-                              
+                          {item.product.isPrescriptionRequired && (
+                            <span className="text-xs text-blue-600 bg-blue-50 rounded-full px-2 py-0.5 inline-block mb-2 w-fit">
+                              Prescription Required
+                            </span>
+                          )}
+                          
+                          <div className="mt-auto flex flex-wrap items-end justify-between">
+                            <div className="flex items-center mt-2">
                               <button 
-                                onClick={() => removeItem(item.id)}
-                                className="text-gray-400 hover:text-gray-600 transition-colors"
-                                aria-label="Remove item"
+                                className="w-8 h-8 border border-gray-300 rounded-l-lg flex items-center justify-center text-gray-700 hover:bg-gray-100"
+                                onClick={() => handleQuantityChange(item.product.id, item.quantity - 1)}
                               >
-                                <X className="w-5 h-5" />
+                                -
+                              </button>
+                              <input 
+                                type="number" 
+                                min="1" 
+                                value={item.quantity} 
+                                onChange={(e) => handleQuantityChange(item.product.id, parseInt(e.target.value) || 1)}
+                                className="w-12 h-8 border-t border-b border-gray-300 text-center focus:outline-none"
+                              />
+                              <button 
+                                className="w-8 h-8 border border-gray-300 rounded-r-lg flex items-center justify-center text-gray-700 hover:bg-gray-100"
+                                onClick={() => handleQuantityChange(item.product.id, item.quantity + 1)}
+                              >
+                                +
                               </button>
                             </div>
                             
-                            <div className="flex justify-between items-center mt-2">
-                              <div className="flex items-center border border-gray-200 rounded-md">
-                                <button 
-                                  onClick={() => updateQuantity(item.id, -1)}
-                                  disabled={item.quantity <= 1}
-                                  className={cn(
-                                    "p-1 transition-colors",
-                                    item.quantity <= 1 
-                                      ? "text-gray-300 cursor-not-allowed" 
-                                      : "text-gray-600 hover:text-gray-900"
-                                  )}
-                                  aria-label="Decrease quantity"
-                                >
-                                  <Minus className="w-4 h-4" />
-                                </button>
-                                
-                                <span className="px-3 py-1 text-sm">
-                                  {item.quantity}
+                            <div className="mt-2">
+                              <span className="text-lg font-semibold">${(item.product.price * item.quantity).toFixed(2)}</span>
+                              {item.product.oldPrice && (
+                                <span className="ml-2 text-sm text-gray-400 line-through">
+                                  ${(item.product.oldPrice * item.quantity).toFixed(2)}
                                 </span>
-                                
-                                <button 
-                                  onClick={() => updateQuantity(item.id, 1)}
-                                  disabled={item.quantity >= item.stock}
-                                  className={cn(
-                                    "p-1 transition-colors",
-                                    item.quantity >= item.stock 
-                                      ? "text-gray-300 cursor-not-allowed" 
-                                      : "text-gray-600 hover:text-gray-900"
-                                  )}
-                                  aria-label="Increase quantity"
-                                >
-                                  <Plus className="w-4 h-4" />
-                                </button>
-                              </div>
-                              
-                              <span className="font-medium text-gray-900">
-                                ${(item.price * item.quantity).toFixed(2)}
-                              </span>
+                              )}
                             </div>
                           </div>
                         </div>
-                      ))}
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Order Summary */}
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden p-6">
+                  <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
+                  
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Subtotal ({cartItems.reduce((acc, item) => acc + item.quantity, 0)} items)</span>
+                      <span className="font-medium">${cartTotal.toFixed(2)}</span>
                     </div>
                     
-                    <div className="p-6">
-                      <Link 
-                        to="/products" 
-                        className="text-nimocare-600 hover:text-nimocare-700 text-sm font-medium flex items-center"
-                      >
-                        <ShoppingCart className="w-4 h-4 mr-2" />
-                        Continue Shopping
-                      </Link>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Shipping</span>
+                      <span className="font-medium">
+                        {shippingCost === 0 ? 'Free' : `$${shippingCost.toFixed(2)}`}
+                      </span>
+                    </div>
+                    
+                    {discount > 0 && (
+                      <div className="flex justify-between text-green-600">
+                        <span>Discount (10%)</span>
+                        <span>-${discount.toFixed(2)}</span>
+                      </div>
+                    )}
+                    
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Tax</span>
+                      <span className="font-medium">${tax.toFixed(2)}</span>
+                    </div>
+                    
+                    <div className="border-t border-gray-200 pt-3 flex justify-between">
+                      <span className="text-lg font-semibold">Total</span>
+                      <span className="text-lg font-semibold">${orderTotal.toFixed(2)}</span>
                     </div>
                   </div>
-                </div>
-                
-                <div className="lg:col-span-1">
-                  <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm sticky top-24">
-                    <div className="p-6 border-b border-gray-100">
-                      <h2 className="text-xl font-bold text-gray-900">Order Summary</h2>
-                    </div>
-                    
-                    <div className="p-6">
-                      <div className="mb-6">
-                        <label htmlFor="coupon" className="block text-sm font-medium text-gray-700 mb-2">
-                          Apply Coupon Code
-                        </label>
-                        <div className="flex">
-                          <input
-                            type="text"
-                            id="coupon"
-                            value={couponCode}
-                            onChange={(e) => setCouponCode(e.target.value)}
-                            placeholder="Enter code"
-                            className="flex-grow px-4 py-2 border border-gray-200 rounded-l-md focus:outline-none focus:ring-2 focus:ring-nimocare-200 focus:border-nimocare-400"
-                          />
-                          <button 
-                            onClick={handleApplyCoupon}
-                            className="bg-nimocare-600 text-white px-4 py-2 rounded-r-md hover:bg-nimocare-700 transition-colors"
-                          >
-                            Apply
-                          </button>
-                        </div>
-                        
-                        {couponApplied && (
-                          <p className="text-sm text-green-600 mt-2 flex items-center">
-                            <ShieldCheck className="w-4 h-4 mr-1" />
-                            Coupon applied successfully!
-                          </p>
-                        )}
-                        
-                        {couponCode && !couponApplied && (
-                          <p className="text-sm text-red-600 mt-2">
-                            Invalid coupon code.
-                          </p>
-                        )}
-                      </div>
-                      
-                      <div className="space-y-4">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Subtotal</span>
-                          <span className="font-medium">${subtotal.toFixed(2)}</span>
-                        </div>
-                        
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Shipping</span>
-                          <span className="font-medium">
-                            {shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}
-                          </span>
-                        </div>
-                        
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Tax</span>
-                          <span className="font-medium">${tax.toFixed(2)}</span>
-                        </div>
-                        
-                        {discount > 0 && (
-                          <div className="flex justify-between text-green-600">
-                            <span>Discount</span>
-                            <span className="font-medium">-${discount.toFixed(2)}</span>
-                          </div>
-                        )}
-                        
-                        <div className="border-t border-gray-100 pt-4 flex justify-between">
-                          <span className="font-bold text-gray-900">Total</span>
-                          <span className="font-bold text-gray-900">${total.toFixed(2)}</span>
-                        </div>
-                      </div>
-                      
-                      <button
-                        onClick={handleCheckout}
-                        disabled={cartItems.length === 0 || isProcessing}
-                        className="w-full mt-6 bg-nimocare-600 hover:bg-nimocare-700 text-white py-3 rounded-md font-medium transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+                  
+                  {/* Coupon Code */}
+                  <div className="mt-6">
+                    <form onSubmit={handleApplyCoupon} className="flex gap-2">
+                      <input 
+                        type="text"
+                        placeholder="Coupon code"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
+                        className="flex-grow px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-nimocare-500"
+                      />
+                      <Button 
+                        type="submit"
+                        variant="outline"
+                        disabled={isApplyingCoupon || !couponCode}
                       >
-                        {isProcessing ? (
-                          <>
-                            <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
-                            Processing...
-                          </>
-                        ) : (
-                          <>
-                            Proceed to Checkout
-                            <ArrowRight className="w-5 h-5 ml-2" />
-                          </>
-                        )}
-                      </button>
-                      
-                      <div className="mt-6 text-center text-sm text-gray-500">
-                        <p className="mb-2">Secure checkout</p>
-                        <p>Free shipping on orders over $50</p>
-                      </div>
+                        {isApplyingCoupon ? 'Applying...' : 'Apply'}
+                      </Button>
+                    </form>
+                  </div>
+                  
+                  {/* Checkout Button */}
+                  <Button 
+                    className="w-full mt-6 bg-nimocare-600 hover:bg-nimocare-700 text-white"
+                    onClick={handleCheckout}
+                    disabled={isCheckingOut}
+                  >
+                    {isCheckingOut ? 'Processing...' : 'Checkout'}
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                  
+                  {/* Trust Badges */}
+                  <div className="mt-6 space-y-3">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <TruckIcon className="w-4 h-4 mr-2 text-green-600" />
+                      <span>Free shipping on orders over $50</span>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <ShieldCheck className="w-4 h-4 mr-2 text-green-600" />
+                      <span>Secure checkout</span>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Clock className="w-4 h-4 mr-2 text-green-600" />
+                      <span>24/7 customer support</span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </section>
-        ) : (
-          <section className="py-16">
-            <div className="container-custom text-center">
-              <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm p-10 max-w-lg mx-auto">
-                <div className="mb-6 flex justify-center">
-                  <ShoppingCart className="w-16 h-16 text-gray-300" />
-                </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
-                <p className="text-gray-600 mb-8">
-                  Looks like you haven't added any products to your cart yet.
-                </p>
-                <Link 
-                  to="/products" 
-                  className="bg-nimocare-600 text-white px-6 py-3 rounded-md font-medium hover:bg-nimocare-700 transition-colors inline-flex items-center"
-                >
-                  <ShoppingCart className="w-5 h-5 mr-2" />
-                  Browse Products
-                </Link>
-              </div>
-            </div>
-          </section>
-        )}
+          )}
+        </div>
       </main>
       
       <Footer />

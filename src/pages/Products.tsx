@@ -5,9 +5,9 @@ import ProductCard from '@/components/ui/ProductCard';
 import RecentlyViewedProducts from '@/components/products/RecentlyViewedProducts';
 import { Search, Filter, ChevronDown, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ContentSkeleton } from '@/components/ui/ContentSkeleton';
 import { SearchRecommendations } from '@/components/ui/SearchRecommendations';
+import { useProducts } from '@/contexts/ProductContext';
 
 // Filter options
 const categories = [
@@ -17,7 +17,9 @@ const categories = [
   "Antibiotics",
   "Skin Care",
   "Allergy Relief",
-  "Diabetes Care"
+  "Diabetes Care",
+  "Devices",
+  "Baby Care"
 ];
 
 const sortOptions = [
@@ -28,115 +30,14 @@ const sortOptions = [
   { value: "newest", label: "Newest First" }
 ];
 
-// Sample product data
-const sampleProducts = [
-  {
-    id: 1,
-    name: "Paracetamol 500mg Tablets",
-    image: "https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?q=80&w=400&auto=format&fit=crop",
-    price: 9.99,
-    oldPrice: 12.99,
-    discount: 23,
-    rating: 4.8,
-    isPrescriptionRequired: false,
-    description: "Pain reliever and fever reducer for adults and children.",
-    category: "Pain Relief",
-    isBestseller: true
-  },
-  {
-    id: 2,
-    name: "Vitamin D3 5000IU Capsules",
-    image: "https://images.unsplash.com/photo-1550572017-edd951b55104?q=80&w=400&auto=format&fit=crop",
-    price: 14.99,
-    oldPrice: null,
-    discount: null,
-    rating: 4.6,
-    isPrescriptionRequired: false,
-    description: "Supports bone health, immune function, and overall wellness.",
-    category: "Vitamins & Supplements"
-  },
-  {
-    id: 3,
-    name: "Amoxicillin 500mg Capsules",
-    image: "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?q=80&w=400&auto=format&fit=crop",
-    price: 19.99,
-    oldPrice: 25.99,
-    discount: 23,
-    rating: 4.5,
-    isPrescriptionRequired: true,
-    description: "Antibiotic used to treat bacterial infections.",
-    category: "Antibiotics"
-  },
-  {
-    id: 4,
-    name: "Omega-3 Fish Oil Softgels",
-    image: "https://images.unsplash.com/photo-1577174881658-0f30ed549adc?q=80&w=400&auto=format&fit=crop",
-    price: 12.99,
-    oldPrice: null,
-    discount: null,
-    rating: 4.7,
-    isPrescriptionRequired: false,
-    description: "Supports heart health, brain function, and reduces inflammation.",
-    category: "Vitamins & Supplements"
-  },
-  {
-    id: 5,
-    name: "Hydrocortisone Cream 1%",
-    image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=400&auto=format&fit=crop",
-    price: 8.99,
-    oldPrice: null,
-    discount: null,
-    rating: 4.3,
-    isPrescriptionRequired: false,
-    description: "Temporarily relieves itching, redness, and swelling due to skin conditions.",
-    category: "Skin Care"
-  },
-  {
-    id: 6,
-    name: "Ibuprofen 200mg Tablets",
-    image: "https://images.unsplash.com/photo-1550170081-7d6e5629c6b6?q=80&w=400&auto=format&fit=crop",
-    price: 7.99,
-    oldPrice: 9.99,
-    discount: 20,
-    rating: 4.6,
-    isPrescriptionRequired: false,
-    description: "Nonsteroidal anti-inflammatory for pain relief and reducing fever.",
-    category: "Pain Relief"
-  },
-  {
-    id: 7,
-    name: "Digital Blood Pressure Monitor",
-    image: "https://images.unsplash.com/photo-1612771409641-97f10a5374e2?q=80&w=400&auto=format&fit=crop",
-    price: 45.99,
-    oldPrice: 59.99,
-    discount: 23,
-    rating: 4.8,
-    isPrescriptionRequired: false,
-    description: "Accurate blood pressure monitoring for home use",
-    category: "Devices"
-  },
-  {
-    id: 8,
-    name: "Baby Diaper Rash Cream",
-    image: "https://images.unsplash.com/photo-1599217394824-e8d19c3a6776?q=80&w=400&auto=format&fit=crop",
-    price: 12.99,
-    oldPrice: null,
-    discount: null,
-    rating: 4.9,
-    isPrescriptionRequired: false,
-    description: "Gentle, protective formula for sensitive baby skin",
-    category: "Baby Care"
-  }
-];
-
 const Products = () => {
-  const [products, setProducts] = useState(sampleProducts);
+  const { products, loading: productsLoading } = useProducts();
   const [searchQuery, setSearchQuery] = useState("");
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [sortBy, setSortBy] = useState("relevance");
   const [showPrescriptionOnly, setShowPrescriptionOnly] = useState(false);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 50]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 100]);
   const [showFilters, setShowFilters] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   
@@ -195,7 +96,7 @@ const Products = () => {
     setSelectedCategory("All Categories");
     setSortBy("relevance");
     setShowPrescriptionOnly(false);
-    setPriceRange([0, 50]);
+    setPriceRange([0, 100]);
   };
   
   return (
@@ -287,7 +188,7 @@ const Products = () => {
                 </button>
                 
                 {/* Clear filters */}
-                {(searchQuery || selectedCategory !== "All Categories" || sortBy !== "relevance" || showPrescriptionOnly || priceRange[0] > 0 || priceRange[1] < 50) && (
+                {(searchQuery || selectedCategory !== "All Categories" || sortBy !== "relevance" || showPrescriptionOnly || priceRange[0] > 0 || priceRange[1] < 100) && (
                   <button
                     onClick={handleClearFilters}
                     className="flex items-center space-x-1 text-nimocare-600 hover:text-nimocare-800 transition-colors text-sm"
@@ -339,7 +240,7 @@ const Products = () => {
                         <input
                           type="range"
                           min="0"
-                          max="50"
+                          max="100"
                           step="5"
                           value={priceRange[1]}
                           onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
@@ -373,7 +274,7 @@ const Products = () => {
         {/* Product Grid */}
         <section className="py-10">
           <div className="container-custom">
-            {isLoading ? (
+            {isLoading || productsLoading ? (
               <div className="animate-fade-in">
                 <ContentSkeleton type="card" count={8} />
               </div>

@@ -27,6 +27,8 @@ import { runGarbageCollection } from "./utils/garbageCollection";
 import LiveChat from "./components/ui/LiveChat";
 import PerformanceMonitor from "./components/performance/PerformanceMonitor"; 
 import { throttle } from "./utils/performanceUtils";
+import { ProductProvider } from "./contexts/ProductContext";
+import { CartProvider } from "./contexts/CartContext";
 
 function App() {
   // Set up an enhanced garbage collection system
@@ -114,34 +116,38 @@ function App() {
 
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-react-theme" attribute="class">
-      <Router>
-        <ScrollToTop />
-        <PageTransition>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/category/:category" element={<CategoryPage />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/payment" element={<Payment />} />
-            <Route path="/order-confirmation" element={<OrderConfirmation />} />
-            <Route path="/order-tracking" element={<OrderTracking />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<CustomerDashboard />} />
-            <Route path="/prescription-upload" element={<PrescriptionUpload />} />
-            <Route path="/store-locator" element={<StoreLocator />} />
-            <Route path="/admin-ai" element={<AdminAI />} />
-            <Route path="/seller" element={<Seller />} />
-            <Route path="/system" element={<SystemOptimization />} />
-            <Route path="/user-management" element={<UserManagement />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </PageTransition>
-        <LiveChat />
-        <PerformanceMonitor />
-      </Router>
+      <ProductProvider>
+        <CartProvider>
+          <Router>
+            <ScrollToTop />
+            <PageTransition>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/product/:id" element={<ProductDetail />} />
+                <Route path="/category/:category" element={<CategoryPage />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/wishlist" element={<Wishlist />} />
+                <Route path="/payment" element={<Payment />} />
+                <Route path="/order-confirmation" element={<OrderConfirmation />} />
+                <Route path="/order-tracking" element={<OrderTracking />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/dashboard" element={<CustomerDashboard />} />
+                <Route path="/prescription-upload" element={<PrescriptionUpload />} />
+                <Route path="/store-locator" element={<StoreLocator />} />
+                <Route path="/admin-ai" element={<AdminAI />} />
+                <Route path="/seller" element={<Seller />} />
+                <Route path="/system" element={<SystemOptimization />} />
+                <Route path="/user-management" element={<UserManagement />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </PageTransition>
+            <LiveChat />
+            <PerformanceMonitor />
+          </Router>
+        </CartProvider>
+      </ProductProvider>
     </ThemeProvider>
   );
 }
