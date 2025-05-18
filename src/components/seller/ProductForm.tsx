@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Card, CardContent, CardDescription, CardHeader, CardTitle 
 } from "@/components/ui/card";
@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from 'sonner';
+import { Image, Upload } from 'lucide-react';
 
 const categories = [
   "Pain Relief",
@@ -44,6 +45,8 @@ const ProductForm = () => {
     stock: '100'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -56,6 +59,36 @@ const ProductForm = () => {
 
   const handleSwitchChange = (name: string, checked: boolean) => {
     setFormData(prev => ({ ...prev, [name]: checked }));
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check file size (limit to 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size should be less than 5MB');
+      return;
+    }
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file');
+      return;
+    }
+
+    // Create preview URL
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result as string;
+      setPreviewImage(result);
+      setFormData(prev => ({ ...prev, image: result }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -109,6 +142,7 @@ const ProductForm = () => {
         isBestseller: false,
         stock: '100'
       });
+      setPreviewImage(null);
 
       toast.success('Product added successfully');
     } catch (error) {
@@ -216,14 +250,57 @@ const ProductForm = () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="image">Image URL</Label>
-            <Input 
-              id="image" 
-              name="image" 
-              value={formData.image} 
-              onChange={handleChange} 
-              placeholder="https://example.com/image.jpg"
-            />
+            <Label>Product Image</Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="w-full" 
+                  onClick={triggerFileInput}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Image
+                </Button>
+                <div className="text-xs text-gray-500 mt-1">
+                  Max file size: 5MB. Formats: JPG, PNG, GIF
+                </div>
+              </div>
+              <div className="flex items-center">
+                {previewImage ? (
+                  <div className="relative border rounded w-24 h-24">
+                    <img 
+                      src={previewImage} 
+                      alt="Preview" 
+                      className="object-cover w-full h-full" 
+                    />
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center border rounded w-24 h-24 bg-gray-50">
+                    <Image className="h-8 w-8 text-gray-400" />
+                    <span className="text-xs text-gray-500 mt-1">Preview</span>
+                  </div>
+                )}
+                
+                <div className="ml-4 flex-grow">
+                  <Label htmlFor="image">Or enter image URL</Label>
+                  <Input 
+                    id="image" 
+                    name="image" 
+                    value={formData.image} 
+                    onChange={handleChange} 
+                    placeholder="https://example.com/image.jpg"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="flex flex-col space-y-4">
