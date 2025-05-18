@@ -12,6 +12,7 @@ import * as z from 'zod';
 import { toast } from 'sonner';
 import { Progress } from '@/components/ui/progress';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const productFormSchema = z.object({
   name: z.string().min(2, { message: 'Product name must be at least 2 characters.' }),
@@ -354,129 +355,131 @@ const Seller = () => {
                       <Plus className="mr-2 h-4 w-4" /> Add Product
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[550px]">
-                    <DialogHeader>
-                      <DialogTitle>Add New Product</DialogTitle>
-                      <DialogDescription>
-                        Fill in the product details below to add a new product to your inventory.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <Form {...form}>
-                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <FormField
-                          control={form.control}
-                          name="name"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Product Name</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Enter product name" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="price"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Price ($)</FormLabel>
-                              <FormControl>
-                                <Input type="number" step="0.01" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="description"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Description</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Enter product description" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="category"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Category</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Enter product category" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="stock"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Stock Quantity</FormLabel>
-                              <FormControl>
-                                <Input type="number" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <div className="space-y-2">
-                          <div className="text-sm font-medium text-gray-700">Product Image</div>
-                          <div 
-                            className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:bg-gray-50 transition-colors"
-                            onClick={triggerFileInput}
-                          >
-                            <input
-                              type="file"
-                              ref={fileInputRef}
-                              onChange={handleImageUpload}
-                              className="hidden"
-                              accept="image/*"
-                            />
-                            
-                            {!selectedImage ? (
-                              <div className="space-y-2">
-                                <Upload className="w-8 h-8 mx-auto text-gray-400" />
-                                <p className="text-sm text-gray-500">Click to upload product image</p>
-                                <p className="text-xs text-gray-400">PNG, JPG or GIF (max. 5MB)</p>
-                              </div>
-                            ) : (
-                              <div className="space-y-2">
-                                <img 
-                                  src={selectedImage} 
-                                  alt="Selected product" 
-                                  className="w-32 h-32 object-cover mx-auto rounded-md"
-                                />
-                                <p className="text-sm text-gray-500">Click to change image</p>
-                              </div>
+                  <DialogContent className="sm:max-w-[550px] max-h-[80vh]">
+                    <ScrollArea className="h-full max-h-[calc(80vh-120px)]">
+                      <DialogHeader>
+                        <DialogTitle>Add New Product</DialogTitle>
+                        <DialogDescription>
+                          Fill in the product details below to add a new product to your inventory.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                          <FormField
+                            control={form.control}
+                            name="name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Product Name</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Enter product name" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
                             )}
-                            
-                            {uploading && (
-                              <div className="mt-4">
-                                <div className="flex justify-between text-xs text-gray-500 mb-1">
-                                  <span>Uploading...</span>
-                                  <span>{uploadProgress}%</span>
+                          />
+                          <FormField
+                            control={form.control}
+                            name="price"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Price ($)</FormLabel>
+                                <FormControl>
+                                  <Input type="number" step="0.01" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="description"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Description</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Enter product description" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="category"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Category</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Enter product category" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="stock"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Stock Quantity</FormLabel>
+                                <FormControl>
+                                  <Input type="number" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <div className="space-y-2">
+                            <div className="text-sm font-medium text-gray-700">Product Image</div>
+                            <div 
+                              className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:bg-gray-50 transition-colors"
+                              onClick={triggerFileInput}
+                            >
+                              <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleImageUpload}
+                                className="hidden"
+                                accept="image/*"
+                              />
+                              
+                              {!selectedImage ? (
+                                <div className="space-y-2">
+                                  <Upload className="w-8 h-8 mx-auto text-gray-400" />
+                                  <p className="text-sm text-gray-500">Click to upload product image</p>
+                                  <p className="text-xs text-gray-400">PNG, JPG or GIF (max. 5MB)</p>
                                 </div>
-                                <Progress value={uploadProgress} className="h-1" />
-                              </div>
-                            )}
+                              ) : (
+                                <div className="space-y-2">
+                                  <img 
+                                    src={selectedImage} 
+                                    alt="Selected product" 
+                                    className="w-32 h-32 object-cover mx-auto rounded-md"
+                                  />
+                                  <p className="text-sm text-gray-500">Click to change image</p>
+                                </div>
+                              )}
+                              
+                              {uploading && (
+                                <div className="mt-4">
+                                  <div className="flex justify-between text-xs text-gray-500 mb-1">
+                                    <span>Uploading...</span>
+                                    <span>{uploadProgress}%</span>
+                                  </div>
+                                  <Progress value={uploadProgress} className="h-1" />
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                        
-                        <DialogFooter>
-                          <Button type="submit">Add Product</Button>
-                        </DialogFooter>
-                      </form>
-                    </Form>
+                          
+                          <DialogFooter>
+                            <Button type="submit">Add Product</Button>
+                          </DialogFooter>
+                        </form>
+                      </Form>
+                    </ScrollArea>
                   </DialogContent>
                 </Dialog>
               </div>
