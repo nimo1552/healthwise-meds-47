@@ -15,6 +15,8 @@ import Register from "./pages/Register";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import PrescriptionUpload from "./pages/PrescriptionUpload";
 import StoreLocator from "./pages/StoreLocator";
+import AboutUs from "./pages/AboutUs";
+import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import { PageTransition } from "./components/ui/PageTransition";
 import ScrollToTop from "./components/layout/ScrollToTop";
@@ -136,6 +138,8 @@ function App() {
                 <Route path="/dashboard" element={<CustomerDashboard />} />
                 <Route path="/prescription-upload" element={<PrescriptionUpload />} />
                 <Route path="/store-locator" element={<StoreLocator />} />
+                <Route path="/about-us" element={<AboutUs />} />
+                <Route path="/contact" element={<Contact />} />
                 <Route path="/admin-ai" element={<AdminAI />} />
                 <Route path="/seller" element={<Seller />} />
                 <Route path="/system" element={<SystemOptimization />} />

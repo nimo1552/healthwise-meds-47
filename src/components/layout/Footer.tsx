@@ -1,90 +1,85 @@
 
-import { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin, X } from 'lucide-react';
+import Logo from '../ui/Logo';
+import { ArrowRight, Facebook, Instagram, Twitter, Linkedin } from 'lucide-react';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
-  const [showCookieConsent, setShowCookieConsent] = useState(false);
-  
-  useEffect(() => {
-    // Check if user has already accepted cookies
-    const hasAcceptedCookies = localStorage.getItem('cookieConsent') === 'accepted';
-    if (!hasAcceptedCookies) {
-      // Show banner after a short delay
-      const timer = setTimeout(() => {
-        setShowCookieConsent(true);
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, []);
-  
-  const acceptCookies = () => {
-    localStorage.setItem('cookieConsent', 'accepted');
-    setShowCookieConsent(false);
-  };
-  
-  const declineCookies = () => {
-    localStorage.setItem('cookieConsent', 'declined');
-    setShowCookieConsent(false);
-  };
-  
   return (
-    <footer className="bg-white border-t border-gray-100">
-      <div className="container-custom">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 py-16">
-          {/* Company Info */}
-          <div className="space-y-6">
+    <footer className="bg-gray-50 border-t border-gray-100">
+      {/* Newsletter */}
+      <div className="container-custom py-12">
+        <div className="bg-nimocare-600 rounded-lg p-6 md:p-8 lg:p-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div>
-              <Link to="/" className="relative inline-block">
-                <span className="text-2xl font-display font-bold text-nimocare-600">
-                  Nimocare
-                </span>
-                <span className="absolute -top-1 -right-3 text-xs bg-nimocare-100 text-nimocare-600 px-1 rounded">Rx</span>
-              </Link>
-              <p className="mt-6 text-gray-600 max-w-xs">
-                Your trusted online pharmacy for all your healthcare needs. Safe, reliable, and eco-friendly.
+              <h3 className="text-2xl font-bold text-white mb-2">Join Our Newsletter</h3>
+              <p className="text-nimocare-100">
+                Stay updated with our latest health tips, product launches, and exclusive offers.
               </p>
             </div>
-            
-            <div className="flex space-x-4">
-              <a href="https://facebook.com/nimocare" target="_blank" rel="noreferrer" className="p-2 rounded-full bg-gray-100 hover:bg-nimocare-100 transition-colors">
-                <Facebook className="w-5 h-5 text-nimocare-600" />
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Input 
+                type="email" 
+                placeholder="Enter your email" 
+                className="flex-grow bg-white/90"
+              />
+              <Button className="whitespace-nowrap bg-white text-nimocare-600 hover:bg-nimocare-50">
+                Subscribe <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Main Footer */}
+      <div className="container-custom py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+          {/* Column 1 - Logo and About */}
+          <div className="lg:col-span-2">
+            <Logo size="md" />
+            <p className="mt-4 text-gray-600 max-w-md">
+              PharmaCare is your trusted online pharmacy and healthcare partner. We provide reliable medications, health advice, and exceptional service.
+            </p>
+            <div className="flex mt-6 space-x-4">
+              <a href="#" className="text-gray-400 hover:text-gray-600">
+                <Facebook className="h-5 w-5" />
               </a>
-              <a href="https://twitter.com/nimocare" target="_blank" rel="noreferrer" className="p-2 rounded-full bg-gray-100 hover:bg-nimocare-100 transition-colors">
-                <Twitter className="w-5 h-5 text-nimocare-600" />
+              <a href="#" className="text-gray-400 hover:text-gray-600">
+                <Twitter className="h-5 w-5" />
               </a>
-              <a href="https://instagram.com/nimocare" target="_blank" rel="noreferrer" className="p-2 rounded-full bg-gray-100 hover:bg-nimocare-100 transition-colors">
-                <Instagram className="w-5 h-5 text-nimocare-600" />
+              <a href="#" className="text-gray-400 hover:text-gray-600">
+                <Instagram className="h-5 w-5" />
               </a>
-              <a href="https://linkedin.com/company/nimocare" target="_blank" rel="noreferrer" className="p-2 rounded-full bg-gray-100 hover:bg-nimocare-100 transition-colors">
-                <Linkedin className="w-5 h-5 text-nimocare-600" />
+              <a href="#" className="text-gray-400 hover:text-gray-600">
+                <Linkedin className="h-5 w-5" />
               </a>
             </div>
           </div>
           
-          {/* Quick Links */}
+          {/* Column 2 - Quick Links */}
           <div>
-            <h3 className="text-lg font-bold mb-6">Quick Links</h3>
-            <ul className="space-y-4">
-              <li>
-                <Link to="/about" className="text-gray-600 hover:text-nimocare-600 transition-colors">
-                  About Us
-                </Link>
-              </li>
+            <h4 className="font-semibold text-gray-900 mb-4">Quick Links</h4>
+            <ul className="space-y-2">
               <li>
                 <Link to="/products" className="text-gray-600 hover:text-nimocare-600 transition-colors">
                   Products
                 </Link>
               </li>
               <li>
-                <Link to="/prescription" className="text-gray-600 hover:text-nimocare-600 transition-colors">
+                <Link to="/prescription-upload" className="text-gray-600 hover:text-nimocare-600 transition-colors">
                   Upload Prescription
                 </Link>
               </li>
               <li>
-                <Link to="/blog" className="text-gray-600 hover:text-nimocare-600 transition-colors">
-                  Health Blog
+                <Link to="/store-locator" className="text-gray-600 hover:text-nimocare-600 transition-colors">
+                  Store Locator
+                </Link>
+              </li>
+              <li>
+                <Link to="/about-us" className="text-gray-600 hover:text-nimocare-600 transition-colors">
+                  About Us
                 </Link>
               </li>
               <li>
@@ -95,120 +90,82 @@ const Footer = () => {
             </ul>
           </div>
           
-          {/* Help & Support */}
+          {/* Column 3 - Customer Service */}
           <div>
-            <h3 className="text-lg font-bold mb-6">Help & Support</h3>
-            <ul className="space-y-4">
+            <h4 className="font-semibold text-gray-900 mb-4">Customer Service</h4>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/dashboard" className="text-gray-600 hover:text-nimocare-600 transition-colors">
+                  My Account
+                </Link>
+              </li>
+              <li>
+                <Link to="/order-tracking" className="text-gray-600 hover:text-nimocare-600 transition-colors">
+                  Track Order
+                </Link>
+              </li>
               <li>
                 <Link to="/faq" className="text-gray-600 hover:text-nimocare-600 transition-colors">
                   FAQs
                 </Link>
               </li>
               <li>
-                <Link to="/shipping" className="text-gray-600 hover:text-nimocare-600 transition-colors">
-                  Shipping Policy
+                <Link to="/return-policy" className="text-gray-600 hover:text-nimocare-600 transition-colors">
+                  Return Policy
                 </Link>
               </li>
               <li>
-                <Link to="/returns" className="text-gray-600 hover:text-nimocare-600 transition-colors">
-                  Returns & Refunds
-                </Link>
-              </li>
-              <li>
-                <Link to="/privacy" className="text-gray-600 hover:text-nimocare-600 transition-colors">
+                <Link to="/privacy-policy" className="text-gray-600 hover:text-nimocare-600 transition-colors">
                   Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link to="/terms" className="text-gray-600 hover:text-nimocare-600 transition-colors">
-                  Terms & Conditions
                 </Link>
               </li>
             </ul>
           </div>
           
-          {/* Contact Info */}
+          {/* Column 4 - Contact */}
           <div>
-            <h3 className="text-lg font-bold mb-6">Contact Us</h3>
-            <ul className="space-y-4">
-              <li className="flex items-start">
-                <MapPin className="w-5 h-5 text-nimocare-600 mt-0.5 mr-3 flex-shrink-0" />
-                <span className="text-gray-600">
-                  123 Health Street, Medical District, CA 90210, USA
-                </span>
+            <h4 className="font-semibold text-gray-900 mb-4">Contact Us</h4>
+            <ul className="space-y-3">
+              <li className="text-gray-600">
+                <span className="block font-medium mb-1">Address:</span>
+                123 Healthcare Street, New York, NY 10001
               </li>
-              <li className="flex items-center">
-                <Phone className="w-5 h-5 text-nimocare-600 mr-3 flex-shrink-0" />
-                <a href="tel:+1234567890" className="text-gray-600 hover:text-nimocare-600 transition-colors">
-                  +1 (234) 567-890
-                </a>
+              <li className="text-gray-600">
+                <span className="block font-medium mb-1">Phone:</span>
+                1-800-PHARMA (1-800-742-762)
               </li>
-              <li className="flex items-center">
-                <Mail className="w-5 h-5 text-nimocare-600 mr-3 flex-shrink-0" />
-                <a href="mailto:support@nimocare.com" className="text-gray-600 hover:text-nimocare-600 transition-colors">
-                  support@nimocare.com
-                </a>
+              <li className="text-gray-600">
+                <span className="block font-medium mb-1">Email:</span>
+                support@pharmacare.com
+              </li>
+              <li className="text-gray-600">
+                <span className="block font-medium mb-1">Hours:</span>
+                Mon-Fri: 9am-6pm, Sat: 10am-4pm
               </li>
             </ul>
           </div>
         </div>
-        
-        {/* Bottom Bar */}
-        <div className="border-t border-gray-100 py-8 text-center md:flex md:justify-between md:text-left">
-          <p className="text-gray-600">
-            &copy; {currentYear} Nimocare. All rights reserved.
+      </div>
+      
+      {/* Bottom Footer */}
+      <div className="border-t border-gray-200 py-6">
+        <div className="container-custom flex flex-col md:flex-row justify-between items-center">
+          <p className="text-sm text-gray-500">
+            © 2023 PharmaCare. All rights reserved.
           </p>
-          <div className="mt-4 md:mt-0 flex flex-wrap justify-center md:justify-end gap-x-6 gap-y-2">
-            <a href="#" className="text-gray-600 hover:text-nimocare-600 transition-colors text-sm">
-              Compliance
-            </a>
-            <a href="#" className="text-gray-600 hover:text-nimocare-600 transition-colors text-sm">
-              Accessibility
-            </a>
-            <a href="#" className="text-gray-600 hover:text-nimocare-600 transition-colors text-sm">
-              Legal
-            </a>
-            <a href="#" className="text-gray-600 hover:text-nimocare-600 transition-colors text-sm">
-              Sitemap
-            </a>
+          <div className="flex space-x-6 mt-4 md:mt-0">
+            <Link to="/terms-conditions" className="text-sm text-gray-500 hover:text-gray-700">
+              Terms & Conditions
+            </Link>
+            <Link to="/privacy-policy" className="text-sm text-gray-500 hover:text-gray-700">
+              Privacy Policy
+            </Link>
+            <Link to="/seller" className="text-sm text-gray-500 hover:text-gray-700">
+              Sell With Us
+            </Link>
           </div>
         </div>
       </div>
-      
-      {/* Cookie Consent Banner */}
-      {showCookieConsent && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200 p-4 z-50 animate-fade-in">
-          <div className="container-custom flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex-1">
-              <h4 className="font-semibold text-gray-900 mb-1">We use cookies</h4>
-              <p className="text-sm text-gray-600">
-                We use cookies to enhance your browsing experience, serve personalized ads or content, and analyze our traffic. By clicking "Accept All", you consent to our use of cookies.
-              </p>
-            </div>
-            <div className="flex gap-3 mt-3 md:mt-0">
-              <button 
-                onClick={declineCookies}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Decline
-              </button>
-              <button 
-                onClick={acceptCookies}
-                className="px-4 py-2 bg-nimocare-600 text-white rounded-md text-sm font-medium hover:bg-nimocare-700 transition-colors"
-              >
-                Accept All
-              </button>
-              <button 
-                onClick={() => setShowCookieConsent(false)}
-                className="p-2 text-gray-500 hover:text-gray-700 md:hidden"
-                aria-label="Close"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </footer>
   );
 };
