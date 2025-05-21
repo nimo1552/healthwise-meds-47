@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { 
   Menu, X, ShoppingCart, Heart, Search, User, ChevronDown, 
-  Stethoscope, Package, MapPin, ArrowRight, Moon, Sun 
+  Stethoscope, Package, MapPin, ArrowRight, Store 
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -119,6 +118,17 @@ const Navbar = () => {
               }
             >
               Store Locator
+            </NavLink>
+
+            <NavLink 
+              to="/seller" 
+              className={({ isActive }) => 
+                `px-4 py-2 rounded-lg text-sm transition-colors ${
+                  isActive ? 'text-nimocare-600 font-medium' : 'hover:text-nimocare-600'
+                }`
+              }
+            >
+              Sell With Us
             </NavLink>
           </div>
           
@@ -243,6 +253,18 @@ const Navbar = () => {
                 >
                   <MapPin className="h-5 w-5 mr-3 inline-block" />
                   Store Locator
+                </NavLink>
+                
+                <NavLink 
+                  to="/seller" 
+                  className={({ isActive }) => 
+                    `px-4 py-3 rounded-lg transition-colors ${
+                      isActive ? 'bg-nimocare-50 text-nimocare-600 font-medium' : 'hover:bg-gray-50'
+                    }`
+                  }
+                >
+                  <Store className="h-5 w-5 mr-3 inline-block" />
+                  Sell With Us
                 </NavLink>
                 
                 <NavLink 

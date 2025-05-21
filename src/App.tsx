@@ -31,34 +31,34 @@ import { ProductProvider } from "./contexts/ProductContext";
 import { CartProvider } from "./contexts/CartContext";
 
 function App() {
-  // Set up an enhanced garbage collection system
+  // Set up an enhanced garbage collection system that excludes products data
   useEffect(() => {
     // Define collection strategies based on different scenarios
     const strategies = {
       // Regular interval collection - less frequent for better performance
       regular: throttle(() => {
         console.log("Running regular garbage collection...");
-        runGarbageCollection(15 * 60 * 1000); // Use 15 minute TTL for regular collections
+        runGarbageCollection(15 * 60 * 1000, ['pharmacy-products']); // Exclude products data
       }, 15 * 60 * 1000), // Run at most once every 15 minutes
       
       // Collection when tab becomes visible again after being hidden
       onVisibilityChange: throttle(() => {
         if (document.visibilityState === 'visible') {
           console.log("Running garbage collection on visibility change...");
-          runGarbageCollection(10 * 60 * 1000); // Use 10 minute TTL for visibility triggered collections
+          runGarbageCollection(10 * 60 * 1000, ['pharmacy-products']); // Exclude products data
         }
       }, 2 * 60 * 1000), // At most once per 2 minutes
       
       // Collection on low memory conditions (Chrome only)
       onLowMemory: () => {
         console.log("Running urgent garbage collection due to low memory...");
-        runGarbageCollection(5 * 60 * 1000); // Use 5 minute TTL for low memory collections
+        runGarbageCollection(5 * 60 * 1000, ['pharmacy-products']); // Exclude products data
       },
       
       // Collection when the user has been idle
       onUserIdle: throttle(() => {
         console.log("Running garbage collection during user idle time...");
-        runGarbageCollection(8 * 60 * 1000); // Use 8 minute TTL for idle collections
+        runGarbageCollection(8 * 60 * 1000, ['pharmacy-products']); // Exclude products data
       }, 5 * 60 * 1000), // At most once every 5 minutes
     };
     

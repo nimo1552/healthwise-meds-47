@@ -26,13 +26,13 @@ const Logo = ({ size = 'md', showText = true, className }: LogoProps) => {
     <div className={cn("relative flex items-center", className)}>
       <img 
         src="https://images.unsplash.com/photo-1587854692152-cbe660dbde88?q=80&w=400&auto=format&fit=crop&ixlib=rb-4.0.3" 
-        alt="Nimocare Logo" 
+        alt="PharmaCare Logo" 
         className={cn("object-contain mr-2", sizes[size])}
       />
       {showText && (
         <>
           <span className={cn("font-display font-bold text-nimocare-600", textSizes[size])}>
-            Nimocare
+            PharmaCare
           </span>
           <span className={cn(
             "absolute text-xs bg-nimocare-100 text-nimocare-600 px-1 rounded",

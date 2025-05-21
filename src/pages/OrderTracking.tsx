@@ -50,7 +50,7 @@ const OrderTracking = () => {
       {
         status: 'Shipped',
         date: 'May 13, 2023 - 9:15 AM',
-        location: 'Warehouse',
+        location: 'PharmaCare Warehouse',
         completed: true
       },
       {
