@@ -5,6 +5,7 @@ import Footer from '@/components/layout/Footer';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
 
 const AboutUs = () => {
   return (
