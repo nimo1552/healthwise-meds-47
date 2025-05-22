@@ -5,7 +5,9 @@ import { motion } from 'framer-motion';
 import { ShoppingCart, Heart, Star } from 'lucide-react';
 import { Button } from './button';
 import { useCart } from '@/contexts/CartContext';
+import { Product } from '@/contexts/ProductContext';
 
+// Update interface to include createdAt which is required by Product type
 interface ProductCardProps {
   id: number;
   name: string;
@@ -19,6 +21,7 @@ interface ProductCardProps {
   category: string;
   isBestseller?: boolean;
   stock?: number;
+  createdAt: string; // Add the missing required property
 }
 
 const ProductCard = (props: ProductCardProps) => {
