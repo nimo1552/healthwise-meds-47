@@ -1,5 +1,6 @@
+
 import { useEffect, useState } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, Navigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { 
@@ -18,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { sendOrderConfirmationEmail } from '@/utils/emailService';
 import { useToast } from '@/hooks/use-toast';
+import { useCart } from '@/contexts/CartContext';
 
 interface OrderItem {
   id: number;
@@ -51,11 +53,15 @@ interface OrderDetails {
 const OrderConfirmation = () => {
   const location = useLocation();
   const { toast } = useToast();
+  const { clearCart } = useCart();
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
   const [emailSent, setEmailSent] = useState(false);
   const [customerEmail, setCustomerEmail] = useState('jane.doe@example.com');
   
   useEffect(() => {
+    // Clear the cart once the order is confirmed
+    clearCart();
+    
     const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
     
     const currentDate = new Date();
@@ -95,54 +101,14 @@ const OrderConfirmation = () => {
       
       setOrderDetails(newOrderDetails);
     } else {
-      const mockOrderDetails: OrderDetails = {
-        orderId,
-        date: currentDate.toLocaleDateString(),
-        total: 124.95,
-        subtotal: 112.95,
-        shipping: 0,
-        tax: 12.00,
-        discount: 0,
-        paymentMethod: "Credit Card (ending in 4242)",
-        items: [
-          {
-            id: 1,
-            name: "Acetaminophen 500mg",
-            price: 12.99,
-            quantity: 2,
-            image: "/placeholder.svg"
-          },
-          {
-            id: 2,
-            name: "Digital Thermometer",
-            price: 24.99,
-            quantity: 1,
-            image: "/placeholder.svg"
-          },
-          {
-            id: 3,
-            name: "First Aid Kit",
-            price: 34.99,
-            quantity: 1,
-            image: "/placeholder.svg"
-          }
-        ],
-        shippingAddress: {
-          name: "Jane Doe",
-          street: "123 Main St",
-          city: "Anytown",
-          state: "California",
-          zipCode: "12345",
-          country: "United States"
-        },
-        estimatedDelivery: deliveryDate.toLocaleDateString()
-      };
-      
-      setTimeout(() => {
-        setOrderDetails(mockOrderDetails);
-      }, 500);
+      // Redirect to products page if no order data is provided
+      toast({
+        title: "No order data found",
+        description: "Redirecting to products page",
+        variant: "destructive",
+      });
     }
-  }, [location.state]);
+  }, [location.state, toast, clearCart]);
   
   useEffect(() => {
     if (orderDetails && !emailSent) {
@@ -178,6 +144,10 @@ const OrderConfirmation = () => {
       });
     });
   };
+  
+  if (!location.state || !location.state.orderItems) {
+    return <Navigate to="/products" replace />;
+  }
   
   if (!orderDetails) {
     return (
