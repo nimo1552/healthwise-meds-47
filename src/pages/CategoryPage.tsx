@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
@@ -74,7 +75,8 @@ const allProducts = [
     isPrescriptionRequired: false,
     description: "Pain reliever and fever reducer for adults and children.",
     category: "otc",
-    isBestseller: true
+    isBestseller: true,
+    createdAt: new Date().toISOString() // Add missing createdAt property
   },
   {
     id: 2,
@@ -86,7 +88,8 @@ const allProducts = [
     rating: 4.6,
     isPrescriptionRequired: false,
     description: "Supports bone health, immune function, and overall wellness.",
-    category: "vitamins"
+    category: "vitamins",
+    createdAt: new Date().toISOString() // Add missing createdAt property
   },
   {
     id: 3,
@@ -98,7 +101,8 @@ const allProducts = [
     rating: 4.5,
     isPrescriptionRequired: true,
     description: "Antibiotic used to treat bacterial infections.",
-    category: "prescription"
+    category: "prescription",
+    createdAt: new Date().toISOString() // Add missing createdAt property
   },
   {
     id: 4,
@@ -110,7 +114,8 @@ const allProducts = [
     rating: 4.7,
     isPrescriptionRequired: false,
     description: "Supports heart health, brain function, and reduces inflammation.",
-    category: "vitamins"
+    category: "vitamins",
+    createdAt: new Date().toISOString() // Add missing createdAt property
   },
   {
     id: 5,
@@ -122,7 +127,8 @@ const allProducts = [
     rating: 4.3,
     isPrescriptionRequired: false,
     description: "Temporarily relieves itching, redness, and swelling due to skin conditions.",
-    category: "personal-care"
+    category: "personal-care",
+    createdAt: new Date().toISOString() // Add missing createdAt property
   },
   {
     id: 6,
@@ -134,7 +140,8 @@ const allProducts = [
     rating: 4.6,
     isPrescriptionRequired: false,
     description: "Nonsteroidal anti-inflammatory for pain relief and reducing fever.",
-    category: "otc"
+    category: "otc",
+    createdAt: new Date().toISOString() // Add missing createdAt property
   },
   {
     id: 7,
@@ -146,7 +153,8 @@ const allProducts = [
     rating: 4.8,
     isPrescriptionRequired: false,
     description: "Accurate blood pressure monitoring for home use",
-    category: "devices"
+    category: "devices",
+    createdAt: new Date().toISOString() // Add missing createdAt property
   },
   {
     id: 8,
@@ -158,7 +166,8 @@ const allProducts = [
     rating: 4.9,
     isPrescriptionRequired: false,
     description: "Gentle, protective formula for sensitive baby skin",
-    category: "baby-mother"
+    category: "baby-mother",
+    createdAt: new Date().toISOString() // Add missing createdAt property
   },
   {
     id: 9,
@@ -170,7 +179,8 @@ const allProducts = [
     rating: 4.7,
     isPrescriptionRequired: false,
     description: "Complete nutrition for expectant mothers",
-    category: "baby-mother"
+    category: "baby-mother",
+    createdAt: new Date().toISOString() // Add missing createdAt property
   },
   {
     id: 10,
@@ -182,7 +192,8 @@ const allProducts = [
     rating: 4.5,
     isPrescriptionRequired: false,
     description: "Fast and accurate temperature readings",
-    category: "devices"
+    category: "devices",
+    createdAt: new Date().toISOString() // Add missing createdAt property
   }
 ];
 
