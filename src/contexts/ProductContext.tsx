@@ -17,11 +17,12 @@ export interface Product {
   isBestseller?: boolean;
   sellerId?: string;
   stock?: number;
+  createdAt: string;
 }
 
 interface ProductContextType {
   products: Product[];
-  addProduct: (product: Omit<Product, 'id'>) => void;
+  addProduct: (product: Omit<Product, 'id' | 'createdAt'>) => void;
   updateProduct: (product: Product) => void;
   deleteProduct: (id: number) => void;
   getProductById: (id: number) => Product | undefined;
@@ -42,6 +43,7 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     if (storedProducts) {
       setProducts(JSON.parse(storedProducts));
     } else {
+      // Initialize with empty array
       setProducts([]);
     }
     setLoading(false);
@@ -51,16 +53,20 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (!loading) {
       localStorage.setItem('pharmacy-products', JSON.stringify(products));
+      console.log('Products saved to localStorage:', products.length);
     }
   }, [products, loading]);
 
-  const addProduct = (product: Omit<Product, 'id'>) => {
+  const addProduct = (product: Omit<Product, 'id' | 'createdAt'>) => {
     // Generate a new ID (in a real app, this would come from the backend)
     const newId = products.length > 0 
       ? Math.max(...products.map(p => p.id)) + 1 
       : 1;
     
-    const newProduct = { ...product, id: newId };
+    // Add timestamp
+    const createdAt = new Date().toISOString();
+    
+    const newProduct = { ...product, id: newId, createdAt };
     
     setProducts(prev => [...prev, newProduct]);
     toast.success("Product added successfully");
@@ -82,8 +88,11 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
     return products.find(product => product.id === id);
   };
 
-  // Derived states
-  const featuredProducts = products.slice(0, 4); // First 4 products as featured
+  // Derived states - sorted by most recent first
+  const featuredProducts = [...products].sort((a, b) => 
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  ).slice(0, 4);
+  
   const bestsellerProducts = products.filter(product => product.isBestseller);
 
   return (

@@ -21,7 +21,6 @@ import NotFound from "./pages/NotFound";
 import { PageTransition } from "./components/ui/PageTransition";
 import ScrollToTop from "./components/layout/ScrollToTop";
 import { ThemeProvider } from "./components/theme-provider";
-import AdminAI from "./pages/AdminAI";
 import Seller from "./pages/Seller";
 import SystemOptimization from "./pages/SystemOptimization";
 import UserManagement from "./pages/UserManagement";
@@ -140,7 +139,6 @@ function App() {
                 <Route path="/store-locator" element={<StoreLocator />} />
                 <Route path="/about-us" element={<AboutUs />} />
                 <Route path="/contact" element={<Contact />} />
-                <Route path="/admin-ai" element={<AdminAI />} />
                 <Route path="/seller" element={<Seller />} />
                 <Route path="/system" element={<SystemOptimization />} />
                 <Route path="/user-management" element={<UserManagement />} />

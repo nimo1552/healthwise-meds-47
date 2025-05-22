@@ -102,6 +102,7 @@ const ProductForm = () => {
       }
 
       if (!formData.image) {
+        // Default placeholder image
         formData.image = 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?q=80&w=400&auto=format&fit=crop';
       }
 

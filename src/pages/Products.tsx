@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -8,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ContentSkeleton } from '@/components/ui/ContentSkeleton';
 import { SearchRecommendations } from '@/components/ui/SearchRecommendations';
 import { useProducts } from '@/contexts/ProductContext';
+import { Link } from 'react-router-dom';
 
 // Filter options
 const categories = [
@@ -23,11 +25,11 @@ const categories = [
 ];
 
 const sortOptions = [
-  { value: "relevance", label: "Most Relevant" },
+  { value: "newest", label: "Newest First" },
   { value: "price-low", label: "Price: Low to High" },
   { value: "price-high", label: "Price: High to Low" },
   { value: "rating", label: "Highest Rated" },
-  { value: "newest", label: "Newest First" }
+  { value: "relevance", label: "Most Relevant" }
 ];
 
 const Products = () => {
@@ -35,11 +37,19 @@ const Products = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
-  const [sortBy, setSortBy] = useState("relevance");
+  const [sortBy, setSortBy] = useState("newest");
   const [showPrescriptionOnly, setShowPrescriptionOnly] = useState(false);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 100]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [showFilters, setShowFilters] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Calculate max price for range slider
+  useEffect(() => {
+    if (products.length > 0) {
+      const maxPrice = Math.max(...products.map(p => p.price)) + 50; // Add buffer
+      setPriceRange([0, Math.min(maxPrice, 1000)]);
+    }
+  }, [products]);
   
   // Simulate loading state
   useEffect(() => {
@@ -69,8 +79,7 @@ const Products = () => {
       case "rating":
         return b.rating - a.rating;
       case "newest":
-        // In a real app, you'd sort by date added
-        return 0;
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       default:
         // Relevance or any other case
         return 0;
@@ -94,9 +103,9 @@ const Products = () => {
   const handleClearFilters = () => {
     setSearchQuery("");
     setSelectedCategory("All Categories");
-    setSortBy("relevance");
+    setSortBy("newest");
     setShowPrescriptionOnly(false);
-    setPriceRange([0, 100]);
+    setPriceRange([0, 1000]);
   };
   
   return (
@@ -188,7 +197,7 @@ const Products = () => {
                 </button>
                 
                 {/* Clear filters */}
-                {(searchQuery || selectedCategory !== "All Categories" || sortBy !== "relevance" || showPrescriptionOnly || priceRange[0] > 0 || priceRange[1] < 100) && (
+                {(searchQuery || selectedCategory !== "All Categories" || sortBy !== "newest" || showPrescriptionOnly || priceRange[0] > 0 || priceRange[1] < 1000) && (
                   <button
                     onClick={handleClearFilters}
                     className="flex items-center space-x-1 text-nimocare-600 hover:text-nimocare-800 transition-colors text-sm"
@@ -240,7 +249,7 @@ const Products = () => {
                         <input
                           type="range"
                           min="0"
-                          max="100"
+                          max="1000"
                           step="5"
                           value={priceRange[1]}
                           onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
@@ -324,6 +333,9 @@ const Products = () => {
                 >
                   We couldn't find any products matching your criteria.
                 </motion.p>
+                <Link to="/seller" className="inline-block px-4 py-2 bg-nimocare-600 text-white rounded-md hover:bg-nimocare-700 transition-colors">
+                  Add Products
+                </Link>
               </div>
             )}
           </div>

@@ -12,12 +12,9 @@ import ProductForm from '@/components/seller/ProductForm';
 import { useProducts } from '@/contexts/ProductContext';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash, Package } from 'lucide-react';
-import { toast } from 'sonner';
 
 const Seller = () => {
   const { products, deleteProduct } = useProducts();
-  // This would be filtered by seller ID in a real app
-  const sellerProducts = products; 
   
   const handleDeleteProduct = (id: number) => {
     if (confirm("Are you sure you want to delete this product?")) {
@@ -52,9 +49,9 @@ const Seller = () => {
                     <CardContent className="pt-6">
                       <h2 className="text-xl font-semibold mb-4">Your Products</h2>
                       
-                      {sellerProducts.length > 0 ? (
+                      {products.length > 0 ? (
                         <div className="space-y-4">
-                          {sellerProducts.map(product => (
+                          {products.map(product => (
                             <div key={product.id} className="flex flex-col md:flex-row border rounded-lg p-4 gap-4">
                               <div className="w-24 h-24 flex-shrink-0">
                                 <img 

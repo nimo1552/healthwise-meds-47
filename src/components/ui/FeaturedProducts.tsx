@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ProductCard from './ProductCard';
 import { motion } from 'framer-motion';
+import { useProducts } from '@/contexts/ProductContext';
 
 // Categories for tabbed navigation
 const categories = [
@@ -15,77 +16,31 @@ const categories = [
   "Skin Care"
 ];
 
-// Sample product data
-const sampleProducts = [
-  {
-    id: 1,
-    name: "Paracetamol 500mg Tablets",
-    image: "https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?q=80&w=400&auto=format&fit=crop",
-    price: 9.99,
-    oldPrice: 12.99,
-    discount: 23,
-    rating: 4.8,
-    isPrescriptionRequired: false,
-    description: "Pain reliever and fever reducer for adults and children.",
-    category: "Pain Relief",
-    isBestseller: true
-  },
-  {
-    id: 2,
-    name: "Vitamin D3 5000IU Capsules",
-    image: "https://images.unsplash.com/photo-1550572017-edd951b55104?q=80&w=400&auto=format&fit=crop",
-    price: 14.99,
-    oldPrice: null,
-    discount: null,
-    rating: 4.6,
-    isPrescriptionRequired: false,
-    description: "Supports bone health, immune function, and overall wellness.",
-    category: "Vitamins & Supplements"
-  },
-  {
-    id: 3,
-    name: "Amoxicillin 500mg Capsules",
-    image: "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?q=80&w=400&auto=format&fit=crop",
-    price: 19.99,
-    oldPrice: 25.99,
-    discount: 23,
-    rating: 4.5,
-    isPrescriptionRequired: true,
-    description: "Antibiotic used to treat bacterial infections.",
-    category: "Antibiotics"
-  },
-  {
-    id: 4,
-    name: "Omega-3 Fish Oil Softgels",
-    image: "https://images.unsplash.com/photo-1577174881658-0f30ed549adc?q=80&w=400&auto=format&fit=crop",
-    price: 12.99,
-    oldPrice: null,
-    discount: null,
-    rating: 4.7,
-    isPrescriptionRequired: false,
-    description: "Supports heart health, brain function, and reduces inflammation.",
-    category: "Vitamins & Supplements"
-  }
-];
-
 const FeaturedProducts = () => {
   const [activeCategory, setActiveCategory] = useState("All");
-  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
+  const { products, loading } = useProducts();
   
   // Load products based on active category
   useEffect(() => {
-    // In a real app, this would be fetched from a backend API
-    // For now, we'll filter the sample products based on the selected category
-    let filtered = [...sampleProducts];
+    if (loading) return;
+    
+    let filtered = [...products];
     if (activeCategory !== "All") {
-      filtered = sampleProducts.filter(product => 
+      filtered = products.filter(product => 
         product.category === activeCategory ||
         (activeCategory === "Bestsellers" && product.isBestseller)
       );
     }
     
-    setProducts(filtered);
-  }, [activeCategory]);
+    // Sort by newest first
+    filtered = filtered.sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+    
+    // Limit to 8 products for display
+    setFilteredProducts(filtered.slice(0, 8));
+  }, [activeCategory, products, loading]);
 
   return (
     <section className="section-padding bg-gradient-to-b from-gray-50 to-white">
@@ -114,7 +69,7 @@ const FeaturedProducts = () => {
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
             >
-              Most Popular Medicines
+              Our Products
             </motion.h2>
           </div>
           
@@ -162,9 +117,9 @@ const FeaturedProducts = () => {
         </motion.div>
         
         {/* Products grid */}
-        {products.length > 0 ? (
+        {filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.map((product, index) => (
+            {filteredProducts.map((product, index) => (
               <motion.div
                 key={product.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -185,8 +140,13 @@ const FeaturedProducts = () => {
               transition={{ duration: 0.5 }}
               className="text-gray-600 mb-4"
             >
-              No products available for this category.
+              {loading ? "Loading products..." : "No products available for this category yet."}
             </motion.p>
+            {!loading && (
+              <Link to="/seller" className="inline-block px-4 py-2 bg-nimocare-600 text-white rounded-md hover:bg-nimocare-700 transition-colors">
+                Add Products
+              </Link>
+            )}
           </div>
         )}
       </div>
