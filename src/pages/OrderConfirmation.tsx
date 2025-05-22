@@ -1,25 +1,15 @@
 
 import { useEffect, useState } from 'react';
-import { useLocation, Link, Navigate } from 'react-router-dom';
+import { useLocation, Navigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { 
-  CheckCircle, 
-  Truck, 
-  Calendar, 
-  MapPin, 
-  CreditCard,
-  ArrowRight,
-  Printer,
-  FileText,
-  ShoppingBag,
-  Mail
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { sendOrderConfirmationEmail } from '@/utils/emailService';
 import { useToast } from '@/hooks/use-toast';
 import { useCart } from '@/contexts/CartContext';
+import { sendOrderConfirmationEmail } from '@/utils/emailService';
+
+import OrderConfirmationHeader from '@/components/order/OrderConfirmationHeader';
+import OrderSummary from '@/components/order/OrderSummary';
+import OrderActionButtons from '@/components/order/OrderActionButtons';
 
 interface OrderItem {
   id: number;
@@ -165,174 +155,15 @@ const OrderConfirmation = () => {
     );
   }
 
-  console.log("Order Details:", orderDetails);
-  console.log("Order Items:", orderDetails.items);
-  
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
       <main className="flex-grow pt-20 pb-16">
         <div className="container-custom max-w-4xl">
-          <div className="bg-gradient-to-r from-green-50 to-teal-50 border border-green-100 rounded-xl p-6 mb-8 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-              <CheckCircle className="w-8 h-8 text-green-600" />
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Thank You for Your Order!</h1>
-            <p className="text-gray-600 max-w-lg mx-auto">
-              Your order has been confirmed and will be processed right away. A confirmation email has been sent to {customerEmail}.
-            </p>
-          </div>
-          
-          <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden mb-8">
-            <div className="p-6 border-b border-gray-100">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                <div>
-                  <p className="text-sm text-gray-500 mb-1">Order Number</p>
-                  <h2 className="text-xl font-bold text-gray-900">{orderDetails.orderId}</h2>
-                </div>
-                
-                <div className="mt-4 md:mt-0 flex gap-3">
-                  <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={handleResendEmail}>
-                    <Mail className="w-4 h-4" />
-                    Resend Email
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <Printer className="w-4 h-4" />
-                    Print
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <FileText className="w-4 h-4" />
-                    Download Receipt
-                  </Button>
-                </div>
-              </div>
-            </div>
-            
-            <div className="p-6 bg-gray-50 border-b border-gray-100">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <p className="text-sm text-gray-500 mb-1">Order Date</p>
-                  <div className="flex items-center">
-                    <Calendar className="w-4 h-4 text-gray-400 mr-2" />
-                    <p className="font-medium">{orderDetails.date}</p>
-                  </div>
-                </div>
-                
-                <div>
-                  <p className="text-sm text-gray-500 mb-1">Estimated Delivery</p>
-                  <div className="flex items-center">
-                    <Truck className="w-4 h-4 text-gray-400 mr-2" />
-                    <p className="font-medium">{orderDetails.estimatedDelivery}</p>
-                  </div>
-                </div>
-                
-                <div>
-                  <p className="text-sm text-gray-500 mb-1">Payment Method</p>
-                  <div className="flex items-center">
-                    <CreditCard className="w-4 h-4 text-gray-400 mr-2" />
-                    <p className="font-medium">{orderDetails.paymentMethod}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="p-6 border-b border-gray-100">
-              <h3 className="font-medium text-gray-900 mb-4">Order Items</h3>
-              
-              <div className="space-y-4">
-                {Array.isArray(orderDetails.items) && orderDetails.items.length > 0 ? (
-                  orderDetails.items.map((item) => (
-                    <div key={item.id} className="flex items-start py-3">
-                      <div className="w-16 h-16 rounded bg-gray-100 overflow-hidden flex-shrink-0">
-                        <img
-                          src={item.image || "/placeholder.svg"}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = "/placeholder.svg";
-                          }}
-                        />
-                      </div>
-                      
-                      <div className="ml-4 flex-grow">
-                        <div className="flex justify-between">
-                          <h4 className="font-medium text-gray-900">{item.name}</h4>
-                          <p className="font-medium text-gray-900">${item.price.toFixed(2)}</p>
-                        </div>
-                        <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="py-4 text-center text-gray-500">No items found in your order.</div>
-                )}
-              </div>
-              
-              <Separator className="my-6" />
-              
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span className="font-medium">${orderDetails.subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Shipping</span>
-                  <span className="font-medium">
-                    {orderDetails.shipping === 0 ? "Free" : `$${orderDetails.shipping.toFixed(2)}`}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Tax</span>
-                  <span className="font-medium">${orderDetails.tax.toFixed(2)}</span>
-                </div>
-                {orderDetails.discount > 0 && (
-                  <div className="flex justify-between text-sm text-green-600">
-                    <span>Discount</span>
-                    <span>-${orderDetails.discount.toFixed(2)}</span>
-                  </div>
-                )}
-                <Separator className="my-2" />
-                <div className="flex justify-between">
-                  <span className="font-medium text-gray-900">Total</span>
-                  <span className="font-bold text-gray-900">${orderDetails.total.toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="p-6">
-              <h3 className="font-medium text-gray-900 mb-4">Shipping Address</h3>
-              
-              <div className="flex items-start">
-                <MapPin className="w-5 h-5 text-gray-400 mt-0.5 mr-3" />
-                <div>
-                  <p className="font-medium text-gray-900">{orderDetails.shippingAddress.name}</p>
-                  <p className="text-gray-600">{orderDetails.shippingAddress.street}</p>
-                  <p className="text-gray-600">
-                    {orderDetails.shippingAddress.city}, {orderDetails.shippingAddress.state} {orderDetails.shippingAddress.zipCode}
-                  </p>
-                  <p className="text-gray-600">{orderDetails.shippingAddress.country}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild variant="outline" className="flex-1">
-              <Link to="/order-tracking">
-                Track Order
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Link>
-            </Button>
-            
-            <Button asChild className="flex-1 bg-nimocare-600 hover:bg-nimocare-700">
-              <Link to="/products">
-                Continue Shopping
-                <ShoppingBag className="w-4 h-4 ml-2" />
-              </Link>
-            </Button>
-          </div>
+          <OrderConfirmationHeader customerEmail={customerEmail} />
+          <OrderSummary orderDetails={orderDetails} onResendEmail={handleResendEmail} />
+          <OrderActionButtons />
         </div>
       </main>
       
