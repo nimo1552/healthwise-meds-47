@@ -164,6 +164,9 @@ const OrderConfirmation = () => {
       </div>
     );
   }
+
+  console.log("Order Details:", orderDetails);
+  console.log("Order Items:", orderDetails.items);
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -238,25 +241,33 @@ const OrderConfirmation = () => {
               <h3 className="font-medium text-gray-900 mb-4">Order Items</h3>
               
               <div className="space-y-4">
-                {orderDetails.items.map((item) => (
-                  <div key={item.id} className="flex items-start py-3">
-                    <div className="w-16 h-16 rounded bg-gray-100 overflow-hidden flex-shrink-0">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    
-                    <div className="ml-4 flex-grow">
-                      <div className="flex justify-between">
-                        <h4 className="font-medium text-gray-900">{item.name}</h4>
-                        <p className="font-medium text-gray-900">${item.price.toFixed(2)}</p>
+                {Array.isArray(orderDetails.items) && orderDetails.items.length > 0 ? (
+                  orderDetails.items.map((item) => (
+                    <div key={item.id} className="flex items-start py-3">
+                      <div className="w-16 h-16 rounded bg-gray-100 overflow-hidden flex-shrink-0">
+                        <img
+                          src={item.image || "/placeholder.svg"}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = "/placeholder.svg";
+                          }}
+                        />
                       </div>
-                      <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                      
+                      <div className="ml-4 flex-grow">
+                        <div className="flex justify-between">
+                          <h4 className="font-medium text-gray-900">{item.name}</h4>
+                          <p className="font-medium text-gray-900">${item.price.toFixed(2)}</p>
+                        </div>
+                        <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <div className="py-4 text-center text-gray-500">No items found in your order.</div>
+                )}
               </div>
               
               <Separator className="my-6" />
