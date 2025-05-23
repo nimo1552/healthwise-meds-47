@@ -16,7 +16,7 @@ interface OrderItem {
   name: string;
   price: number;
   quantity: number;
-  image: string;
+  image?: string;
 }
 
 interface OrderDetails {
@@ -70,10 +70,15 @@ const OrderConfirmation = () => {
         orderShipping, 
         orderTax, 
         orderDiscount = 0,
-        customerInfo
+        customerInfo,
+        paymentMethod
       } = location.state;
       
       console.log("Order items received:", orderItems);
+      
+      const paymentDisplay = paymentMethod 
+        ? (paymentMethod === "Credit Card" ? "Credit Card (ending in 4242)" : paymentMethod)
+        : "Credit Card (ending in 4242)";
       
       const newOrderDetails: OrderDetails = {
         orderId,
@@ -83,7 +88,7 @@ const OrderConfirmation = () => {
         shipping: orderShipping || 0,
         tax: orderTax || 0,
         discount: orderDiscount || 0,
-        paymentMethod: "Credit Card (ending in 4242)",
+        paymentMethod: paymentDisplay,
         items: Array.isArray(orderItems) ? orderItems : [],
         shippingAddress: customerInfo || {
           name: "Jane Doe",

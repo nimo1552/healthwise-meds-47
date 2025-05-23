@@ -12,7 +12,7 @@ interface OrderItem {
   name: string;
   price: number;
   quantity: number;
-  image: string;
+  image?: string;
 }
 
 interface OrderDetails {
@@ -44,6 +44,9 @@ interface OrderSummaryProps {
 const OrderSummary = ({ orderDetails, onResendEmail }: OrderSummaryProps) => {
   console.log("Rendering OrderSummary with details:", orderDetails);
   
+  // Ensure items are valid before rendering
+  const validItems = Array.isArray(orderDetails.items) ? orderDetails.items : [];
+  
   return (
     <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden mb-8">
       <OrderSummaryHeader 
@@ -60,7 +63,7 @@ const OrderSummary = ({ orderDetails, onResendEmail }: OrderSummaryProps) => {
       <div className="p-6 border-b border-gray-100">
         <h3 className="font-medium text-gray-900 mb-4">Order Items</h3>
         
-        <OrderItemsList items={orderDetails.items || []} />
+        <OrderItemsList items={validItems} />
         
         <Separator className="my-6" />
         
