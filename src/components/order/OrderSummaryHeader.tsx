@@ -8,6 +8,18 @@ interface OrderSummaryHeaderProps {
 }
 
 const OrderSummaryHeader = ({ orderId, onResendEmail }: OrderSummaryHeaderProps) => {
+  // Handle print action
+  const handlePrint = () => {
+    window.print();
+  };
+  
+  // Handle download receipt
+  const handleDownloadReceipt = () => {
+    // In a real implementation, this would generate a PDF
+    // For now, we just print as a simple fallback
+    window.print();
+  };
+  
   return (
     <div className="p-6 border-b border-gray-100">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -21,11 +33,11 @@ const OrderSummaryHeader = ({ orderId, onResendEmail }: OrderSummaryHeaderProps)
             <Mail className="w-4 h-4" />
             Resend Email
           </Button>
-          <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={() => window.print()}>
+          <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={handlePrint}>
             <Printer className="w-4 h-4" />
             Print
           </Button>
-          <Button variant="outline" size="sm" className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={handleDownloadReceipt}>
             <FileText className="w-4 h-4" />
             Download Receipt
           </Button>

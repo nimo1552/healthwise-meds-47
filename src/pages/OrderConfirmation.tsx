@@ -1,14 +1,15 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useLocation, Link, Navigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { useToast } from '@/hooks/use-toast';
-import { useCart } from '@/contexts/CartContext';
 import { sendOrderConfirmationEmail } from '@/utils/emailService';
-import { CheckCircle, Package, ArrowRight, ShoppingBag } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+
+import OrderConfirmationHeader from '@/components/order/OrderConfirmationHeader';
+import OrderSummary from '@/components/order/OrderSummary';
+import OrderActionButtons from '@/components/order/OrderActionButtons';
 
 interface OrderItem {
   id: number;
@@ -44,11 +45,18 @@ interface OrderDetails {
 const OrderConfirmation = () => {
   const location = useLocation();
   const { toast } = useToast();
-  const { clearCart } = useCart();
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
   const [emailSent, setEmailSent] = useState(false);
+  const initialized = useRef(false);
   
   useEffect(() => {
+    // Only run this once to prevent regenerating the order
+    if (initialized.current) {
+      return;
+    }
+    
+    initialized.current = true;
+    
     // Only process if we have order data in location state
     if (location.state && location.state.orderItems) {
       // Extract all order information from location state
@@ -61,12 +69,12 @@ const OrderConfirmation = () => {
         orderDiscount = 0,
         customerInfo,
         paymentMethod,
-        customerEmail
+        customerEmail,
+        orderId: existingOrderId
       } = location.state;
 
-      // Generate a proper order ID with timestamp
-      const timestamp = new Date().getTime().toString().slice(-6);
-      const orderId = `ORD-${timestamp}`;
+      // Only generate a new order ID if one wasn't already created
+      const orderId = existingOrderId || `ORD-${new Date().getTime().toString().slice(-6)}`;
       
       // Set delivery date to 5-7 days from now
       const currentDate = new Date();
@@ -118,7 +126,7 @@ const OrderConfirmation = () => {
       setOrderDetails(newOrderDetails);
       
       // Send confirmation email if customer email is available
-      if (customerEmail && newOrderDetails.items.length > 0) {
+      if (customerEmail && newOrderDetails.items.length > 0 && !emailSent) {
         sendOrderConfirmationEmail(customerEmail, {
           orderId: newOrderDetails.orderId,
           date: newOrderDetails.date,
@@ -133,19 +141,15 @@ const OrderConfirmation = () => {
           });
         });
       }
-      
-      // Clear cart once everything is processed
-      clearCart();
-      
     } else {
       // Show error toast if no order data
       toast({
         title: "No order data found",
-        description: "Redirecting to products page",
+        description: "Please return to cart and complete your purchase",
         variant: "destructive",
       });
     }
-  }, [location.state, toast, clearCart]);
+  }, [location.state, toast, emailSent]);
 
   // Handle email resend
   const handleResendEmail = () => {
@@ -192,167 +196,18 @@ const OrderConfirmation = () => {
       <main className="flex-grow pt-16 pb-16">
         <div className="max-w-4xl mx-auto px-4">
           {/* Confirmation Header */}
-          <div className="bg-white border border-green-100 rounded-xl p-6 mb-6 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-              <CheckCircle className="w-8 h-8 text-green-600" />
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Order Confirmed!</h1>
-            <p className="text-gray-600 max-w-lg mx-auto">
-              Thank you for your order. We've received your order and will begin processing it right away.
-              {emailSent && location.state.customerEmail && (
-                <span> A confirmation email has been sent to <span className="font-medium">{location.state.customerEmail}</span>.</span>
-              )}
-            </p>
-          </div>
+          {location.state.customerEmail && (
+            <OrderConfirmationHeader customerEmail={location.state.customerEmail} />
+          )}
           
           {/* Order Details Card */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
-            {/* Order ID and Actions Header */}
-            <div className="p-6 border-b border-gray-100">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                <div>
-                  <p className="text-sm text-gray-500 mb-1">Order Number</p>
-                  <h2 className="text-xl font-bold text-gray-900">{orderDetails.orderId}</h2>
-                </div>
-                
-                <div className="mt-4 md:mt-0 flex flex-wrap gap-3">
-                  {location.state.customerEmail && (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="flex items-center gap-2" 
-                      onClick={handleResendEmail}
-                    >
-                      Resend Email
-                    </Button>
-                  )}
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="flex items-center gap-2"
-                    onClick={() => window.print()}
-                  >
-                    Print Receipt
-                  </Button>
-                </div>
-              </div>
-            </div>
-            
-            {/* Order Info Section */}
-            <div className="p-6 bg-gray-50 border-b border-gray-100">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <p className="text-sm text-gray-500 mb-1">Order Date</p>
-                  <p className="font-medium">{orderDetails.date}</p>
-                </div>
-                
-                <div>
-                  <p className="text-sm text-gray-500 mb-1">Estimated Delivery</p>
-                  <div className="flex items-center">
-                    <Package className="w-4 h-4 text-gray-400 mr-2" />
-                    <p className="font-medium">{orderDetails.estimatedDelivery}</p>
-                  </div>
-                </div>
-                
-                <div>
-                  <p className="text-sm text-gray-500 mb-1">Payment Method</p>
-                  <p className="font-medium">{orderDetails.paymentMethod}</p>
-                </div>
-              </div>
-            </div>
-            
-            {/* Order Items */}
-            <div className="p-6 border-b border-gray-100">
-              <h3 className="font-medium text-gray-900 mb-4">Order Items</h3>
-              
-              <div className="space-y-4">
-                {orderDetails.items.map((item) => (
-                  <div key={item.id} className="flex items-start py-3">
-                    <div className="w-16 h-16 rounded bg-gray-100 overflow-hidden flex-shrink-0">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = "/placeholder.svg";
-                        }}
-                      />
-                    </div>
-                    
-                    <div className="ml-4 flex-grow">
-                      <div className="flex justify-between">
-                        <h4 className="font-medium text-gray-900">{item.name}</h4>
-                        <p className="font-medium text-gray-900">${(item.price || 0).toFixed(2)}</p>
-                      </div>
-                      <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              <Separator className="my-6" />
-              
-              {/* Order Price Summary */}
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span className="font-medium">${orderDetails.subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Shipping</span>
-                  <span className="font-medium">
-                    {orderDetails.shipping === 0 ? "Free" : `$${orderDetails.shipping.toFixed(2)}`}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Tax</span>
-                  <span className="font-medium">${orderDetails.tax.toFixed(2)}</span>
-                </div>
-                {orderDetails.discount > 0 && (
-                  <div className="flex justify-between text-sm text-green-600">
-                    <span>Discount</span>
-                    <span>-${orderDetails.discount.toFixed(2)}</span>
-                  </div>
-                )}
-                <Separator className="my-2" />
-                <div className="flex justify-between">
-                  <span className="font-medium text-gray-900">Total</span>
-                  <span className="font-bold text-gray-900">${orderDetails.total.toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
-            
-            {/* Shipping Address */}
-            <div className="p-6">
-              <h3 className="font-medium text-gray-900 mb-3">Shipping Address</h3>
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="font-medium">{orderDetails.shippingAddress.name}</p>
-                <p className="text-gray-600">{orderDetails.shippingAddress.street}</p>
-                <p className="text-gray-600">
-                  {orderDetails.shippingAddress.city}, {orderDetails.shippingAddress.state} {orderDetails.shippingAddress.zipCode}
-                </p>
-                <p className="text-gray-600">{orderDetails.shippingAddress.country}</p>
-              </div>
-            </div>
-          </div>
+          <OrderSummary 
+            orderDetails={orderDetails}
+            onResendEmail={handleResendEmail}
+          />
           
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-            <Button asChild variant="outline" className="flex-1 text-base">
-              <Link to="/products">
-                Continue Shopping
-                <ShoppingBag className="w-4 h-4 ml-2" />
-              </Link>
-            </Button>
-            
-            <Button asChild className="flex-1 bg-blue-600 hover:bg-blue-700 text-base">
-              <Link to="/order-tracking">
-                Track Order
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Link>
-            </Button>
-          </div>
+          <OrderActionButtons />
         </div>
       </main>
       

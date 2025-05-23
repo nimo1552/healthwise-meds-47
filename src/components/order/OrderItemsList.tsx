@@ -12,12 +12,13 @@ interface OrderItemsListProps {
 }
 
 const OrderItemsList = ({ items }: OrderItemsListProps) => {
-  console.log("Rendering OrderItemsList with items:", items);
+  // Ensure items is always an array
+  const validItems = Array.isArray(items) ? items : [];
   
   return (
     <div className="space-y-4">
-      {Array.isArray(items) && items.length > 0 ? (
-        items.map((item) => (
+      {validItems.length > 0 ? (
+        validItems.map((item) => (
           <div key={item.id || Math.random()} className="flex items-start py-3">
             <div className="w-16 h-16 rounded bg-gray-100 overflow-hidden flex-shrink-0">
               <img
