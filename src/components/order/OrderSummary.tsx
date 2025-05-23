@@ -42,6 +42,8 @@ interface OrderSummaryProps {
 }
 
 const OrderSummary = ({ orderDetails, onResendEmail }: OrderSummaryProps) => {
+  console.log("Rendering OrderSummary with details:", orderDetails);
+  
   return (
     <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden mb-8">
       <OrderSummaryHeader 
@@ -58,16 +60,16 @@ const OrderSummary = ({ orderDetails, onResendEmail }: OrderSummaryProps) => {
       <div className="p-6 border-b border-gray-100">
         <h3 className="font-medium text-gray-900 mb-4">Order Items</h3>
         
-        <OrderItemsList items={orderDetails.items} />
+        <OrderItemsList items={orderDetails.items || []} />
         
         <Separator className="my-6" />
         
         <OrderPriceSummary
-          subtotal={orderDetails.subtotal}
-          shipping={orderDetails.shipping}
-          tax={orderDetails.tax}
-          discount={orderDetails.discount}
-          total={orderDetails.total}
+          subtotal={orderDetails.subtotal || 0}
+          shipping={orderDetails.shipping || 0}
+          tax={orderDetails.tax || 0}
+          discount={orderDetails.discount || 0}
+          total={orderDetails.total || 0}
         />
       </div>
       

@@ -52,11 +52,15 @@ const OrderConfirmation = () => {
     // Clear the cart once the order is confirmed
     clearCart();
     
+    // Generate an order ID
     const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
     
+    // Set delivery date to 3 days from now
     const currentDate = new Date();
     const deliveryDate = new Date(currentDate);
     deliveryDate.setDate(deliveryDate.getDate() + 3);
+    
+    console.log("Location state:", location.state);
     
     if (location.state && location.state.orderItems) {
       const { 
@@ -65,20 +69,23 @@ const OrderConfirmation = () => {
         orderSubtotal, 
         orderShipping, 
         orderTax, 
-        orderDiscount = 0 
+        orderDiscount = 0,
+        customerInfo
       } = location.state;
+      
+      console.log("Order items received:", orderItems);
       
       const newOrderDetails: OrderDetails = {
         orderId,
         date: currentDate.toLocaleDateString(),
-        total: orderTotal,
-        subtotal: orderSubtotal,
-        shipping: orderShipping,
-        tax: orderTax,
-        discount: orderDiscount,
+        total: orderTotal || 0,
+        subtotal: orderSubtotal || 0,
+        shipping: orderShipping || 0,
+        tax: orderTax || 0,
+        discount: orderDiscount || 0,
         paymentMethod: "Credit Card (ending in 4242)",
-        items: orderItems,
-        shippingAddress: {
+        items: Array.isArray(orderItems) ? orderItems : [],
+        shippingAddress: customerInfo || {
           name: "Jane Doe",
           street: "123 Main St",
           city: "Anytown",
@@ -89,6 +96,7 @@ const OrderConfirmation = () => {
         estimatedDelivery: deliveryDate.toLocaleDateString()
       };
       
+      console.log("Setting order details:", newOrderDetails);
       setOrderDetails(newOrderDetails);
     } else {
       // Redirect to products page if no order data is provided
@@ -101,7 +109,7 @@ const OrderConfirmation = () => {
   }, [location.state, toast, clearCart]);
   
   useEffect(() => {
-    if (orderDetails && !emailSent) {
+    if (orderDetails && !emailSent && orderDetails.items.length > 0) {
       sendOrderConfirmationEmail(customerEmail, {
         orderId: orderDetails.orderId,
         date: orderDetails.date,
