@@ -21,7 +21,7 @@ const OrderSummaryHeader = ({ orderId, onResendEmail }: OrderSummaryHeaderProps)
             <Mail className="w-4 h-4" />
             Resend Email
           </Button>
-          <Button variant="outline" size="sm" className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={() => window.print()}>
             <Printer className="w-4 h-4" />
             Print
           </Button>
