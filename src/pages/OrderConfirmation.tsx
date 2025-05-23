@@ -43,26 +43,24 @@ interface OrderDetails {
 const OrderConfirmation = () => {
   const location = useLocation();
   const { toast } = useToast();
-  const { clearCart } = useCart();
+  const { cartItems, clearCart } = useCart();
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
   const [emailSent, setEmailSent] = useState(false);
   const [customerEmail, setCustomerEmail] = useState('jane.doe@example.com');
   
   useEffect(() => {
-    // Clear the cart once the order is confirmed
-    clearCart();
-    
-    // Generate an order ID
-    const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
-    
-    // Set delivery date to 3 days from now
-    const currentDate = new Date();
-    const deliveryDate = new Date(currentDate);
-    deliveryDate.setDate(deliveryDate.getDate() + 3);
-    
-    console.log("Location state:", location.state);
-    
+    // Check if there's order data before clearing the cart
     if (location.state && location.state.orderItems) {
+      // Generate an order ID
+      const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
+      
+      // Set delivery date to 3 days from now
+      const currentDate = new Date();
+      const deliveryDate = new Date(currentDate);
+      deliveryDate.setDate(deliveryDate.getDate() + 3);
+      
+      console.log("Location state:", location.state);
+      
       const { 
         orderItems, 
         orderTotal, 
@@ -80,6 +78,12 @@ const OrderConfirmation = () => {
         ? (paymentMethod === "Credit Card" ? "Credit Card (ending in 4242)" : paymentMethod)
         : "Credit Card (ending in 4242)";
       
+      // Ensure we have properly formatted order items with images
+      const formattedItems = Array.isArray(orderItems) ? orderItems.map(item => ({
+        ...item,
+        image: item.image || "/placeholder.svg"
+      })) : [];
+      
       const newOrderDetails: OrderDetails = {
         orderId,
         date: currentDate.toLocaleDateString(),
@@ -89,7 +93,7 @@ const OrderConfirmation = () => {
         tax: orderTax || 0,
         discount: orderDiscount || 0,
         paymentMethod: paymentDisplay,
-        items: Array.isArray(orderItems) ? orderItems : [],
+        items: formattedItems,
         shippingAddress: customerInfo || {
           name: "Jane Doe",
           street: "123 Main St",
@@ -103,6 +107,9 @@ const OrderConfirmation = () => {
       
       console.log("Setting order details:", newOrderDetails);
       setOrderDetails(newOrderDetails);
+      
+      // Only clear the cart after setting order details
+      clearCart();
     } else {
       // Redirect to products page if no order data is provided
       toast({

@@ -16,7 +16,7 @@ const OrderSummaryHeader = ({ orderId, onResendEmail }: OrderSummaryHeaderProps)
           <h2 className="text-xl font-bold text-gray-900">{orderId}</h2>
         </div>
         
-        <div className="mt-4 md:mt-0 flex gap-3">
+        <div className="mt-4 md:mt-0 flex flex-wrap gap-3">
           <Button variant="outline" size="sm" className="flex items-center gap-2" onClick={onResendEmail}>
             <Mail className="w-4 h-4" />
             Resend Email
