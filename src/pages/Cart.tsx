@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
@@ -56,9 +55,43 @@ const Cart = () => {
   const handleCheckout = () => {
     setIsCheckingOut(true);
     
+    // Calculate order details
+    const shippingCost = cartTotal >= 50 ? 0 : 5.99;
+    const discount = couponCode.toLowerCase() === 'discount10' ? cartTotal * 0.10 : 0;
+    const taxRate = 0.08; // 8% tax
+    const tax = (cartTotal - discount) * taxRate;
+    const orderTotal = cartTotal + shippingCost + tax - discount;
+    
+    // Prepare order data for the confirmation page
+    const orderData = {
+      orderItems: cartItems.map(item => ({
+        id: item.product.id,
+        name: item.product.name,
+        price: item.product.price,
+        quantity: item.quantity,
+        image: item.product.image
+      })),
+      orderTotal: orderTotal,
+      orderSubtotal: cartTotal,
+      orderShipping: shippingCost,
+      orderTax: tax,
+      orderDiscount: discount,
+      customerInfo: {
+        name: "John Doe", // This would come from user profile/checkout form
+        street: "123 Main Street",
+        city: "Anytown",
+        state: "CA",
+        zipCode: "12345",
+        country: "United States"
+      },
+      paymentMethod: "Credit Card",
+      customerEmail: "customer@example.com" // This would come from user profile
+    };
+    
     setTimeout(() => {
       setIsCheckingOut(false);
-      navigate('/payment');
+      // Navigate to payment page with order data
+      navigate('/payment', { state: orderData });
     }, 800);
   };
   
