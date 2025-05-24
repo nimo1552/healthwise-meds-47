@@ -1,5 +1,4 @@
-
-import { useEffect, useState, useRef, ReactNode } from 'react';
+import React, { useEffect, useState, useRef, ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { sendOrderConfirmationEmail } from '@/utils/emailService';
