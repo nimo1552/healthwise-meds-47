@@ -7,107 +7,102 @@ import { Badge } from '@/components/ui/badge';
 import { FileText, Eye, RefreshCw, Clock, CheckCircle, Truck, Package } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+// Copied from OrderConfirmation.tsx for consistency
 interface OrderItem {
-  id: number;
+  id: number; // Product ID
   name: string;
   price: number;
   quantity: number;
+  image?: string; // Product image
 }
 
-interface Order {
-  id: string;
-  date: string;
-  total: number;
-  status: 'processing' | 'shipped' | 'delivered' | 'cancelled';
+interface ShippingAddress {
+  name: string;
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+}
+
+// Copied and adapted from OrderConfirmation.tsx
+interface OrderDetails {
+  orderId: string;
+  date: string; // Date of order placement
+  total: number; // Grand total
+  paymentMethod: string;
   items: OrderItem[];
-  trackingNumber?: string;
+  shippingAddress: ShippingAddress;
+  estimatedDelivery: string; // Estimated delivery date
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  discount: number;
+  // Note: 'status' and 'trackingNumber' were in the mock,
+  // but not in OrderConfirmation.tsx's OrderDetails.
+  // These can be added later if backend provides them.
 }
 
+const ORDERS_STORAGE_KEY = 'nimocare-orders';
+
+// OrderHistory.tsx
+// This component is responsible for displaying the user's order history.
+// It fetches order data from localStorage, which is populated upon order confirmation.
+// This is a simulation for client-side display as there's no backend.
 const OrderHistory = () => {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<OrderDetails[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Fetches orders from localStorage and updates the component's state.
+  const fetchOrdersFromLocalStorage = () => {
+    setLoading(true);
+    try {
+      const storedOrdersString = localStorage.getItem(ORDERS_STORAGE_KEY);
+      if (storedOrdersString) {
+        const parsedOrders = JSON.parse(storedOrdersString);
+        if (Array.isArray(parsedOrders)) {
+          // Basic validation for each order object to ensure it has key fields
+          const validOrders = parsedOrders.filter(order => 
+            order && typeof order.orderId === 'string' && Array.isArray(order.items)
+          );
+          setOrders(validOrders);
+        } else {
+          console.warn("Stored orders is not an array. Resetting.");
+          setOrders([]);
+        }
+      } else {
+        setOrders([]);
+      }
+    } catch (error) {
+      console.error("Failed to parse orders from localStorage:", error);
+      setOrders([]); // Default to empty array on error
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // Simulate API call to fetch order history
-    const fetchOrders = () => {
-      setTimeout(() => {
-        const mockOrders: Order[] = [
-          {
-            id: 'ORD-123456',
-            date: '2023-10-15',
-            total: 124.95,
-            status: 'delivered',
-            items: [
-              { id: 1, name: 'Acetaminophen 500mg', price: 12.99, quantity: 2 },
-              { id: 2, name: 'Digital Thermometer', price: 24.99, quantity: 1 },
-              { id: 3, name: 'First Aid Kit', price: 34.99, quantity: 1 }
-            ],
-            trackingNumber: 'TRK12345678'
-          },
-          {
-            id: 'ORD-123457',
-            date: '2023-11-02',
-            total: 65.97,
-            status: 'shipped',
-            items: [
-              { id: 4, name: 'Vitamin D3 50mcg', price: 15.99, quantity: 1 },
-              { id: 5, name: 'Blood Pressure Monitor', price: 49.98, quantity: 1 }
-            ],
-            trackingNumber: 'TRK23456789'
-          },
-          {
-            id: 'ORD-123458',
-            date: '2023-11-20',
-            total: 42.98,
-            status: 'processing',
-            items: [
-              { id: 6, name: 'Ibuprofen 200mg', price: 8.99, quantity: 2 },
-              { id: 7, name: 'Heating Pad', price: 24.99, quantity: 1 }
-            ]
-          }
-        ];
-        
-        setOrders(mockOrders);
-        setLoading(false);
-      }, 1000);
-    };
-    
-    fetchOrders();
+    fetchOrdersFromLocalStorage();
   }, []);
-
-  const getStatusIcon = (status: Order['status']) => {
-    switch (status) {
-      case 'processing':
-        return <Clock className="h-4 w-4 text-yellow-500" />;
-      case 'shipped':
-        return <Truck className="h-4 w-4 text-blue-500" />;
-      case 'delivered':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'cancelled':
-        return <Package className="h-4 w-4 text-red-500" />;
-      default:
-        return <Clock className="h-4 w-4" />;
-    }
-  };
-
-  const getStatusBadge = (status: Order['status']) => {
-    switch (status) {
-      case 'processing':
-        return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">Processing</Badge>;
-      case 'shipped':
-        return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Shipped</Badge>;
-      case 'delivered':
-        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Delivered</Badge>;
-      case 'cancelled':
-        return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Cancelled</Badge>;
-      default:
-        return <Badge variant="outline">Unknown</Badge>;
-    }
-  };
-
+  
+  // The formatDate function from original file is good.
   const formatDate = (dateString: string) => {
+    // Check if dateString is already in "Month Day, Year" format from OrderConfirmation
+    if (/\w+ \d{1,2}, \d{4}/.test(dateString)) {
+        return dateString; // Already formatted
+    }
+    // Otherwise, assume it's an ISO string or needs formatting
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+    try {
+        return new Date(dateString).toLocaleDateString(undefined, options);
+    } catch (e) {
+        console.warn("Could not parse date:", dateString, e);
+        return dateString; // return original if parsing fails
+    }
+  };
+
+  const handleViewDetails = (order: OrderDetails) => {
+    alert(JSON.stringify(order, null, 2));
   };
 
   if (loading) {
@@ -129,8 +124,10 @@ const OrderHistory = () => {
           <h2 className="text-2xl font-bold">Order History</h2>
           <p className="text-gray-600">View and manage your previous orders</p>
         </div>
-        <Button variant="outline" className="flex items-center gap-2">
-          <RefreshCw className="h-4 w-4" /> Refresh
+        {/* Keep Refresh button, but make it functional */}
+        <Button variant="outline" className="flex items-center gap-2" onClick={fetchOrdersFromLocalStorage} disabled={loading}>
+          {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />} 
+          Refresh
         </Button>
       </div>
       
@@ -146,70 +143,70 @@ const OrderHistory = () => {
       ) : (
         <div className="space-y-4">
           {orders.map((order) => (
-            <Card key={order.id} className="overflow-hidden">
+            <Card key={order.orderId} className="overflow-hidden">
               <div className="bg-gray-50 px-4 py-3 border-b">
-                <div className="flex flex-wrap justify-between gap-2">
+                <div className="flex flex-wrap justify-between items-center gap-2">
                   <div className="flex items-center gap-2">
-                    <p className="font-medium text-sm">Order #{order.id}</p>
+                    <p className="font-medium text-sm">Order #{order.orderId}</p>
                     <Separator orientation="vertical" className="h-4" />
-                    <p className="text-sm text-gray-600">{formatDate(order.date)}</p>
+                    <p className="text-sm text-gray-600">Placed on: {formatDate(order.date)}</p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {getStatusIcon(order.status)}
-                    {getStatusBadge(order.status)}
-                  </div>
+                  {/* Removed status icon/badge as 'status' is not in OrderDetails from localStorage */}
+                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                    Estimated Delivery: {formatDate(order.estimatedDelivery)}
+                  </Badge>
                 </div>
               </div>
               
               <CardContent className="p-4">
-                <div className="space-y-4">
-                  {order.items.map((item) => (
-                    <div key={item.id} className="flex justify-between items-center">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {order.items.slice(0, 3).map((item) => ( // Show first 3 items as preview
+                    <div key={item.id} className="flex items-center gap-2">
+                      <img 
+                        src={item.image || '/placeholder.svg'} 
+                        alt={item.name} 
+                        className="w-10 h-10 object-cover rounded" 
+                      />
                       <div>
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
+                        <p className="text-xs font-medium truncate w-32" title={item.name}>{item.name}</p>
+                        <p className="text-xs text-gray-600">Qty: {item.quantity}</p>
                       </div>
-                      <p>${item.price.toFixed(2)}</p>
+                      <p className="text-xs ml-auto">${item.price.toFixed(2)}</p>
                     </div>
                   ))}
+                  {order.items.length > 3 && (
+                    <div className="flex items-center justify-center text-xs text-gray-500">
+                      + {order.items.length - 3} more items
+                    </div>
+                  )}
                 </div>
                 
                 <Separator className="my-4" />
                 
-                <div className="flex justify-between">
-                  <p className="font-medium">Total</p>
-                  <p className="font-bold">${order.total.toFixed(2)}</p>
-                </div>
-                
-                {order.trackingNumber && (
-                  <div className="mt-4 text-sm">
-                    <p className="text-gray-600">
-                      Tracking Number: <span className="font-medium">{order.trackingNumber}</span>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-xs text-gray-600">Payment Method: {order.paymentMethod}</p>
+                    <p className="text-xs text-gray-600">
+                      Shipping to: {order.shippingAddress.name}, {order.shippingAddress.city}
                     </p>
                   </div>
-                )}
+                  <div className="text-right">
+                    <p className="text-sm text-gray-600">Subtotal: ${order.subtotal.toFixed(2)}</p>
+                    <p className="text-sm text-gray-600">Shipping: ${order.shipping.toFixed(2)}</p>
+                    {order.discount > 0 && <p className="text-sm text-gray-600">Discount: -${order.discount.toFixed(2)}</p>}
+                    <p className="text-sm text-gray-600">Tax: ${order.tax.toFixed(2)}</p>
+                    <p className="font-bold text-lg">Total: ${order.total.toFixed(2)}</p>
+                  </div>
+                </div>
               </CardContent>
               
-              <CardFooter className="bg-gray-50 border-t px-4 py-3 flex justify-between">
-                <Button variant="outline" size="sm" asChild>
-                  <Link to={`/order-detail/${order.id}`}>
-                    <Eye className="h-4 w-4 mr-2" /> View Details
-                  </Link>
+              <CardFooter className="bg-gray-50 border-t px-4 py-3 flex justify-end">
+                <Button variant="outline" size="sm" onClick={() => handleViewDetails(order)}>
+                  <Eye className="h-4 w-4 mr-2" /> View Full Details
                 </Button>
-                
-                {order.status === 'delivered' && (
-                  <Button variant="outline" size="sm">
-                    Buy Again
-                  </Button>
-                )}
-                
-                {order.status === 'shipped' && (
-                  <Button variant="outline" size="sm" asChild>
-                    <Link to={`/order-tracking?id=${order.id}`}>
-                      Track Order
-                    </Link>
-                  </Button>
-                )}
+                {/* Removed status-dependent buttons like "Buy Again" or "Track Order" 
+                    as status is not part of OrderDetails from localStorage for now.
+                    These can be added back if status becomes available. */}
               </CardFooter>
             </Card>
           ))}

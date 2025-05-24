@@ -9,12 +9,14 @@ import {
   ChevronRight, 
   TruckIcon, 
   ShieldCheck, 
-  Clock
+  Clock,
+  Info // Added Info icon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { useCart } from '@/contexts/CartContext';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Added Alert components
 
 const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, clearCart, cartTotal } = useCart();
@@ -206,6 +208,18 @@ const Cart = () => {
               {/* Order Summary */}
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden p-6">
+                  
+                  {/* Prescription Item Alert */}
+                  {cartItems.some(item => item.product.isPrescriptionRequired) && (
+                    <Alert className="mb-6 border-blue-200 bg-blue-50 text-blue-700 [&>svg]:text-blue-700">
+                      <Info className="h-4 w-4" />
+                      <AlertTitle className="font-bold text-blue-800">Prescription Item(s) in Cart</AlertTitle>
+                      <AlertDescription className="text-blue-700">
+                        Our pharmacy team will verify your prescription after checkout. If you've uploaded one, we'll match it. Otherwise, we may contact you or your doctor.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  
                   <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
                   
                   <div className="space-y-3 text-sm">

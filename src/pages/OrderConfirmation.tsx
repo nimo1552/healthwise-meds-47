@@ -10,6 +10,8 @@ import { Separator } from '@/components/ui/separator';
 import OrderConfirmationHeader from '@/components/order/OrderConfirmationHeader';
 import OrderSummary from '@/components/order/OrderSummary';
 import OrderActionButtons from '@/components/order/OrderActionButtons';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Added Alert
+import { Info } from 'lucide-react'; // Added Info icon
 
 interface OrderItem {
   id: number;
@@ -17,6 +19,7 @@ interface OrderItem {
   price: number;
   quantity: number;
   image?: string;
+  isPrescriptionRequired?: boolean; // Added to check for Rx items
 }
 
 interface ShippingAddress {
@@ -41,6 +44,8 @@ interface OrderDetails {
   tax: number;
   discount: number;
 }
+
+const ORDERS_STORAGE_KEY = 'nimocare-orders';
 
 const OrderConfirmation = () => {
   const location = useLocation();
@@ -124,6 +129,55 @@ const OrderConfirmation = () => {
       
       // Save the order details
       setOrderDetails(newOrderDetails);
+
+      // Save order to localStorage.
+      // This is for simulation purposes to enable features like "Order History" 
+      // in customer/seller dashboards without a backend.
+      // In a real application, order data would be persisted on a server.
+      try {
+        const existingOrdersString = localStorage.getItem(ORDERS_STORAGE_KEY);
+        let existingOrders: OrderDetails[] = [];
+        if (existingOrdersString) {
+          try {
+            const parsedOrders = JSON.parse(existingOrdersString);
+            if (Array.isArray(parsedOrders)) {
+              existingOrders = parsedOrders;
+            } else {
+              console.warn("Corrupted order data in localStorage, resetting.");
+              existingOrders = [];
+            }
+          } catch (e) {
+            console.error("Failed to parse orders from localStorage:", e);
+            existingOrders = []; // Reset if parsing fails
+          }
+        }
+        
+        // Check if this order ID already exists to prevent duplicates from quick reloads/navigation
+        const orderExists = existingOrders.some(order => order.orderId === newOrderDetails.orderId);
+
+        if (!orderExists) {
+          const updatedOrders = [...existingOrders, newOrderDetails];
+          localStorage.setItem(ORDERS_STORAGE_KEY, JSON.stringify(updatedOrders));
+          toast({
+            title: "Order Saved",
+            description: "Your order details have been saved locally.",
+            duration: 3000, // Short duration toast
+          });
+        } else {
+           // This case might happen if the user navigates back and forth quickly
+           // or if state was somehow lost and useEffect ran again with same orderId.
+           // For now, we just log it, as initialized.current should mostly prevent this.
+          console.log("Order already exists in localStorage, not saving again:", newOrderDetails.orderId);
+        }
+
+      } catch (error) {
+        console.error("Failed to save order to localStorage:", error);
+        toast({
+          title: "Storage Error",
+          description: "Could not save order details locally. This won't affect your order processing.",
+          variant: "destructive",
+        });
+      }
       
       // Send confirmation email if customer email is available
       if (customerEmail && newOrderDetails.items.length > 0 && !emailSent) {
@@ -198,6 +252,17 @@ const OrderConfirmation = () => {
           {/* Confirmation Header */}
           {location.state.customerEmail && (
             <OrderConfirmationHeader customerEmail={location.state.customerEmail} />
+          )}
+
+          {/* Prescription Item Alert */}
+          {orderDetails.items.some(item => item.isPrescriptionRequired) && (
+            <Alert className="mb-6 border-blue-200 bg-blue-50 text-blue-700 [&>svg]:text-blue-700">
+              <Info className="h-4 w-4" />
+              <AlertTitle className="font-bold text-blue-800">Prescription Item(s) Confirmed</AlertTitle>
+              <AlertDescription className="text-blue-700">
+                Your order includes prescription medication. Our pharmacy team will verify your prescription. If you've uploaded one, we'll match it. Otherwise, we may contact you or your doctor. This process typically takes 1-2 business days.
+              </AlertDescription>
+            </Alert>
           )}
           
           {/* Order Details Card */}

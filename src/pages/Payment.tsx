@@ -18,11 +18,13 @@ import {
   ArrowRight, 
   Loader2,
   Bitcoin,
-  DollarSign
+  DollarSign,
+  Info // Added Info icon
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"; // Added Alert components
 
 const creditCardSchema = z.object({
   cardNumber: z.string()
@@ -60,6 +62,8 @@ const Payment = () => {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [activePaymentMethod, setActivePaymentMethod] = useState("card");
   
+  // Retrieve order details from location state, with fallback mock data if not provided.
+  // In a real app, this data would typically be fetched securely or passed via a robust state management solution.
   const orderDetails = location.state?.orderDetails || {
     subtotal: 89.97,
     shipping: 0,
@@ -143,18 +147,22 @@ const Payment = () => {
   const handlePaymentSubmit = (data: any) => {
     setIsProcessing(true);
     
-    console.log(`Payment data (${activePaymentMethod}):`, data);
+    // Log payment data for debugging (remove in production)
+    console.log(`Simulating payment processing for ${activePaymentMethod} with data:`, data);
     
+    // Simulate payment processing delay.
+    // In a real application, this would involve API calls to a payment gateway (e.g., Stripe, PayPal).
+    // The response from the payment gateway would determine success or failure.
     setTimeout(() => {
       setIsProcessing(false);
-      setShowSuccessDialog(true);
+      setShowSuccessDialog(true); // Show success dialog on mock success
       
       toast({
-        title: "Payment Successful",
-        description: `Your payment using ${getPaymentMethodName(activePaymentMethod)} was successful`,
+        title: "Payment Successful (Simulated)",
+        description: `Your payment using ${getPaymentMethodName(activePaymentMethod)} was successful.`,
         variant: "default",
       });
-    }, 2000);
+    }, 2000); // Simulate 2 seconds processing time
   };
   
   const getPaymentMethodName = (method: string) => {
@@ -546,11 +554,23 @@ const Payment = () => {
                 </div>
                 
                 <div className="p-6">
+                  {/* Prescription Item Alert */}
+                  {orderDetails.items && orderDetails.items.some((item: any) => item.isPrescriptionRequired) && (
+                    <Alert className="mb-4 border-blue-200 bg-blue-50 text-blue-700 [&>svg]:text-blue-700">
+                      <Info className="h-4 w-4" />
+                      <AlertTitle className="font-bold text-blue-800">Prescription Verification</AlertTitle>
+                      <AlertDescription className="text-blue-700">
+                        Reminder: Your order includes prescription medication. Our team will handle prescription verification after your payment is complete.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
                   <div className="space-y-4 mb-6">
                     {orderDetails.items.map((item: any) => (
                       <div key={item.id} className="flex justify-between text-sm">
                         <span className="text-gray-600">
                           {item.name} x {item.quantity}
+                          {item.isPrescriptionRequired && <span className="text-blue-500 ml-1">(Rx)</span>}
                         </span>
                         <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
                       </div>

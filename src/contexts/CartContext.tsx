@@ -1,4 +1,7 @@
 
+// CartContext.tsx
+// This context manages the shopping cart data client-side using localStorage.
+// It allows adding, updating, removing items, and clearing the cart.
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { toast } from 'sonner';
 import { Product } from './ProductContext';
@@ -22,22 +25,29 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false); // State to track if initial load from localStorage is done
 
-  // Load cart from localStorage on mount
+  // useEffect hook to load cart items from localStorage on initial component mount.
   useEffect(() => {
     const storedCart = localStorage.getItem('nimocare-cart');
     if (storedCart) {
       try {
-        setCartItems(JSON.parse(storedCart));
+        const parsedCart = JSON.parse(storedCart);
+        if (Array.isArray(parsedCart)) {
+          setCartItems(parsedCart);
+        }
+        // If not an array or parsing fails, it will default to initial empty state.
       } catch (error) {
-        console.error('Error parsing cart data:', error);
+        console.error('Error parsing cart data from localStorage:', error);
+        // setCartItems([]); // Optionally reset, though default empty state already handles this.
       }
     }
-    setIsInitialized(true);
+    setIsInitialized(true); // Mark as initialized after attempting to load
   }, []);
 
-  // Save cart to localStorage whenever it changes
+  // useEffect hook to save cart items to localStorage whenever the cartItems state changes.
+  // This ensures cart persistence across browser sessions.
+  // It only runs after the initial load is complete (isInitialized is true).
   useEffect(() => {
     if (isInitialized) {
       localStorage.setItem('nimocare-cart', JSON.stringify(cartItems));

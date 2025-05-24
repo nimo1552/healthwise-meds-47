@@ -1,6 +1,9 @@
 
-// Mock email service since we don't have a backend
-// In a real application, this would connect to a backend API
+// utils/emailService.ts
+// This is a MOCK email service. It simulates sending emails by logging to the console.
+// In a real-world application, this module would integrate with a backend email service
+// (e.g., SendGrid, Mailgun, AWS SES) or an SMTP server to dispatch actual emails.
+// The current implementation is for frontend demonstration and development purposes ONLY.
 
 export interface EmailDetails {
   to: string;
@@ -8,16 +11,29 @@ export interface EmailDetails {
   body: string;
 }
 
+/**
+ * Simulates sending an email.
+ * @param details - The email details (to, subject, body).
+ * @returns A promise that resolves to true after a simulated delay.
+ */
 export const sendEmail = (details: EmailDetails): Promise<boolean> => {
   return new Promise((resolve) => {
-    // Simulate API call delay
+    // Simulate API call delay to mimic real-world network latency.
     setTimeout(() => {
-      console.log('Email sent:', details);
+      console.log('Mock Email Service: Email sent:', details);
+      // In a real service, this would return success/failure based on the API response.
       resolve(true);
     }, 800);
   });
 };
 
+/**
+ * Simulates sending an order confirmation email.
+ * Constructs an HTML email body with order details and uses the mock sendEmail function.
+ * @param email - The recipient's email address.
+ * @param orderDetails - The details of the order to include in the email.
+ * @returns A promise that resolves to true if the email was "sent" successfully.
+ */
 export const sendOrderConfirmationEmail = async (
   email: string,
   orderDetails: {

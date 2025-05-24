@@ -1,4 +1,7 @@
 
+// ProductContext.tsx
+// This context manages product data client-side using localStorage for simulation purposes.
+// In a real application, this would typically interact with a backend API.
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { toast } from 'sonner';
 
@@ -37,33 +40,48 @@ export const ProductProvider = ({ children }: { children: ReactNode }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // useEffect hook to load products from localStorage on initial component mount.
   useEffect(() => {
     // Load from localStorage if available, otherwise use empty array
     const storedProducts = localStorage.getItem('pharmacy-products');
     if (storedProducts) {
-      setProducts(JSON.parse(storedProducts));
+      try {
+        const parsedProducts = JSON.parse(storedProducts);
+        if (Array.isArray(parsedProducts)) {
+          setProducts(parsedProducts);
+        } else {
+          // Handle cases where localStorage might contain non-array data under this key
+          console.warn("Products data from localStorage was not an array, initializing as empty.");
+          setProducts([]);
+        }
+      } catch (error) {
+        console.error("Failed to parse products from localStorage:", error);
+        setProducts([]); // Initialize with empty array on parsing error
+      }
     } else {
-      // Initialize with empty array
+      // Initialize with empty array if no data in localStorage
       setProducts([]);
     }
     setLoading(false);
   }, []);
 
-  // Save to localStorage whenever products change
+  // useEffect hook to save products to localStorage whenever the products state changes.
+  // This ensures data persistence across sessions on the client-side.
   useEffect(() => {
-    if (!loading) {
+    if (!loading) { // Avoid saving during initial load before products are settled
       localStorage.setItem('pharmacy-products', JSON.stringify(products));
-      console.log('Products saved to localStorage:', products.length);
+      // console.log('Products saved to localStorage:', products.length); // Useful for debugging
     }
   }, [products, loading]);
 
   const addProduct = (product: Omit<Product, 'id' | 'createdAt'>) => {
-    // Generate a new ID (in a real app, this would come from the backend)
+    // Client-side ID generation: In a real application, the backend would generate IDs.
+    // This approach is for simulation and simplicity.
     const newId = products.length > 0 
       ? Math.max(...products.map(p => p.id)) + 1 
       : 1;
     
-    // Add timestamp
+    // Client-side timestamp generation
     const createdAt = new Date().toISOString();
     
     const newProduct = { ...product, id: newId, createdAt };

@@ -3,9 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, Heart, Star, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { ShoppingCart, Heart, Star, ShieldCheck, ArrowLeft, Info } from 'lucide-react'; // Added Info
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"; // Added HoverCard
 import { useProducts } from '@/contexts/ProductContext';
 import { useCart } from '@/contexts/CartContext';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
@@ -128,22 +129,40 @@ const ProductDetail = () => {
                 )}
                 
                 {product.isPrescriptionRequired && (
-                  <span className="ml-auto px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                    Prescription Required
-                  </span>
+                  <HoverCard>
+                    <HoverCardTrigger asChild>
+                      <span className="ml-auto px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium flex items-center cursor-pointer">
+                        Prescription Required <Info className="w-4 h-4 ml-1" />
+                      </span>
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-80">
+                      <p className="text-sm">
+                        A valid prescription is required for this item. Our pharmacy team will verify your prescription after you place an order. You can also upload your prescription via your dashboard or by visiting the 'Prescription Upload' page.
+                      </p>
+                    </HoverCardContent>
+                  </HoverCard>
                 )}
               </div>
               
               <p className="text-gray-600 mb-6">{product.description}</p>
               
               <div className="mb-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-3">Available Stock</h3>
-                <div className="px-4 py-3 bg-green-50 border border-green-200 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <span className="text-green-800 font-medium">{product.stock ? product.stock : "In Stock"}</span>
-                    <ShieldCheck className="text-green-700" size={20} />
+                <h3 className="text-lg font-medium text-gray-900 mb-3">Availability</h3>
+                {product.stock && product.stock > 0 ? (
+                  <div className="px-4 py-3 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-green-800 font-medium">In Stock ({product.stock} available)</span>
+                      <ShieldCheck className="text-green-700" size={20} />
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-red-800 font-medium">Out of Stock</span>
+                      <ShieldCheck className="text-red-700" size={20} /> {/* Or a different icon like AlertTriangle */}
+                    </div>
+                  </div>
+                )}
               </div>
               
               <div className="mb-6">

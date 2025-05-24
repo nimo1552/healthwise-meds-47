@@ -62,9 +62,10 @@ const Products = () => {
   
   // Filter and sort products
   const filteredProducts = products.filter(product => {
-    const matchesSearch = searchQuery === "" || 
-                          product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          product.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const trimmedSearchQuery = searchQuery.trim().toLowerCase();
+    const matchesSearch = trimmedSearchQuery === "" || 
+                          product.name.toLowerCase().includes(trimmedSearchQuery) || 
+                          product.description.toLowerCase().includes(trimmedSearchQuery);
     const matchesCategory = selectedCategory === "All Categories" || product.category === selectedCategory;
     const matchesPrescription = !showPrescriptionOnly || product.isPrescriptionRequired;
     const matchesPriceRange = product.price >= priceRange[0] && product.price <= priceRange[1];
@@ -144,15 +145,25 @@ const Products = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               {/* Search Bar */}
               <form onSubmit={handleSearch} className="relative max-w-md w-full">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={handleSearchFocus}
                   placeholder="Search products..."
-                  className="w-full py-2 pl-10 pr-4 border border-gray-200 rounded-lg focus:outline-none focus:border-nimocare-400 transition-colors"
+                  className="w-full py-2 pl-10 pr-10 border border-gray-200 rounded-lg focus:outline-none focus:border-nimocare-400 transition-colors" // Added pr-10 for X button
                 />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    aria-label="Clear search"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
                 
                 {/* Search recommendations */}
                 <div className="absolute mt-1 w-full z-20">
@@ -331,11 +342,14 @@ const Products = () => {
                   transition={{ duration: 0.5, delay: 0.2 }}
                   className="text-gray-600 mb-4"
                 >
-                  We couldn't find any products matching your criteria.
+                  We couldn't find any products matching your current filters or search query.
                 </motion.p>
-                <Link to="/seller" className="inline-block px-4 py-2 bg-nimocare-600 text-white rounded-md hover:bg-nimocare-700 transition-colors">
-                  Add Products
-                </Link>
+                <button 
+                  onClick={handleClearFilters} 
+                  className="inline-block px-4 py-2 bg-nimocare-600 text-white rounded-md hover:bg-nimocare-700 transition-colors"
+                >
+                  Clear Filters / Reset Search
+                </button>
               </div>
             )}
           </div>

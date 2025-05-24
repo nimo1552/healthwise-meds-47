@@ -173,7 +173,12 @@ const PrescriptionUpload = () => {
       });
     }, 300);
     
-    // Simulate upload process
+    // Simulate upload process.
+    // In a real application, this would involve:
+    // 1. Securely uploading the file(s) to a backend server or a cloud storage service (e.g., AWS S3, Firebase Storage).
+    // 2. Storing metadata about the uploaded prescription (e.g., user ID, file path, upload date) in a database.
+    // 3. Triggering a notification or workflow for pharmacists to review the uploaded prescription.
+    // The current implementation only logs to console and updates UI state for demonstration.
     setTimeout(() => {
       clearInterval(interval);
       setUploadProgress(100);
@@ -181,7 +186,7 @@ const PrescriptionUpload = () => {
       toast.success("Prescription uploaded successfully!");
       
       // In a real app, you would handle the actual file upload here
-      console.log('Files to upload:', files);
+      console.log('Simulated file upload - Files to upload:', files);
     }, 3000);
   };
   
@@ -205,6 +210,9 @@ const PrescriptionUpload = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
               {/* Main Content */}
               <div className="lg:col-span-2">
+                {/* Informational section about prescription verification. */}
+                {/* The steps described (e.g., pharmacist verification) are illustrative of a real-world process */}
+                {/* and are NOT functionally implemented in this client-side simulation. */}
                 {showPrescriptionInfo ? (
                   <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
                     <div className="p-6 border-b border-gray-100">
@@ -334,9 +342,9 @@ const PrescriptionUpload = () => {
                           <CheckCircle className="w-10 h-10 text-green-600" />
                         </div>
                         
-                        <h2 className="text-2xl font-bold text-gray-900 mb-3">Prescription Uploaded Successfully</h2>
-                        <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                          Our pharmacists will review your prescription shortly. This will help expedite your order processing.
+                        <h2 className="text-2xl font-bold text-gray-900 mb-3">Document(s) Submitted</h2>
+                        <p className="text-gray-600 mb-8 max-w-lg mx-auto">
+                          Your document(s) have been successfully submitted. If these are for a prescription, our pharmacy team will review them. This may help expedite the processing of any prescription medications in your order. You can now continue shopping or upload additional documents if needed.
                         </p>
                         
                         <div className="flex flex-col sm:flex-row justify-center gap-4">

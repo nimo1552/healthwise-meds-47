@@ -2,10 +2,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ShoppingCart, Heart, Star } from 'lucide-react';
+import { ShoppingCart, Heart, Star, Info } from 'lucide-react'; // Added Info
 import { Button } from './button';
 import { useCart } from '@/contexts/CartContext';
 import { Product } from '@/contexts/ProductContext';
+import { toast } from 'sonner'; // Added for wishlist toast
 
 // Update interface to include createdAt which is required by Product type
 interface ProductCardProps {
@@ -43,7 +44,13 @@ const ProductCard = (props: ProductCardProps) => {
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsWishlist(!isWishlist);
+    const newWishlistState = !isWishlist;
+    setIsWishlist(newWishlistState);
+    if (newWishlistState) {
+      toast.success(`${name} added to wishlist!`);
+    } else {
+      toast.info(`${name} removed from wishlist.`);
+    }
   };
   
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -102,7 +109,8 @@ const ProductCard = (props: ProductCardProps) => {
           <h3 className="font-medium text-gray-900 mb-1 line-clamp-2">{name}</h3>
           
           {isPrescriptionRequired && (
-            <span className="text-xs text-blue-600 bg-blue-50 rounded-full px-2 py-0.5 inline-block mb-2 w-fit">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mb-2 w-fit">
+              <Info className="w-3 h-3 mr-1" />
               Prescription Required
             </span>
           )}

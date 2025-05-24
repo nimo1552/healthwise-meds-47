@@ -64,6 +64,26 @@ This project is built with .
 
 Simply open [Lovable](https://lovable.dev/projects/ea2fa76b-52c1-40eb-86ac-fa2eb4ec1889) and click on Share -> Publish.
 
+## Local Storage Usage
+
+This application utilizes `localStorage` for client-side data persistence to simulate features that would typically rely on a backend database in a production environment. This approach is for demonstration and development convenience.
+
+The following `localStorage` keys are used:
+
+*   **`pharmacy-products`**:
+    *   Stores an array of product objects.
+    *   Each product object contains details such as `id`, `name`, `image`, `price`, `oldPrice`, `discount`, `rating`, `isPrescriptionRequired`, `description`, `category`, `isBestseller`, `stock`, and `createdAt`. (Corresponds to the `Product` interface defined in `src/contexts/ProductContext.tsx`).
+*   **`nimocare-cart`**:
+    *   Stores an array of cart item objects.
+    *   Each cart item object includes the full `product` object (as defined above) and the `quantity` of that product in the cart. (Managed by `src/contexts/CartContext.tsx`).
+*   **`nimocare-orders`**:
+    *   Stores an array of completed order detail objects.
+    *   Each order object includes details like `orderId`, `date`, `total`, `paymentMethod`, an array of `items` (each item being a product with quantity), `shippingAddress`, `estimatedDelivery`, `subtotal`, `shipping`, `tax`, and `discount`. (Corresponds to the `OrderDetails` interface defined in `src/pages/OrderConfirmation.tsx`).
+*   **`vite-react-theme`**:
+    *   Stores the user's selected theme preference for the application (e.g., "light", "dark", "system"). This is typically managed by a theme provider component.
+
+**Note:** In a production application, sensitive data and transactional information (like products, orders, and user-specific cart data) would be managed and stored securely on a backend server and database, not solely in client-side `localStorage`.
+
 ## I want to use a custom domain - is that possible?
 
 We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)

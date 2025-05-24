@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Card, CardContent, CardDescription, CardHeader, CardTitle 
 } from "@/components/ui/card";
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { useProducts } from "@/contexts/ProductContext";
+import { useProducts, Product } from "@/contexts/ProductContext";
 import {
   Select,
   SelectContent,
@@ -31,22 +31,60 @@ const categories = [
   "Baby Care"
 ];
 
-const ProductForm = () => {
-  const { addProduct } = useProducts();
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    oldPrice: '',
-    category: '',
-    image: '',
-    isPrescriptionRequired: false,
-    isBestseller: false,
-    stock: '100'
-  });
+interface ProductFormProps {
+  productToEdit?: Product | null;
+  onFormSubmit?: () => void;
+}
+
+const initialFormData = {
+  name: '',
+  description: '',
+  price: '',
+  oldPrice: '',
+  category: '',
+  image: '',
+  isPrescriptionRequired: false,
+  isBestseller: false,
+  stock: '100'
+};
+
+const ProductForm: React.FC<ProductFormProps> = ({ productToEdit, onFormSubmit }) => {
+  const { addProduct, updateProduct } = useProducts();
+  const [formData, setFormData] = useState(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (productToEdit) {
+      setFormData({
+        name: productToEdit.name,
+        description: productToEdit.description,
+        price: productToEdit.price.toString(),
+        oldPrice: productToEdit.oldPrice?.toString() || '',
+        category: productToEdit.category,
+        image: productToEdit.image,
+        isPrescriptionRequired: productToEdit.isPrescriptionRequired,
+        isBestseller: productToEdit.isBestseller || false,
+        stock: productToEdit.stock?.toString() || '0',
+      });
+      if (productToEdit.image) {
+        setPreviewImage(productToEdit.image);
+      } else {
+        setPreviewImage(null);
+      }
+    } else {
+      resetForm();
+    }
+  }, [productToEdit]);
+
+  const resetForm = () => {
+    setFormData(initialFormData);
+    setPreviewImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // Clear the file input
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -96,68 +134,75 @@ const ProductForm = () => {
     setIsSubmitting(true);
 
     try {
-      // Validation
       if (!formData.name || !formData.description || !formData.price || !formData.category) {
-        throw new Error('Please fill all required fields');
+        toast.error('Please fill all required fields: Name, Description, Price, and Category.');
+        setIsSubmitting(false);
+        return;
       }
 
-      if (!formData.image) {
-        // Default placeholder image
-        formData.image = 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?q=80&w=400&auto=format&fit=crop';
-      }
-
-      // Calculate discount if oldPrice exists
       const price = parseFloat(formData.price);
       const oldPrice = formData.oldPrice ? parseFloat(formData.oldPrice) : null;
       let discount = null;
 
       if (oldPrice && oldPrice > price) {
         discount = Math.round(((oldPrice - price) / oldPrice) * 100);
+      } else if (oldPrice && oldPrice <= price) {
+        toast.warn('Original price should be higher than the current price to calculate a discount.');
       }
+      
+      const finalImage = formData.image || 'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?q=80&w=400&auto=format&fit=crop';
 
-      // Add the product
-      addProduct({
+      const productData = {
         name: formData.name,
         description: formData.description,
         price: price,
         oldPrice: oldPrice,
         discount: discount,
         category: formData.category,
-        image: formData.image,
+        image: finalImage,
         isPrescriptionRequired: formData.isPrescriptionRequired,
         isBestseller: formData.isBestseller,
-        rating: 4.0, // Default rating for new products
-        sellerId: 'current-seller', // In a real app, this would be the actual seller ID
-        stock: parseInt(formData.stock)
-      });
+        stock: parseInt(formData.stock) || 0,
+        // rating and sellerId will be handled by context or backend if not editing
+      };
 
-      // Reset form
-      setFormData({
-        name: '',
-        description: '',
-        price: '',
-        oldPrice: '',
-        category: '',
-        image: '',
-        isPrescriptionRequired: false,
-        isBestseller: false,
-        stock: '100'
-      });
-      setPreviewImage(null);
+      if (productToEdit) {
+        updateProduct({
+          ...productToEdit, // Retain id, createdAt, rating, sellerId from original
+          ...productData,   // Overwrite with form data
+        });
+        toast.success('Product updated successfully');
+      } else {
+        addProduct({
+          ...productData,
+          rating: 4.0, // Default rating for new products
+          sellerId: 'current-seller', // In a real app, this would be the actual seller ID
+        });
+        // addProduct in context already shows a toast
+      }
 
-      toast.success('Product added successfully');
+      resetForm();
+      onFormSubmit?.();
+
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to add product');
+      toast.error(error instanceof Error ? error.message : `Failed to ${productToEdit ? 'update' : 'add'} product`);
     } finally {
       setIsSubmitting(false);
     }
+  };
+  
+  const handleCancel = () => {
+    resetForm();
+    onFormSubmit?.(); // To signal parent to clear editing state
   };
 
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Add New Product</CardTitle>
-        <CardDescription>Enter the details of your new product listing</CardDescription>
+        <CardTitle>{productToEdit ? "Edit Product" : "Add New Product"}</CardTitle>
+        <CardDescription>
+          {productToEdit ? "Update the details of your existing product." : "Enter the details of your new product listing."}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -324,9 +369,18 @@ const ProductForm = () => {
             </div>
           </div>
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Adding..." : "Add Product"}
-          </Button>
+          <div className="flex space-x-2">
+            <Button type="submit" className="flex-grow" disabled={isSubmitting}>
+              {isSubmitting 
+                ? (productToEdit ? "Updating..." : "Adding...") 
+                : (productToEdit ? "Update Product" : "Add Product")}
+            </Button>
+            {productToEdit && (
+              <Button type="button" variant="outline" onClick={handleCancel} disabled={isSubmitting}>
+                Cancel
+              </Button>
+            )}
+          </div>
         </form>
       </CardContent>
     </Card>
