@@ -57,10 +57,32 @@ const Cart = () => {
   
   const handleCheckout = () => {
     setIsCheckingOut(true);
+
+    // Prepare orderDetails to pass to Payment page
+    const orderDetailsForPayment = {
+      items: cartItems.map(item => ({
+        id: item.product.id,
+        name: item.product.name,
+        price: item.product.price,
+        quantity: item.quantity,
+        image: item.product.image,
+        isPrescriptionRequired: item.product.isPrescriptionRequired,
+        // Include other product fields if Payment/OrderConfirmation expects them,
+        // e.g., item.product.description, item.product.category for a richer OrderItem type.
+        // For now, sticking to what was mentioned in the task.
+      })),
+      subtotal: cartTotal,
+      shipping: shippingCost, // Calculated value
+      tax: tax,               // Calculated value
+      discount: discount,         // Calculated value
+      total: orderTotal         // Calculated value
+      // customerInfo could be added here if collected prior to this step
+    };
     
+    // Simulate a short delay for processing, then navigate
     setTimeout(() => {
       setIsCheckingOut(false);
-      navigate('/payment');
+      navigate('/payment', { state: { orderDetails: orderDetailsForPayment } });
     }, 800);
   };
   
