@@ -65,7 +65,8 @@ const Products = () => {
     const trimmedSearchQuery = searchQuery.trim().toLowerCase();
     const matchesSearch = trimmedSearchQuery === "" || 
                           product.name.toLowerCase().includes(trimmedSearchQuery) || 
-                          product.description.toLowerCase().includes(trimmedSearchQuery);
+                          product.description.toLowerCase().includes(trimmedSearchQuery) ||
+                          (product.category && product.category.toLowerCase().includes(trimmedSearchQuery)); // Added category search
     const matchesCategory = selectedCategory === "All Categories" || product.category === selectedCategory;
     const matchesPrescription = !showPrescriptionOnly || product.isPrescriptionRequired;
     const matchesPriceRange = product.price >= priceRange[0] && product.price <= priceRange[1];
