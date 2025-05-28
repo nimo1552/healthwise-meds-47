@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Menu, X, ShoppingCart, Heart, Search, User, ChevronDown, 
   Stethoscope, Package, MapPin, ArrowRight, Store 
@@ -16,6 +16,7 @@ const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const location = useLocation();
+  const navigate = useNavigate();
   const { cartCount } = useCart();
   
   // Close mobile menu when route changes
@@ -36,7 +37,10 @@ const Navbar = () => {
   // Handle search submission
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Searching for:', searchQuery);
+    if (searchQuery.trim()) {
+      const encodedSearchQuery = encodeURIComponent(searchQuery.trim());
+      navigate(`/products?search=${encodedSearchQuery}`);
+    }
     setIsSearchOpen(false);
     setSearchQuery('');
   };
